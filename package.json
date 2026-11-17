@@ -12,6 +12,7 @@
     "url": "https://github.com/anan2620/ReqMate/issues"
   },
   "license": "MIT",
+  "packageManager": "pnpm@12.9.1",
   "scripts": {
     "dev": "pnpm --filter @reqmate/desktop dev",
     "build": "pnpm --filter @reqmate/desktop build",
