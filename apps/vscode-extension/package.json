@@ -2,7 +2,7 @@
   "name": "reqmate-vscode",
   "displayName": "ReqMate",
   "description": "ReqMate integration for VS Code — browse collections, send requests, and run tests",
-  "version": "0.4.6",
+  "version": "1.0.0",
   "publisher": "reqmate",
   "license": "MIT",
   "engines": {

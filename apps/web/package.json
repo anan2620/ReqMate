@@ -1,7 +1,7 @@
 {
   "name": "@reqmate/web",
   "private": true,
-  "version": "0.4.6",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "dev": "rm -rf .next && next dev --turbopack",

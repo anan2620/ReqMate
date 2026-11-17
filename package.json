@@ -1,7 +1,7 @@
 {
   "name": "reqmate",
   "private": true,
-  "version": "0.4.6",
+  "version": "1.0.0",
   "description": "Local-first API development platform",
   "repository": {
     "type": "git",

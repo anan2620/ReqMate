@@ -1,6 +1,6 @@
 [package]
 name = "reqmate"
-version = "0.4.6"
+version = "1.0.0"
 description = "Local-first API development platform"
 authors = ["ReqMate Contributors"]
 edition = "2021"

@@ -3,6 +3,9 @@ import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 import monacoEditorPlugin from "vite-plugin-monaco-editor";
 import path from "path";
+import { createRequire } from "node:module";
+
+const pkg = createRequire(import.meta.url)("./package.json") as { version: string };
 
 const host = process.env.TAURI_DEV_HOST;
 
@@ -19,6 +22,10 @@ export default defineConfig(async () => ({
     alias: {
       "@": path.resolve(__dirname, "./src"),
     },
+  },
+  define: {
+    // Single source for the version shown in the UI (matches tauri.conf.json)
+    __APP_VERSION__: JSON.stringify(pkg.version),
   },
   clearScreen: false,
   server: {
