@@ -112,33 +112,32 @@ export function ProxySidePanel() {
           )}
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center justify-between gap-2">
           {!status.running && (
             <input
               type="text"
               value={port}
               onChange={(e) => setPort(e.target.value)}
               placeholder="8888"
-              className="w-20 rounded bg-[var(--color-surface)] px-2 py-1.5 text-sm text-[var(--color-text-primary)] outline-none focus:ring-1 focus:ring-indigo-500"
+              aria-label="Proxy port"
+              className="h-7 w-[64px] rounded-md bg-[var(--color-surface)] px-2 text-xs text-[var(--color-text-primary)] outline-none transition-colors focus:ring-1 focus:ring-[var(--color-accent)]"
             />
           )}
           <button
             onClick={handleToggle}
             disabled={loading}
-            className={`flex flex-1 items-center justify-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-semibold text-white disabled:opacity-50 ${
-              status.running
-                ? "bg-red-600 hover:bg-red-700"
-                : "bg-indigo-600 hover:bg-indigo-700"
+            className={`flex h-7 shrink-0 items-center justify-center gap-1.5 whitespace-nowrap rounded-md px-2.5 text-xs font-semibold disabled:opacity-50 ${
+              status.running ? "btn-danger" : "btn-accent"
             }`}
           >
             {status.running ? (
               <>
-                <Square className="h-3.5 w-3.5" />
+                <Square className="h-3 w-3 shrink-0" />
                 Stop
               </>
             ) : (
               <>
-                <Play className="h-3.5 w-3.5" />
+                <Play className="h-3 w-3 shrink-0" />
                 Start Proxy
               </>
             )}
@@ -294,14 +293,14 @@ export function ProxyCaptureViewer() {
           {filtered.length}
         </span>
         <div className="flex-1" />
-        <div className="flex items-center gap-1 rounded-lg bg-[var(--color-elevated)] px-2 py-0.5">
-          <Search className="h-3 w-3 text-[var(--color-text-dimmed)]" />
+        <div className="ring-focus flex items-center gap-1 rounded-lg border border-transparent bg-[color-mix(in_srgb,var(--color-text-primary)_5%,transparent)] pl-2 pr-1 py-0.5 transition-colors hover:bg-[color-mix(in_srgb,var(--color-text-primary)_7%,transparent)]">
+          <Search className="h-3.5 w-3.5 shrink-0 text-[var(--color-text-dimmed)]" />
           <input
             type="text"
             value={filter}
             onChange={(e) => setFilter(e.target.value)}
             placeholder="Filter..."
-            className="w-28 bg-transparent text-xs text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none"
+            className="w-28 bg-transparent py-1 text-xs text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none"
           />
         </div>
         <button

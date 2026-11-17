@@ -11,15 +11,26 @@ export function EmptyState({
   action?: React.ReactNode;
 }) {
   return (
-    <div className="flex flex-1 flex-col items-center justify-center gap-3 p-6 text-center animate-fade-in">
-      <div className="text-[var(--color-text-dimmed)]">{icon}</div>
-      <div>
-        <p className="text-sm font-medium text-[var(--color-text-muted)]">{title}</p>
+    <div className="animate-fade-in relative flex flex-1 flex-col items-center justify-center gap-4 p-6 text-center">
+      {/* Soft halo behind the illustration */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute left-1/2 top-1/2 h-56 w-56 -translate-x-1/2 -translate-y-[62%] rounded-full opacity-60 blur-2xl"
+        style={{
+          background:
+            "radial-gradient(circle, color-mix(in srgb, var(--color-accent) 14%, transparent), transparent 70%)",
+        }}
+      />
+      <div className="relative flex h-16 w-16 items-center justify-center rounded-2xl border border-[var(--color-border)] bg-[color-mix(in_srgb,var(--color-card)_85%,var(--color-surface))] text-[var(--color-text-dimmed)] elev-sm">
+        {icon}
+      </div>
+      <div className="relative">
+        <p className="text-[13px] font-medium text-[var(--color-text-secondary)]">{title}</p>
         {description && (
-          <p className="mt-1 text-xs text-[var(--color-text-dimmed)]">{description}</p>
+          <p className="mt-1.5 text-[11.5px] leading-relaxed text-[var(--color-text-dimmed)]">{description}</p>
         )}
       </div>
-      {action && <div className="mt-1">{action}</div>}
+      {action && <div className="relative mt-1">{action}</div>}
     </div>
   );
 }

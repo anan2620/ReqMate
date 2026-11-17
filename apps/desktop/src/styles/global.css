@@ -69,6 +69,33 @@
   --color-accent: #6366f1;
   --color-accent-hover: #4f46e5;
   --color-accent-glow: rgba(99, 102, 241, 0.1);
+
+  /* Derived accent helpers — follow [data-accent] automatically */
+  --color-accent-soft: color-mix(in srgb, var(--color-accent) 12%, transparent);
+  --color-accent-line: color-mix(in srgb, var(--color-accent) 45%, transparent);
+  --color-accent-ring: color-mix(in srgb, var(--color-accent) 28%, transparent);
+
+  /* Elevation — tuned per theme below */
+  --shadow-xs: 0 1px 2px rgba(9, 14, 26, 0.06);
+  --shadow-sm: 0 2px 6px -1px rgba(9, 14, 26, 0.08), 0 1px 2px rgba(9, 14, 26, 0.04);
+  --shadow-md: 0 8px 20px -8px rgba(9, 14, 26, 0.18), 0 2px 6px -2px rgba(9, 14, 26, 0.08);
+  --shadow-lg: 0 24px 48px -16px rgba(9, 14, 26, 0.28), 0 8px 16px -8px rgba(9, 14, 26, 0.12);
+  --shadow-pop: 0 18px 44px -14px rgba(9, 14, 26, 0.34), 0 4px 10px -4px rgba(9, 14, 26, 0.14);
+
+  /* Radius scale */
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 9px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+
+  /* Fonts */
+  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas,
+    "Liberation Mono", monospace;
+
+  /* Motion */
+  --ease-out-soft: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out-soft: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 [data-accent="blue"] {
@@ -118,20 +145,28 @@
    ═══════════════════════════════════════════ */
 
 [data-theme="light"] {
-  --color-bg: #f8f9fc;
-  --color-surface: #f0f1f5;
-  --color-elevated: #e4e6ed;
-  --color-border: #d1d5e0;
-  --color-text-primary: #111827;
-  --color-text-secondary: #374151;
-  --color-text-muted: #6b7280;
-  --color-text-dimmed: #9ca3af;
-  --color-activity-bar: #e8eaf0;
+  --color-bg: #f6f8fc;
+  --color-surface: #f9fafd;
+  --color-elevated: #eff2f8;
+  --color-border: #e8ecf4;
+  --color-border-strong: #d3dce8;
+  --color-text-primary: #0f1726;
+  --color-text-secondary: #3d4a5f;
+  --color-text-muted: #66748b;
+  --color-text-dimmed: #93a0b4;
+  --color-activity-bar: #f3f6fb;
   --color-card: #ffffff;
-  --color-card-hover: #f5f6fa;
-  --color-success: #10b981;
-  --color-warning: #f59e0b;
-  --color-error: #ef4444;
+  --color-card-hover: #f8fafd;
+  --color-success: #0f9d76;
+  --color-warning: #d97706;
+  --color-error: #dc4759;
+  --color-overlay: rgba(15, 23, 38, 0.32);
+
+  --shadow-xs: 0 1px 2px rgba(20, 33, 58, 0.05);
+  --shadow-sm: 0 2px 6px -1px rgba(20, 33, 58, 0.08), 0 1px 2px rgba(20, 33, 58, 0.04);
+  --shadow-md: 0 10px 24px -10px rgba(20, 33, 58, 0.18), 0 2px 6px -2px rgba(20, 33, 58, 0.07);
+  --shadow-lg: 0 28px 56px -20px rgba(20, 33, 58, 0.24), 0 10px 20px -12px rgba(20, 33, 58, 0.1);
+  --shadow-pop: 0 18px 44px -16px rgba(20, 33, 58, 0.24), 0 4px 10px -4px rgba(20, 33, 58, 0.1);
   color-scheme: light;
 }
 
@@ -140,20 +175,28 @@
    ═══════════════════════════════════════════ */
 
 [data-theme="dark"] {
-  --color-bg: #0a0a0b;
-  --color-surface: #141416;
-  --color-elevated: #1c1c1f;
-  --color-border: #2a2a2e;
-  --color-text-primary: #f4f4f5;
-  --color-text-secondary: #c4c4cc;
-  --color-text-muted: #8e8e96;
-  --color-text-dimmed: #6e6e76;
-  --color-activity-bar: #0f0f11;
-  --color-card: #18181b;
-  --color-card-hover: #1f1f23;
-  --color-success: #22c55e;
-  --color-warning: #eab308;
-  --color-error: #ef4444;
+  --color-bg: #070910;
+  --color-surface: #0b0e15;
+  --color-elevated: #1a212c;
+  --color-border: #222a36;
+  --color-border-strong: #303a49;
+  --color-text-primary: #edf1f8;
+  --color-text-secondary: #b6c0d0;
+  --color-text-muted: #8593a7;
+  --color-text-dimmed: #62708a;
+  --color-activity-bar: #080b11;
+  --color-card: #12171f;
+  --color-card-hover: #1e2530;
+  --color-success: #34d399;
+  --color-warning: #fbbf24;
+  --color-error: #f87171;
+  --color-overlay: rgba(4, 6, 10, 0.66);
+
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-sm: 0 2px 8px -2px rgba(0, 0, 0, 0.55), 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 12px 28px -12px rgba(0, 0, 0, 0.7), 0 3px 8px -3px rgba(0, 0, 0, 0.45);
+  --shadow-lg: 0 32px 64px -24px rgba(0, 0, 0, 0.8), 0 12px 24px -14px rgba(0, 0, 0, 0.5);
+  --shadow-pop: 0 20px 48px -16px rgba(0, 0, 0, 0.8), 0 6px 14px -6px rgba(0, 0, 0, 0.5);
   color-scheme: dark;
 }
 
@@ -212,20 +255,132 @@
 
 [data-theme="black"] {
   --color-bg: #000000;
-  --color-surface: #0a0a0a;
-  --color-elevated: #141414;
-  --color-border: #1f1f1f;
-  --color-text-primary: #f4f4f5;
-  --color-text-secondary: #c4c4cc;
-  --color-text-muted: #8e8e96;
-  --color-text-dimmed: #6e6e76;
+  --color-surface: #070809;
+  --color-elevated: #131619;
+  --color-border: #1d2229;
+  --color-border-strong: #2a313a;
+  --color-text-primary: #edf1f8;
+  --color-text-secondary: #b6c0d0;
+  --color-text-muted: #8593a7;
+  --color-text-dimmed: #5d6a80;
   --color-activity-bar: #000000;
-  --color-card: #0a0a0a;
-  --color-card-hover: #141414;
-  --color-success: #22c55e;
-  --color-warning: #eab308;
-  --color-error: #ef4444;
+  --color-card: #0b0d10;
+  --color-card-hover: #15191e;
+  --color-success: #34d399;
+  --color-warning: #fbbf24;
+  --color-error: #f87171;
+  --color-overlay: rgba(0, 0, 0, 0.72);
+
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.6);
+  --shadow-sm: 0 2px 8px -2px rgba(0, 0, 0, 0.7), 0 1px 2px rgba(0, 0, 0, 0.5);
+  --shadow-md: 0 12px 28px -12px rgba(0, 0, 0, 0.85), 0 3px 8px -3px rgba(0, 0, 0, 0.55);
+  --shadow-lg: 0 32px 64px -24px rgba(0, 0, 0, 0.9), 0 12px 24px -14px rgba(0, 0, 0, 0.6);
+  --shadow-pop: 0 20px 48px -16px rgba(0, 0, 0, 0.9), 0 6px 14px -6px rgba(0, 0, 0, 0.6);
   color-scheme: dark;
+}
+
+/* ═══════════════════════════════════════════
+   METHOD / PROTOCOL PILLS
+   Theme-aware so they stay legible in light mode
+   ═══════════════════════════════════════════ */
+
+:root {
+  --m-get: #0f9d76;
+  --m-post: #b45309;
+  --m-put: #1d4ed8;
+  --m-patch: #7c3aed;
+  --m-delete: #dc2626;
+  --m-head: #0e7490;
+  --m-options: #5b6472;
+  --m-gql: #7c3aed;
+  --m-ws: #0e7490;
+  --m-sse: #c2410c;
+  --m-grpc: #0f9d76;
+  --m-mqtt: #9333ea;
+  --m-sio: #db2777;
+}
+
+[data-theme="dark"],
+[data-theme="black"] {
+  --m-get: #34d399;
+  --m-post: #fbbf24;
+  --m-put: #60a5fa;
+  --m-patch: #c084fc;
+  --m-delete: #f87171;
+  --m-head: #22d3ee;
+  --m-options: #a1a1aa;
+  --m-gql: #c084fc;
+  --m-ws: #22d3ee;
+  --m-sse: #fb923c;
+  --m-grpc: #34d399;
+  --m-mqtt: #c084fc;
+  --m-sio: #f472b6;
+}
+
+.method-get { --pill-c: var(--m-get); }
+.method-post { --pill-c: var(--m-post); }
+.method-put { --pill-c: var(--m-put); }
+.method-patch { --pill-c: var(--m-patch); }
+.method-delete { --pill-c: var(--m-delete); }
+.method-head { --pill-c: var(--m-head); }
+.method-options { --pill-c: var(--m-options); }
+.method-graphql { --pill-c: var(--m-gql); }
+.method-websocket { --pill-c: var(--m-ws); }
+.method-sse { --pill-c: var(--m-sse); }
+.method-grpc { --pill-c: var(--m-grpc); }
+.method-mqtt { --pill-c: var(--m-mqtt); }
+.method-socketio { --pill-c: var(--m-sio); }
+
+/* Any element carrying a method class also adopts its colour (used for inline labels) */
+.method-get,
+.method-post,
+.method-put,
+.method-patch,
+.method-delete,
+.method-head,
+.method-options,
+.method-graphql,
+.method-websocket,
+.method-sse,
+.method-grpc,
+.method-mqtt,
+.method-socketio {
+  color: var(--pill-c);
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1px 6px;
+  border-radius: var(--radius-sm);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.045em;
+  line-height: 15px;
+  color: var(--pill-c);
+  background: color-mix(in srgb, var(--pill-c) 12%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--pill-c) 24%, transparent);
+}
+
+.method-select {
+  appearance: none;
+  cursor: pointer;
+  color: var(--pill-c);
+  background-color: color-mix(in srgb, var(--pill-c) 11%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--pill-c) 22%, transparent);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  border-radius: var(--radius-sm);
+  transition: background-color 150ms var(--ease-out-soft), box-shadow 150ms var(--ease-out-soft);
+}
+.method-select:hover {
+  background-color: color-mix(in srgb, var(--pill-c) 18%, transparent);
+}
+.method-select option {
+  color: var(--color-text-primary);
+  background-color: var(--color-elevated);
+  font-weight: 500;
 }
 
 /* ═══════════════════════════════════════════
@@ -310,22 +465,312 @@
 
 /* Glass effect utility */
 .glass {
-  backdrop-filter: blur(12px) saturate(150%);
-  -webkit-backdrop-filter: blur(12px) saturate(150%);
+  backdrop-filter: blur(16px) saturate(160%);
+  -webkit-backdrop-filter: blur(16px) saturate(160%);
 }
 
-/* Custom scrollbar */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+/* ═══════════════════════════════════════════
+   BASE LAYER — typography, canvas, chrome
+   ═══════════════════════════════════════════ */
+
+@layer base {
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+
+  body {
+    font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+      "Segoe UI Variable Text", "Segoe UI", "PingFang SC", "Hiragino Sans GB",
+      "Microsoft YaHei", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    background: var(--color-bg);
+    color: var(--color-text-primary);
+    overscroll-behavior: none;
+  }
+
+  ::selection {
+    background: var(--color-accent-ring);
+    color: var(--color-text-primary);
+  }
+
+  input,
+  select,
+  textarea,
+  button {
+    font: inherit;
+  }
+
+  /* Thin, unobtrusive scrollbars that only show on hover */
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: color-mix(in srgb, var(--color-text-dimmed) 26%, transparent);
+    border: 2px solid transparent;
+    background-clip: content-box;
+    border-radius: 999px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: color-mix(in srgb, var(--color-text-dimmed) 55%, transparent);
+    background-clip: content-box;
+  }
+  ::-webkit-scrollbar-corner {
+    background: transparent;
+  }
 }
-::-webkit-scrollbar-track {
-  background: transparent;
+
+/* ═══════════════════════════════════════════
+   SURFACES & UTILITIES
+   ═══════════════════════════════════════════ */
+
+/* App canvas — very subtle ambient light so large empty areas don't read as flat gray */
+.app-canvas {
+  background-color: var(--color-bg);
+  background-image:
+    radial-gradient(120% 80% at 12% 0%, var(--color-accent-soft), transparent 58%),
+    radial-gradient(90% 70% at 100% 100%, color-mix(in srgb, var(--color-accent) 6%, transparent), transparent 62%);
 }
-::-webkit-scrollbar-thumb {
-  background: var(--color-border);
-  border-radius: 3px;
+
+/* Sidebar / tab strip surface with a faint top-to-bottom sheen */
+.chrome-surface {
+  background-color: var(--color-surface);
+  background-image: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--color-text-primary) 3%, transparent),
+    transparent 120px
+  );
 }
-::-webkit-scrollbar-thumb:hover {
-  background: var(--color-text-dimmed);
+
+/* Hairline separator that survives both themes without looking heavy */
+.hairline {
+  border-color: color-mix(in srgb, var(--color-border-strong) 55%, transparent);
 }
+
+/* Plain text fields: a soft accent ring instead of the hard 2px rectangle.
+   Transparent outline is kept so Windows high-contrast still draws its own. */
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+  box-shadow:
+    0 0 0 1px var(--color-accent-line),
+    0 0 0 3px var(--color-accent-ring);
+}
+
+/* Transparent inputs inside a focused surface don't need their own ring */
+.focus-bare:focus-visible {
+  outline: none;
+  box-shadow: none;
+}
+
+/* Transparent inputs inside a focused surface don't need their own ring */
+.focus-bare:focus-visible {
+  outline: none;
+  box-shadow: none;
+}
+
+/* Composite inputs delegate the focus indicator to their wrapper */
+.ring-focus :is(input, select, textarea):focus-visible,
+.field-soft:focus-visible {
+  outline: none;
+  box-shadow: none;
+}
+
+/* Focus glow for composite inputs (command bar, search fields) */
+.ring-focus:focus-within {
+  border-color: var(--color-accent-line);
+  box-shadow:
+    0 0 0 3px var(--color-accent-ring),
+    var(--shadow-sm);
+}
+
+/* Small caps section label */
+.label-caps {
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Elevated panel used for popovers / context menus */
+.surface-pop {
+  background-color: color-mix(in srgb, var(--color-elevated) 94%, var(--color-card));
+  border: 1px solid var(--color-border-strong);
+  box-shadow: var(--shadow-pop);
+}
+
+/* Primary action button — subtle vertical gradient + accent bloom */
+.btn-accent {
+  background-image: linear-gradient(180deg, color-mix(in srgb, var(--color-accent) 88%, #ffffff), var(--color-accent));
+  color: #fff;
+  border: 1px solid color-mix(in srgb, var(--color-accent) 70%, #000000);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.18) inset,
+    0 6px 16px -8px color-mix(in srgb, var(--color-accent) 85%, transparent);
+  transition: filter 150ms var(--ease-out-soft), transform 150ms var(--ease-out-soft),
+    box-shadow 150ms var(--ease-out-soft);
+}
+.btn-accent:hover {
+  filter: brightness(1.07);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.2) inset,
+    0 10px 22px -8px color-mix(in srgb, var(--color-accent) 90%, transparent);
+}
+.btn-accent:active {
+  transform: translateY(0.5px) scale(0.995);
+  filter: brightness(0.98);
+}
+
+/* Success action button — same geometry as .btn-accent, semantic green */
+.btn-success {
+  background-image: linear-gradient(180deg, color-mix(in srgb, var(--color-success) 86%, #ffffff), var(--color-success));
+  color: #fff;
+  border: 1px solid color-mix(in srgb, var(--color-success) 72%, #000000);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.18) inset,
+    0 6px 16px -8px color-mix(in srgb, var(--color-success) 85%, transparent);
+  transition: filter 150ms var(--ease-out-soft), transform 150ms var(--ease-out-soft);
+}
+.btn-success:hover {
+  filter: brightness(1.07);
+}
+.btn-success:active {
+  transform: translateY(0.5px) scale(0.995);
+  filter: brightness(0.98);
+}
+
+/* Destructive / stop action — outline style, never a solid red slab */
+.btn-danger {
+  border: 1px solid color-mix(in srgb, var(--color-error) 42%, transparent);
+  background-color: color-mix(in srgb, var(--color-error) 10%, transparent);
+  color: var(--color-error);
+  transition: background-color 150ms var(--ease-out-soft), border-color 150ms var(--ease-out-soft);
+}
+.btn-danger:hover {
+  background-color: color-mix(in srgb, var(--color-error) 18%, transparent);
+  border-color: color-mix(in srgb, var(--color-error) 60%, transparent);
+}
+
+/* Ghost button */
+.btn-ghost {
+  border: 1px solid var(--color-border-strong);
+  background-color: color-mix(in srgb, var(--color-elevated) 55%, transparent);
+  color: var(--color-text-secondary);
+  transition: background-color 150ms var(--ease-out-soft), color 150ms var(--ease-out-soft),
+    border-color 150ms var(--ease-out-soft);
+}
+.btn-ghost:hover {
+  background-color: var(--color-card-hover);
+  border-color: color-mix(in srgb, var(--color-border-strong) 80%, var(--color-text-muted));
+  color: var(--color-text-primary);
+}
+
+/* Soft inset well — used for code blocks, key/value tables */
+.inset-well {
+  background-color: color-mix(in srgb, var(--color-bg) 55%, var(--color-card));
+  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--color-text-primary) 4%, transparent);
+}
+
+/* Elevated active tab — a real card that connects to the panel below */
+.tab-item-active {
+  background-color: var(--color-card);
+  border-color: var(--color-border);
+  border-top-color: var(--color-accent);
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, var(--color-text-primary) 4%, transparent),
+    0 -10px 16px -14px rgba(0, 0, 0, 0.5);
+}
+
+/* Fade the clipped edge of an overflowing tab strip */
+.tabs-fade-l {
+  mask-image: linear-gradient(to right, transparent 0, black 18px);
+  -webkit-mask-image: linear-gradient(to right, transparent 0, black 18px);
+}
+.tabs-fade-r {
+  mask-image: linear-gradient(to right, black calc(100% - 18px), transparent 100%);
+  -webkit-mask-image: linear-gradient(to right, black calc(100% - 18px), transparent 100%);
+}
+.tabs-fade-lr {
+  mask-image: linear-gradient(to right, transparent 0, black 18px, black calc(100% - 18px), transparent 100%);
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent 0,
+    black 18px,
+    black calc(100% - 18px),
+    transparent 100%
+  );
+}
+
+/* Tab strip scrolls horizontally without a visible scrollbar */
+.no-scrollbar {
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+
+/* Keyboard hint */
+.kbd {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  padding: 1px 5px;
+  border-radius: 5px;
+  border: 1px solid var(--color-border-strong);
+  border-bottom-width: 2px;
+  background: color-mix(in srgb, var(--color-elevated) 80%, var(--color-card));
+  color: var(--color-text-muted);
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 10px;
+  line-height: 14px;
+}
+
+/* Entrance used by dialogs / popovers instead of hard cuts */
+@keyframes panelIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+.animate-panel-in {
+  animation: panelIn 180ms var(--ease-out-soft);
+}
+
+/* Elevation utilities (custom utilities so hover:/focus: variants work) */
+@utility elev-xs {
+  box-shadow: var(--shadow-xs);
+}
+@utility elev-sm {
+  box-shadow: var(--shadow-sm);
+}
+@utility elev-md {
+  box-shadow: var(--shadow-md);
+}
+@utility elev-lg {
+  box-shadow: var(--shadow-lg);
+}
+@utility elev-pop {
+  box-shadow: var(--shadow-pop);
+}
+

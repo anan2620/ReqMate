@@ -73,7 +73,7 @@ function App() {
   const [zenMode, setZenMode] = useState(false);
   const [terminalOpen, setTerminalOpen] = useState(false);
   const urlBarRef = useRef<HTMLInputElement>(null);
-  const envSelectorRef = useRef<HTMLSelectElement>(null);
+  const envSelectorRef = useRef<HTMLButtonElement>(null);
   const { isCompact } = useResponsive();
 
   useTheme();
@@ -499,27 +499,26 @@ function ProtocolView({
           {isTabbed ? (
             <div className="flex flex-1 flex-col overflow-hidden">
               {/* Tabbed layout panel switcher */}
-              <div className="flex shrink-0 border-b border-[var(--color-border)] bg-[var(--color-surface)]">
-                <button
-                  onClick={() => setTabbedActivePanel("request")}
-                  className={`px-4 py-2 text-sm font-medium transition-colors ${
-                    tabbedActivePanel === "request"
-                      ? "border-b-2 border-[var(--color-accent)] text-[var(--color-accent)]"
-                      : "text-[var(--color-text-muted)] hover:text-[var(--color-text-secondary)]"
-                  }`}
-                >
-                  Request
-                </button>
-                <button
-                  onClick={() => setTabbedActivePanel("response")}
-                  className={`px-4 py-2 text-sm font-medium transition-colors ${
-                    tabbedActivePanel === "response"
-                      ? "border-b-2 border-[var(--color-accent)] text-[var(--color-accent)]"
-                      : "text-[var(--color-text-muted)] hover:text-[var(--color-text-secondary)]"
-                  }`}
-                >
-                  Response
-                </button>
+              <div className="flex shrink-0 items-center gap-0.5 border-b border-[var(--color-border)] bg-[var(--color-surface)] px-2">
+                {(["request", "response"] as const).map((panel) => {
+                  const isActive = tabbedActivePanel === panel;
+                  return (
+                    <button
+                      key={panel}
+                      onClick={() => setTabbedActivePanel(panel)}
+                      className={`relative px-3 py-[9px] text-[12.5px] capitalize transition-colors ${
+                        isActive
+                          ? "font-medium text-[var(--color-text-primary)]"
+                          : "text-[var(--color-text-muted)] hover:text-[var(--color-text-secondary)]"
+                      }`}
+                    >
+                      {panel}
+                      {isActive && (
+                        <span className="absolute inset-x-2 -bottom-px h-[2px] rounded-full bg-[var(--color-accent)] shadow-[0_0_8px_var(--color-accent-ring)]" />
+                      )}
+                    </button>
+                  );
+                })}
               </div>
               <div className="flex flex-1 flex-col overflow-hidden">
                 {tabbedActivePanel === "request" ? (
@@ -573,51 +572,78 @@ function EmptyState() {
   const { t } = useTranslation();
   const { newTab, newGraphQLTab, newWebSocketTab } = useTabStore();
   return (
-    <div className="flex flex-1 flex-col items-center justify-center gap-6">
+    <div className="relative flex flex-1 flex-col items-center justify-center gap-7 overflow-hidden">
+      {/* Ambient backdrop */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 opacity-70"
+        style={{
+          backgroundImage:
+            "radial-gradient(60% 50% at 50% 22%, var(--color-accent-soft), transparent 70%)",
+        }}
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 opacity-[0.35]"
+        style={{
+          backgroundImage:
+            "linear-gradient(to right, color-mix(in srgb, var(--color-text-primary) 5%, transparent) 1px, transparent 1px), linear-gradient(to bottom, color-mix(in srgb, var(--color-text-primary) 5%, transparent) 1px, transparent 1px)",
+          backgroundSize: "32px 32px",
+          maskImage: "radial-gradient(55% 45% at 50% 40%, black, transparent 75%)",
+          WebkitMaskImage: "radial-gradient(55% 45% at 50% 40%, black, transparent 75%)",
+        }}
+      />
+
       {/* Logo */}
-      <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-[var(--color-accent)] shadow-lg">
-        <ArrowRightLeft className="h-8 w-8 text-white" />
+      <div className="relative">
+        <div
+          aria-hidden
+          className="absolute -inset-4 rounded-[26px] opacity-70 blur-2xl"
+          style={{ background: "var(--color-accent-ring)" }}
+        />
+        <div className="relative flex h-16 w-16 items-center justify-center rounded-[18px] border border-white/15 bg-gradient-to-b from-[color-mix(in_srgb,var(--color-accent)_85%,#ffffff)] to-[var(--color-accent)] shadow-[0_16px_36px_-12px_var(--color-accent),inset_0_1px_0_rgba(255,255,255,0.35)]">
+          <ArrowRightLeft className="h-7 w-7 text-white" strokeWidth={2} />
+        </div>
       </div>
 
-      <div className="text-center">
-        <h2 className="text-lg font-semibold text-[var(--color-text-primary)]">
+      <div className="relative text-center">
+        <h2 className="text-[17px] font-semibold tracking-[-0.01em] text-[var(--color-text-primary)]">
           {t("app.readyToBuild")}
         </h2>
-        <p className="mt-1 text-sm text-[var(--color-text-muted)]">
+        <p className="mt-1.5 text-[13px] text-[var(--color-text-muted)]">
           {t("app.readyToBuildDesc")}
         </p>
       </div>
 
-      <div className="flex gap-3">
+      <div className="relative flex gap-2">
         <button
           onClick={newTab}
-          className="flex items-center gap-2 rounded-lg bg-[var(--color-accent)] px-5 py-2.5 text-sm font-medium text-white transition-all hover:bg-[var(--color-accent-hover)] active:scale-[0.98]"
+          className="btn-accent rounded-lg px-5 py-2.5 text-[13px] font-semibold"
         >
           {t("tabs.httpRequest")}
         </button>
         <button
           onClick={newGraphQLTab}
-          className="rounded-lg border border-[var(--color-border)] bg-[var(--color-elevated)] px-5 py-2.5 text-sm font-medium text-[var(--color-text-secondary)] transition-all hover:bg-[var(--color-card-hover)] active:scale-[0.98]"
+          className="btn-ghost rounded-lg px-5 py-2.5 text-[13px] font-medium"
         >
           GraphQL
         </button>
         <button
           onClick={newWebSocketTab}
-          className="rounded-lg border border-[var(--color-border)] bg-[var(--color-elevated)] px-5 py-2.5 text-sm font-medium text-[var(--color-text-secondary)] transition-all hover:bg-[var(--color-card-hover)] active:scale-[0.98]"
+          className="btn-ghost rounded-lg px-5 py-2.5 text-[13px] font-medium"
         >
           WebSocket
         </button>
       </div>
 
-      <p className="text-xs text-[var(--color-text-dimmed)]">
-        <kbd className="rounded border border-[var(--color-border)] bg-[var(--color-elevated)] px-1.5 py-0.5 text-[10px]">
-          Ctrl+N
-        </kbd>{" "}
-        new request{" "}
-        <kbd className="ml-2 rounded border border-[var(--color-border)] bg-[var(--color-elevated)] px-1.5 py-0.5 text-[10px]">
-          Ctrl+K
-        </kbd>{" "}
-        command palette
+      <p className="relative flex items-center gap-2 text-[11.5px] text-[var(--color-text-dimmed)]">
+        <span className="kbd">Ctrl</span>
+        <span className="kbd">N</span>
+        <span>new request</span>
+        <span className="mx-1 h-3 w-px bg-[var(--color-border-strong)]" />
+        <span className="kbd">Ctrl</span>
+        <span className="kbd">K</span>
+        <span>command palette</span>
       </p>
     </div>
   );
@@ -703,8 +729,8 @@ function UpdateBanner() {
   return (
     <Dialog.Root open onOpenChange={(open) => { if (!open && !installing) setDismissed(true); }}>
       <Dialog.Portal>
-        <Dialog.Overlay className="fixed inset-0 z-50 bg-black/60" />
-        <Dialog.Content className="fixed left-1/2 top-1/2 z-50 w-[420px] -translate-x-1/2 -translate-y-1/2 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-2xl focus:outline-none">
+        <Dialog.Overlay className="fixed inset-0 z-50 bg-[var(--color-overlay)] backdrop-blur-[3px]" />
+        <Dialog.Content className="animate-panel-in fixed left-1/2 top-1/2 z-50 w-[420px] -translate-x-1/2 -translate-y-1/2 rounded-2xl border border-[var(--color-border-strong)] bg-[var(--color-surface)] elev-lg focus:outline-none">
           <div className="p-6">
             <div className="mb-4 flex items-center gap-3">
               <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--color-accent)]/15">
@@ -872,8 +898,8 @@ function MigrationDialog() {
   return (
     <Dialog.Root open onOpenChange={(open) => !open && dismissMigration()}>
       <Dialog.Portal>
-        <Dialog.Overlay className="fixed inset-0 z-50 bg-black/60" />
-        <Dialog.Content className="fixed left-1/2 top-1/2 z-50 w-[420px] -translate-x-1/2 -translate-y-1/2 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-2xl focus:outline-none">
+        <Dialog.Overlay className="fixed inset-0 z-50 bg-[var(--color-overlay)] backdrop-blur-[3px]" />
+        <Dialog.Content className="animate-panel-in fixed left-1/2 top-1/2 z-50 w-[420px] -translate-x-1/2 -translate-y-1/2 rounded-2xl border border-[var(--color-border-strong)] bg-[var(--color-surface)] elev-lg focus:outline-none">
           <div className="border-b border-[var(--color-border)] px-6 py-4">
             <Dialog.Title className="text-base font-semibold text-[var(--color-text-primary)]">
               {status.isNewer ? t("migration.newerFormat") : t("migration.title")}

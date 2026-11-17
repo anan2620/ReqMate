@@ -31,22 +31,22 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
       <Dialog.Portal>
-        <Dialog.Overlay className="fixed inset-0 z-50 bg-black/50" />
-        <Dialog.Content className="fixed left-1/2 top-1/2 z-50 w-[520px] max-h-[85vh] -translate-x-1/2 -translate-y-1/2 overflow-y-auto rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] shadow-xl focus:outline-none">
-          {/* Header */}
-          <div className="flex items-center justify-between border-b border-[var(--color-border)] px-6 py-4">
-            <Dialog.Title className="text-lg font-semibold text-[var(--color-text-primary)]">
+        <Dialog.Overlay className="fixed inset-0 z-50 bg-[var(--color-overlay)] backdrop-blur-[3px]" />
+        <Dialog.Content className="animate-panel-in fixed left-1/2 top-1/2 z-50 flex h-[82vh] max-h-[780px] w-[760px] max-w-[94vw] -translate-x-1/2 -translate-y-1/2 flex-col overflow-hidden rounded-2xl border border-[var(--color-border-strong)] bg-[var(--color-surface)] elev-lg focus:outline-none">
+          {/* Header — fixed, the body scrolls beneath it */}
+          <div className="flex shrink-0 items-center justify-between border-b border-[var(--color-border)] px-7 py-4">
+            <Dialog.Title className="text-[15px] font-semibold tracking-[-0.01em] text-[var(--color-text-primary)]">
               {t("settings.title")}
             </Dialog.Title>
-            <Dialog.Close className="rounded p-1 text-[var(--color-text-muted)] hover:bg-[var(--color-elevated)] hover:text-[var(--color-text-primary)]">
+            <Dialog.Close className="rounded-md p-1.5 text-[var(--color-text-muted)] transition-colors hover:bg-[var(--color-card-hover)] hover:text-[var(--color-text-primary)]">
               <X className="h-4 w-4" />
             </Dialog.Close>
           </div>
 
-          <div className="space-y-6 p-6">
+          <div className="min-h-0 flex-1 space-y-8 overflow-y-auto px-7 py-6">
             {/* Appearance Section */}
             <section>
-              <h3 className="mb-3 text-sm font-semibold uppercase tracking-wider text-[var(--color-text-muted)]">
+              <h3 className="label-caps mb-3 block">
                 {t("settings.appearance")}
               </h3>
 
@@ -60,10 +60,10 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
                     <button
                       key={themeOption}
                       onClick={() => update({ theme: themeOption })}
-                      className={`rounded px-4 py-2 text-sm capitalize transition-colors ${
+                      className={`rounded-md px-3.5 py-1.5 text-[12.5px] capitalize transition-all ${
                         settings.theme === themeOption
-                          ? "bg-[var(--color-accent)] text-white"
-                          : "bg-[var(--color-elevated)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]"
+                          ? "bg-[var(--color-accent)] font-medium text-white shadow-[var(--shadow-xs)]"
+                          : "bg-[color-mix(in_srgb,var(--color-elevated)_80%,transparent)] text-[var(--color-text-secondary)] hover:bg-[var(--color-card-hover)] hover:text-[var(--color-text-primary)]"
                       }`}
                     >
                       {themeOption === "black" ? t("settings.black") : themeOption}
@@ -121,10 +121,10 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
                     <button
                       key={l.value}
                       onClick={() => update({ layout: l.value })}
-                      className={`rounded-lg border px-4 py-2 text-sm transition-all ${
+                      className={`rounded-md border px-3.5 py-1.5 text-[12.5px] transition-all ${
                         settings.layout === l.value
-                          ? "border-[var(--color-accent)] bg-[var(--color-accent)]/10 text-[var(--color-accent)]"
-                          : "border-[var(--color-border)] text-[var(--color-text-muted)] hover:border-[var(--color-text-dimmed)]"
+                          ? "border-transparent bg-[var(--color-accent)] font-medium text-white shadow-[var(--shadow-xs)]"
+                          : "border-[var(--color-border-strong)] bg-transparent text-[var(--color-text-muted)] hover:border-[color-mix(in_srgb,var(--color-border-strong)_60%,var(--color-text-muted))] hover:text-[var(--color-text-secondary)]"
                       }`}
                     >
                       {l.label}
@@ -177,7 +177,7 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
 
             {/* Network Section */}
             <section>
-              <h3 className="mb-3 text-sm font-semibold uppercase tracking-wider text-[var(--color-text-muted)]">
+              <h3 className="label-caps mb-3 block">
                 {t("settings.network")}
               </h3>
 
@@ -253,7 +253,7 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
 
             {/* Certificates Section */}
             <section>
-              <h3 className="mb-3 text-sm font-semibold uppercase tracking-wider text-[var(--color-text-muted)]">
+              <h3 className="label-caps mb-3 block">
                 {t("settings.certificates")}
               </h3>
 
@@ -315,7 +315,7 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
 
             {/* AI Section */}
             <section id="settings-ai">
-              <h3 className="mb-3 text-sm font-semibold uppercase tracking-wider text-[var(--color-text-muted)]">
+              <h3 className="label-caps mb-3 block">
                 AI Assistant
               </h3>
               <div className="space-y-3">
@@ -462,7 +462,7 @@ function UpdateSection({
 
   return (
     <section>
-      <h3 className="mb-3 text-sm font-semibold uppercase tracking-wider text-[var(--color-text-muted)]">
+      <h3 className="label-caps mb-3 block">
         {t("settings.updates")}
       </h3>
 
@@ -606,7 +606,7 @@ function BackupSection() {
 
   return (
     <section>
-      <h3 className="mb-3 text-sm font-semibold uppercase tracking-wider text-[var(--color-text-muted)]">
+      <h3 className="label-caps mb-3 block">
         {t("settings.backup")}
       </h3>
 
@@ -654,8 +654,8 @@ function BackupSection() {
       {/* Import confirmation dialog */}
       <Dialog.Root open={!!importConfirm} onOpenChange={(v) => { if (!v) setImportConfirm(null); }}>
         <Dialog.Portal>
-          <Dialog.Overlay className="fixed inset-0 z-[60] bg-black/50" />
-          <Dialog.Content className="fixed left-1/2 top-1/2 z-[60] w-80 -translate-x-1/2 -translate-y-1/2 rounded-xl border border-[var(--color-border)] bg-[var(--color-elevated)] p-5 shadow-2xl">
+          <Dialog.Overlay className="fixed inset-0 z-[60] bg-[var(--color-overlay)] backdrop-blur-[3px]" />
+          <Dialog.Content className="animate-panel-in surface-pop fixed left-1/2 top-1/2 z-[60] w-80 -translate-x-1/2 -translate-y-1/2 rounded-xl p-5">
             <Dialog.Title className="mb-2 text-sm font-semibold text-[var(--color-text-primary)]">
               {t("settings.importState")}
             </Dialog.Title>
@@ -752,7 +752,7 @@ function ToggleSwitch({
 function DesignTokensSection() {
   return (
     <section>
-      <h3 className="mb-3 text-sm font-semibold uppercase tracking-wider text-[var(--color-text-muted)]">
+      <h3 className="label-caps mb-3 block">
         Design Tokens
       </h3>
       <p className="mb-3 text-xs text-[var(--color-text-dimmed)]">
@@ -801,7 +801,7 @@ function KeyboardShortcutsSection() {
 
   return (
     <section>
-      <h3 className="mb-3 text-sm font-semibold uppercase tracking-wider text-[var(--color-text-muted)]">
+      <h3 className="label-caps mb-3 block">
         {t("settings.shortcuts")}
       </h3>
 

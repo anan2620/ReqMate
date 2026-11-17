@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { Select } from "@/components/ui/select";
 import * as Dialog from "@radix-ui/react-dialog";
 import { Play, X, Download } from "lucide-react";
 import { useCollectionStore } from "@/stores/collection-store";
@@ -83,28 +84,27 @@ export function CollectionRunnerDialog({
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="mb-1 block text-xs text-[var(--color-text-muted)]">Collection</label>
-                  <select
+                  <Select
+                    size="md"
                     value={collectionPath}
-                    onChange={(e) => setCollectionPath(e.target.value)}
-                    className="w-full rounded bg-[var(--color-elevated)] px-2.5 py-1.5 text-sm text-[var(--color-text-primary)] outline-none"
-                  >
-                    {collections.map((c) => (
-                      <option key={c.path} value={c.path}>{c.name}</option>
-                    ))}
-                  </select>
+                    onChange={setCollectionPath}
+                    options={collections.map((c) => ({ value: c.path, label: c.name }))}
+                    placeholder="Select collection"
+                    aria-label="Collection"
+                  />
                 </div>
                 <div>
                   <label className="mb-1 block text-xs text-[var(--color-text-muted)]">Environment</label>
-                  <select
+                  <Select
+                    size="md"
                     value={environmentName}
-                    onChange={(e) => setEnvironmentName(e.target.value)}
-                    className="w-full rounded bg-[var(--color-elevated)] px-2.5 py-1.5 text-sm text-[var(--color-text-primary)] outline-none"
-                  >
-                    <option value="">{t("body.none")}</option>
-                    {environments.map((e) => (
-                      <option key={e.name} value={e.name}>{e.name}</option>
-                    ))}
-                  </select>
+                    onChange={setEnvironmentName}
+                    options={[
+                      { value: "", label: t("body.none") },
+                      ...environments.map((e) => ({ value: e.name, label: e.name })),
+                    ]}
+                    aria-label="Environment"
+                  />
                 </div>
               </div>
 
@@ -145,7 +145,7 @@ export function CollectionRunnerDialog({
               <button
                 onClick={handleRun}
                 disabled={!collectionPath}
-                className="flex items-center gap-1.5 rounded bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-700 disabled:opacity-50"
+                className="btn-success flex items-center gap-1.5 rounded-lg px-4 py-2 text-[13px] font-semibold disabled:opacity-50"
               >
                 <Play className="h-3.5 w-3.5" />
                 Run Collection

@@ -360,14 +360,14 @@ export function CommandPalette({
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
       <Dialog.Portal>
-        <Dialog.Overlay className="fixed inset-0 z-50 bg-black/50" />
+        <Dialog.Overlay className="fixed inset-0 z-50 bg-[var(--color-overlay)] backdrop-blur-[3px]" />
         <Dialog.Content
-          className="fixed left-1/2 top-[20%] z-50 w-[480px] -translate-x-1/2 overflow-hidden rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] shadow-xl focus:outline-none"
+          className="animate-panel-in fixed left-1/2 top-[18%] z-50 w-[520px] -translate-x-1/2 overflow-hidden rounded-2xl border border-[var(--color-border-strong)] bg-[var(--color-elevated)] elev-lg focus:outline-none"
           onKeyDown={handleKeyDown}
         >
           {/* Search input */}
-          <div className="flex items-center gap-2 border-b border-[var(--color-border)] px-4 py-3">
-            <Search className="h-4 w-4 shrink-0 text-[var(--color-text-muted)]" />
+          <div className="flex items-center gap-2.5 border-b border-[var(--color-border)] px-4 py-3.5">
+            <Search className="h-4 w-4 shrink-0 text-[var(--color-accent)]" />
             <Dialog.Title className="sr-only">Command Palette</Dialog.Title>
             <input
               ref={inputRef}
@@ -375,12 +375,12 @@ export function CommandPalette({
               value={query}
               onChange={(e) => { setQuery(e.target.value); setSelectedIndex(0); }}
               placeholder={t("commandPalette.placeholder")}
-              className="flex-1 bg-transparent text-sm text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none"
+              className="focus-bare flex-1 bg-transparent text-[13.5px] text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none"
             />
           </div>
 
           {/* Command list */}
-          <div ref={listRef} className="max-h-[320px] overflow-y-auto py-1">
+          <div ref={listRef} className="max-h-[320px] overflow-y-auto p-2">
             {filtered.length === 0 ? (
               <p className="px-4 py-6 text-center text-sm text-[var(--color-text-dimmed)]">
                 {t("commandPalette.noResults")}
@@ -393,15 +393,21 @@ export function CommandPalette({
                     key={cmd.id}
                     onClick={cmd.action}
                     onMouseEnter={() => setSelectedIndex(i)}
-                    className={`flex w-full items-center gap-3 px-4 py-2 text-left text-sm ${
+                    className={`flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left text-[12.5px] transition-colors ${
                       i === selectedIndex
-                        ? "bg-[var(--color-elevated)] text-[var(--color-text-primary)]"
-                        : "text-[var(--color-text-secondary)]"
+                        ? "bg-[var(--color-accent-soft)] text-[var(--color-text-primary)]"
+                        : "text-[var(--color-text-secondary)] hover:bg-[color-mix(in_srgb,var(--color-text-primary)_4%,transparent)]"
                     }`}
                   >
-                    {Icon && <Icon className="h-4 w-4 shrink-0 text-[var(--color-text-muted)]" />}
+                    {Icon && (
+                      <Icon
+                        className={`h-4 w-4 shrink-0 ${
+                          i === selectedIndex ? "text-[var(--color-accent)]" : "text-[var(--color-text-muted)]"
+                        }`}
+                      />
+                    )}
                     <span className="flex-1 truncate">{cmd.label}</span>
-                    <span className="text-xs text-[var(--color-text-dimmed)]">{cmd.category}</span>
+                    <span className="text-[10.5px] uppercase tracking-[0.08em] text-[var(--color-text-dimmed)]">{cmd.category}</span>
                   </button>
                 );
               })
@@ -409,7 +415,7 @@ export function CommandPalette({
           </div>
 
           {/* Footer */}
-          <div className="flex items-center justify-between border-t border-[var(--color-border)] px-4 py-2 text-xs text-[var(--color-text-dimmed)]">
+          <div className="flex items-center justify-between border-t border-[var(--color-border)] px-4 py-2 text-[10.5px] text-[var(--color-text-dimmed)]">
             <span>{t("commandPalette.navigate")}</span>
             <span>{t("commandPalette.enterToSelect")}</span>
           </div>

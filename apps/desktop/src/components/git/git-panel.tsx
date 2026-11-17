@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useGitStore } from "@/stores/git-store";
 import { useCollectionStore } from "@/stores/collection-store";
+import { Select } from "@/components/ui/select";
 import {
   GitBranch,
   Plus,
@@ -67,7 +68,7 @@ export function GitPanel() {
         <button
           onClick={() => init()}
           disabled={loading}
-          className="flex items-center gap-1.5 rounded-lg bg-orange-600 px-4 py-2 text-sm font-semibold text-white hover:bg-orange-700 disabled:opacity-50"
+          className="btn-accent flex items-center gap-1.5 rounded-lg px-4 py-2 text-[13px] font-semibold disabled:opacity-50"
         >
           <GitBranch className="h-3.5 w-3.5" />
           Initialize Git Repo
@@ -99,17 +100,13 @@ export function GitPanel() {
     <div className="flex flex-col gap-2 p-3">
       {/* Collection selector */}
       {collections.length > 1 && (
-        <select
+        <Select
           value={collectionPath ?? ""}
-          onChange={(e) => setCollection(e.target.value)}
-          className="w-full rounded bg-[var(--color-elevated)] px-2 py-1.5 text-xs text-[var(--color-text-primary)] outline-none"
-        >
-          {collections.map((c) => (
-            <option key={c.path} value={c.path}>
-              {c.name}
-            </option>
-          ))}
-        </select>
+          onChange={setCollection}
+          options={collections.map((c) => ({ value: c.path, label: c.name }))}
+          placeholder="Select collection"
+          aria-label="Collection"
+        />
       )}
 
       {/* Branch & status */}
@@ -258,7 +255,7 @@ export function GitPanel() {
             value={commitMessage}
             onChange={(e) => setCommitMessage(e.target.value)}
             placeholder="Commit message..."
-            className="w-full resize-none rounded bg-[var(--color-surface)] px-2 py-1.5 text-xs text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none focus:ring-1 focus:ring-orange-500"
+            className="w-full resize-none rounded bg-[var(--color-surface)] px-2 py-1.5 text-xs text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none focus:ring-1 focus:ring-[var(--color-accent)]"
             rows={2}
             onKeyDown={(e) => {
               if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
@@ -270,7 +267,7 @@ export function GitPanel() {
           <button
             onClick={handleCommit}
             disabled={loading || !commitMessage.trim()}
-            className="mt-1.5 flex w-full items-center justify-center gap-1.5 rounded-lg bg-orange-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-orange-700 disabled:opacity-50"
+            className="btn-accent mt-1.5 flex w-full items-center justify-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold disabled:opacity-50"
           >
             {loading ? (
               <Loader2 className="h-3.5 w-3.5 animate-spin" />

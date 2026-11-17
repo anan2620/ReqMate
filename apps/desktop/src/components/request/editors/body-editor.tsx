@@ -35,7 +35,7 @@ export function BodyEditor({
             onClick={() => onChange({ ...body, type: btId })}
             className={`rounded px-3 py-1 text-xs transition-colors ${
               body.type === btId
-                ? "bg-blue-600 text-white"
+                ? "bg-[var(--color-accent)] text-white shadow-[var(--shadow-xs)]"
                 : "bg-[var(--color-elevated)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]"
             }`}
           >

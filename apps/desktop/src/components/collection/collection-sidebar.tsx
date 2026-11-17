@@ -16,7 +16,7 @@ type SidebarSection = "collections" | "environments" | "history";
 interface CollectionSidebarProps {
   onOpenSettings?: () => void;
   collapsed?: boolean;
-  envSelectorRef?: React.RefObject<HTMLSelectElement | null>;
+  envSelectorRef?: React.RefObject<HTMLButtonElement | null>;
   onOpenImport?: () => void;
 }
 
@@ -104,7 +104,7 @@ export function CollectionSidebar({ onOpenSettings, collapsed, envSelectorRef, o
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder={t("sidebar.search")}
-                    className="w-full rounded bg-[var(--color-elevated)] py-1 pl-7 pr-6 text-xs text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none focus:ring-1 focus:ring-blue-500"
+                    className="w-full rounded bg-[var(--color-elevated)] py-1 pl-7 pr-6 text-xs text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none focus:ring-1 focus:ring-[var(--color-accent)]"
                   />
                   {searchQuery && (
                     <button

@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { useTranslation } from "react-i18next";
+import { Select } from "@/components/ui/select";
 import { useTabStore, useActiveTab } from "@/stores/tab-store";
 import { KeyValueEditor } from "@/components/request/key-value-editor";
 import { ResponsePanel } from "@/components/response/response-panel";
@@ -176,10 +177,8 @@ export function GraphQLView() {
               disabled={
                 subStatus === "connecting" || !tab.url.trim()
               }
-              className={`flex items-center gap-1.5 rounded-lg px-5 py-2 text-sm font-semibold text-white disabled:opacity-50 ${
-                subStatus === "subscribed" || subStatus === "connected"
-                  ? "bg-red-600 hover:bg-red-700"
-                  : "bg-purple-600 hover:bg-purple-700"
+              className={`flex items-center gap-1.5 rounded-xl px-4 py-2 text-[13px] font-semibold disabled:opacity-50 ${
+                subStatus === "subscribed" || subStatus === "connected" ? "btn-danger" : "btn-accent"
               }`}
             >
               {subStatus === "subscribed" || subStatus === "connected" ? (
@@ -455,10 +454,11 @@ function AuthEditorCompact({
   const { t } = useTranslation();
   return (
     <div className="space-y-3">
-      <select
+      <Select
+        size="md"
         value={auth.type}
-        onChange={(e) => {
-          const type = e.target.value as AuthConfig["type"];
+        onChange={(value) => {
+          const type = value as AuthConfig["type"];
           switch (type) {
             case "none":
               onChange({ type: "none" });
@@ -479,13 +479,14 @@ function AuthEditorCompact({
               break;
           }
         }}
-        className="rounded bg-[var(--color-elevated)] px-3 py-1.5 text-sm text-[var(--color-text-primary)] outline-none focus:ring-1 focus:ring-purple-500"
-      >
-        <option value="none">{t("auth.none")}</option>
-        <option value="bearer">{t("auth.bearer")}</option>
-        <option value="basic">{t("auth.basic")}</option>
-        <option value="api-key">{t("auth.apiKey")}</option>
-      </select>
+        options={[
+          { value: "none", label: t("auth.none") },
+          { value: "bearer", label: t("auth.bearer") },
+          { value: "basic", label: t("auth.basic") },
+          { value: "api-key", label: t("auth.apiKey") },
+        ]}
+        aria-label={t("auth.type")}
+      />
 
       {auth.type === "bearer" && (
         <input
@@ -493,7 +494,7 @@ function AuthEditorCompact({
           value={auth.token}
           onChange={(e) => onChange({ ...auth, token: e.target.value })}
           placeholder={t("auth.token")}
-          className="w-full rounded bg-[var(--color-elevated)] px-3 py-1.5 text-sm text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none focus:ring-1 focus:ring-purple-500"
+          className="w-full rounded bg-[var(--color-elevated)] px-3 py-1.5 text-sm text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none focus:ring-1 focus:ring-[var(--color-accent)]"
         />
       )}
 

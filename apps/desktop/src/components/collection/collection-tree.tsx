@@ -48,13 +48,13 @@ import { useVirtualizer } from "@tanstack/react-virtual";
 const CLOSE_ALL_MENUS = "collection-tree:close-all-menus";
 
 const METHOD_COLORS: Record<HttpMethod, string> = {
-  GET: "text-green-500",
-  POST: "text-yellow-500",
-  PUT: "text-blue-500",
-  PATCH: "text-purple-500",
-  DELETE: "text-red-500",
-  HEAD: "text-cyan-500",
-  OPTIONS: "text-gray-500",
+  GET: "method-get",
+  POST: "method-post",
+  PUT: "method-put",
+  PATCH: "method-patch",
+  DELETE: "method-delete",
+  HEAD: "method-head",
+  OPTIONS: "method-options",
 };
 
 // ── Flat node type for virtualization ──
@@ -510,7 +510,7 @@ function TreeNodeRow({
     return (
       <>
         <div
-          className="group relative flex w-full items-center gap-1.5 rounded px-2 py-1 text-sm hover:bg-[var(--color-elevated)]"
+          className="group relative flex w-full items-center gap-1.5 rounded-md px-2 py-[5px] text-[12.5px] transition-colors hover:bg-[color-mix(in_srgb,var(--color-text-primary)_6%,transparent)]"
           style={{ paddingLeft: `${depth * 16 + 8}px` }}
           onContextMenu={handleContextMenu}
         >
@@ -521,11 +521,11 @@ function TreeNodeRow({
             <GripVertical className="h-3 w-3 text-[var(--color-text-muted)]" />
           </span>
           <span
-            className={`w-9 shrink-0 text-[10px] font-bold ${
-              node.protocol === "graphql" || node.isGraphql ? "text-violet-400"
-              : node.protocol === "websocket" ? "text-cyan-400"
-              : node.protocol === "sse" ? "text-orange-400"
-              : node.protocol === "grpc" ? "text-green-400"
+            className={`w-9 shrink-0 text-[9.5px] font-bold tracking-[0.02em] ${
+              node.protocol === "graphql" || node.isGraphql ? "method-graphql"
+              : node.protocol === "websocket" ? "method-websocket"
+              : node.protocol === "sse" ? "method-sse"
+              : node.protocol === "grpc" ? "method-grpc"
               : METHOD_COLORS[node.method]
             }`}
           >
@@ -545,12 +545,12 @@ function TreeNodeRow({
                 if (e.key === "Enter") submitRename();
                 if (e.key === "Escape") setRenaming(false);
               }}
-              className="min-w-0 flex-1 rounded bg-[var(--color-elevated)] px-1 text-sm text-[var(--color-text-primary)] outline-none ring-1 ring-blue-500"
+              className="min-w-0 flex-1 rounded bg-[var(--color-elevated)] px-1 text-sm text-[var(--color-text-primary)] outline-none ring-1 ring-[var(--color-accent)]"
             />
           ) : (
             <>
               <span
-                className="flex-1 cursor-pointer truncate text-[var(--color-text-secondary)]"
+                className="flex-1 cursor-pointer truncate text-[var(--color-text-secondary)] transition-colors group-hover:text-[var(--color-text-primary)]"
                 onClick={() => openTab(node.path, collectionPath)}
               >
                 {node.name}
@@ -612,7 +612,7 @@ function TreeNodeRow({
         onClick={() => toggleExpand(node.path)}
         onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") toggleExpand(node.path); }}
         onContextMenu={handleContextMenu}
-        className="group flex w-full cursor-pointer items-center gap-1.5 rounded px-2 py-1 text-left text-sm hover:bg-[var(--color-elevated)]"
+        className="group flex w-full cursor-pointer items-center gap-1.5 rounded-md px-2 py-[5px] text-left text-[12.5px] transition-colors hover:bg-[color-mix(in_srgb,var(--color-text-primary)_6%,transparent)]"
         style={{ paddingLeft: `${depth * 16 + 8}px` }}
       >
         {node.type !== "collection" && (
@@ -644,7 +644,7 @@ function TreeNodeRow({
               if (e.key === "Enter") submitRename();
               if (e.key === "Escape") setRenaming(false);
             }}
-            className="min-w-0 flex-1 rounded bg-[var(--color-elevated)] px-1 text-sm text-[var(--color-text-primary)] outline-none ring-1 ring-blue-500"
+            className="min-w-0 flex-1 rounded bg-[var(--color-elevated)] px-1 text-sm text-[var(--color-text-primary)] outline-none ring-1 ring-[var(--color-accent)]"
             onClick={(e) => e.stopPropagation()}
           />
         ) : (

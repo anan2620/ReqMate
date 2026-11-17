@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
+import { Select } from "@/components/ui/select";
 import { useMonitorStore } from "@/stores/monitor-store";
 import { useCollectionStore } from "@/stores/collection-store";
 import {
@@ -158,26 +159,21 @@ export function MonitorDialog() {
                 placeholder={t("monitor.create")}
                 className="w-full rounded bg-[var(--color-elevated)] px-2 py-1.5 text-xs text-[var(--color-text-primary)] outline-none"
               />
-              <select
+              <Select
                 value={collectionPath}
-                onChange={(e) => setCollectionPath(e.target.value)}
-                className="w-full rounded bg-[var(--color-elevated)] px-2 py-1.5 text-xs text-[var(--color-text-primary)] outline-none"
-              >
-                {collections.map((c) => (
-                  <option key={c.path} value={c.path}>{c.name}</option>
-                ))}
-              </select>
+                onChange={setCollectionPath}
+                options={collections.map((c) => ({ value: c.path, label: c.name }))}
+                placeholder={t("monitor.selectCollection", "Select a collection")}
+                aria-label={t("sidebar.collections")}
+              />
               <div>
                 <label className="block text-xs text-[var(--color-text-muted)]">Schedule</label>
-                <select
+                <Select
                   value={cronExpression}
-                  onChange={(e) => setCronExpression(e.target.value)}
-                  className="w-full rounded bg-[var(--color-elevated)] px-2 py-1.5 text-xs text-[var(--color-text-primary)] outline-none"
-                >
-                  {CRON_PRESETS.map((p) => (
-                    <option key={p.value} value={p.value}>{p.label}</option>
-                  ))}
-                </select>
+                  onChange={setCronExpression}
+                  options={CRON_PRESETS.map((p) => ({ value: p.value, label: p.label }))}
+                  aria-label="Schedule"
+                />
               </div>
               <input
                 value={environmentName}
@@ -202,7 +198,7 @@ export function MonitorDialog() {
               <button
                 onClick={handleCreate}
                 disabled={creating || !name || !collectionPath}
-                className="flex w-full items-center justify-center gap-1 rounded bg-blue-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-blue-700 disabled:opacity-50"
+                className="btn-accent flex w-full items-center justify-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold disabled:opacity-50"
               >
                 <Plus className="h-3 w-3" />
                 {creating ? "Creating..." : t("monitor.newMonitor")}

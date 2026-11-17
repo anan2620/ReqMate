@@ -2,8 +2,9 @@ import { useEffect, forwardRef } from "react";
 import { useTranslation } from "react-i18next";
 import { useEnvironmentStore } from "@/stores/environment-store";
 import { useCollectionStore } from "@/stores/collection-store";
+import { Select } from "@/components/ui/select";
 
-export const EnvironmentSelector = forwardRef<HTMLSelectElement>(
+export const EnvironmentSelector = forwardRef<HTMLButtonElement>(
   function EnvironmentSelector(_props, ref) {
     const { t } = useTranslation();
     const { environments, activeEnvironmentName, setActiveEnvironment, loadEnvironments } =
@@ -29,22 +30,17 @@ export const EnvironmentSelector = forwardRef<HTMLSelectElement>(
     }
 
     return (
-      <select
-        ref={ref}
+      <Select
+        triggerRef={ref}
         data-tour="environment"
         value={activeEnvironmentName ?? ""}
-        onChange={(e) =>
-          setActiveEnvironment(e.target.value || null)
-        }
-        className="w-full rounded bg-[var(--color-elevated)] px-2 py-1.5 text-xs text-[var(--color-text-primary)] outline-none focus:ring-1 focus:ring-blue-500"
-      >
-        <option value="">{t("environment.noEnvironment")}</option>
-        {environments.map((env) => (
-          <option key={env.name} value={env.name}>
-            {env.name}
-          </option>
-        ))}
-      </select>
+        onChange={(value) => setActiveEnvironment(value || null)}
+        options={[
+          { value: "", label: t("environment.noEnvironment") },
+          ...environments.map((env) => ({ value: env.name, label: env.name })),
+        ]}
+        aria-label={t("environment.noEnvironment")}
+      />
     );
   },
 );

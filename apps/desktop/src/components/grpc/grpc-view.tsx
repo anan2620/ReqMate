@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useMemo } from "react";
 import { useTranslation } from "react-i18next";
+import { Select } from "@/components/ui/select";
 import { useTabStore, useActiveTab } from "@/stores/tab-store";
 import { grpcLoadProto, grpcCallUnary, grpcCallServerStream, grpcCallClientStream, grpcCallBidiStream } from "@/lib/tauri-api";
 import { open } from "@tauri-apps/plugin-dialog";
@@ -216,22 +217,20 @@ export function GrpcView() {
           {/* Service selector */}
           {grpc.services.length > 0 && (
             <div className="border-b border-[var(--color-border)] px-3 py-2">
-              <select
+              <Select
                 value={grpc.selectedService ?? ""}
-                onChange={(e) => {
-                  const svc = grpc.services.find((s) => s.fullName === e.target.value);
+                onChange={(value) => {
+                  const svc = grpc.services.find((s) => s.fullName === value);
                   updateGrpc({
-                    selectedService: e.target.value,
+                    selectedService: value,
                     selectedMethod: svc?.methods[0]?.name ?? null,
                   });
                   setMethodFilter("");
                 }}
-                className="w-full rounded bg-[var(--color-elevated)] px-2 py-1 text-xs text-[var(--color-text-primary)] outline-none"
-              >
-                {grpc.services.map((s) => (
-                  <option key={s.fullName} value={s.fullName}>{s.fullName}</option>
-                ))}
-              </select>
+                options={grpc.services.map((s) => ({ value: s.fullName, label: s.fullName }))}
+                placeholder="Select service"
+                aria-label="Service"
+              />
             </div>
           )}
 
@@ -310,7 +309,7 @@ export function GrpcView() {
                           updated[i] = e.target.value;
                           setClientMessages(updated);
                         }}
-                        className="w-full resize-none rounded bg-[var(--color-elevated)] p-2 font-mono text-xs text-[var(--color-text-primary)] outline-none focus:ring-1 focus:ring-blue-500"
+                        className="w-full resize-none rounded bg-[var(--color-elevated)] p-2 font-mono text-xs text-[var(--color-text-primary)] outline-none focus:ring-1 focus:ring-[var(--color-accent)]"
                         placeholder='{ "field": "value" }'
                         rows={3}
                         spellCheck={false}
@@ -328,7 +327,7 @@ export function GrpcView() {
                 <textarea
                   value={grpc.requestJson}
                   onChange={(e) => updateGrpc({ requestJson: e.target.value })}
-                  className="h-full w-full resize-none rounded bg-[var(--color-elevated)] p-3 font-mono text-sm text-[var(--color-text-primary)] outline-none focus:ring-1 focus:ring-blue-500"
+                  className="h-full w-full resize-none rounded bg-[var(--color-elevated)] p-3 font-mono text-sm text-[var(--color-text-primary)] outline-none focus:ring-1 focus:ring-[var(--color-accent)]"
                   placeholder='{ "field": "value" }'
                   spellCheck={false}
                 />
@@ -517,7 +516,7 @@ function MethodBrowser({
             value={filter}
             onChange={(e) => onFilterChange(e.target.value)}
             placeholder="Filter methods..."
-            className="flex-1 bg-transparent text-xs text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none"
+            className="focus-bare flex-1 bg-transparent text-xs text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none"
           />
           {filter && (
             <button

@@ -26,14 +26,14 @@ export function Breadcrumb() {
   if (!segments || segments.length === 0) return null;
 
   return (
-    <div className="flex items-center gap-0.5 border-b border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-1">
+    <div className="flex h-7 shrink-0 items-center gap-0.5 border-b border-[var(--color-border)] bg-[var(--color-card)] px-4">
       {segments.map((segment, i) => (
         <span key={i} className="flex items-center gap-0.5">
-          {i > 0 && <ChevronRight className="h-3 w-3 text-[var(--color-text-dimmed)]" />}
+          {i > 0 && <ChevronRight className="h-3 w-3 text-[var(--color-text-dimmed)]/70" />}
           <span
-            className={`text-xs ${
+            className={`text-[11px] ${
               i === segments.length - 1
-                ? "font-medium text-[var(--color-text-primary)]"
+                ? "font-medium text-[var(--color-text-secondary)]"
                 : "text-[var(--color-text-muted)]"
             }`}
           >

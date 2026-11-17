@@ -10,28 +10,24 @@ const iconMap = {
 
 const styleMap = {
   error: {
-    container: "border-[var(--color-error)] bg-[var(--color-error)]/15",
+    border: "var(--color-error)",
+    iconBg: "color-mix(in srgb, var(--color-error) 14%, transparent)",
     icon: "text-[var(--color-error)]",
-    text: "text-[var(--color-error)]",
-    close: "hover:bg-[var(--color-error)]/20 text-[var(--color-error)]",
   },
   warning: {
-    container: "border-[var(--color-warning)] bg-[var(--color-warning)]/15",
+    border: "var(--color-warning)",
+    iconBg: "color-mix(in srgb, var(--color-warning) 16%, transparent)",
     icon: "text-[var(--color-warning)]",
-    text: "text-[var(--color-warning)]",
-    close: "hover:bg-[var(--color-warning)]/20 text-[var(--color-warning)]",
   },
   info: {
-    container: "border-[var(--color-accent)] bg-[var(--color-accent)]/15",
+    border: "var(--color-accent)",
+    iconBg: "var(--color-accent-soft)",
     icon: "text-[var(--color-accent)]",
-    text: "text-[var(--color-accent)]",
-    close: "hover:bg-[var(--color-accent)]/20 text-[var(--color-accent)]",
   },
   success: {
-    container: "border-[var(--color-success)] bg-[var(--color-success)]/15",
+    border: "var(--color-success)",
+    iconBg: "color-mix(in srgb, var(--color-success) 14%, transparent)",
     icon: "text-[var(--color-success)]",
-    text: "text-[var(--color-success)]",
-    close: "hover:bg-[var(--color-success)]/20 text-[var(--color-success)]",
   },
 };
 
@@ -42,24 +38,32 @@ export function ToastContainer() {
   if (toasts.length === 0) return null;
 
   return (
-    <div className="fixed bottom-6 right-6 z-[100] flex flex-col gap-3" role="log" aria-live="polite">
+    <div className="fixed bottom-6 right-6 z-[100] flex flex-col gap-2.5" role="log" aria-live="polite">
       {toasts.map((toast) => {
         const Icon = iconMap[toast.type];
         const styles = styleMap[toast.type];
         return (
           <div
             key={toast.id}
-            className={`flex items-start gap-3 rounded-lg border-l-4 px-4 py-3.5 shadow-2xl backdrop-blur-sm ${styles.container} min-w-[320px] max-w-[440px] animate-[slideIn_0.2s_ease-out]`}
+            className="surface-pop animate-panel-in flex min-w-[300px] max-w-[420px] items-start gap-3 overflow-hidden rounded-xl border-l-[3px] px-3.5 py-3"
+            style={{ borderLeftColor: styles.border }}
             role="alert"
           >
-            <Icon className={`mt-0.5 h-5 w-5 shrink-0 ${styles.icon}`} />
-            <p className={`flex-1 text-sm font-medium ${styles.text}`}>{toast.message}</p>
+            <span
+              className={`mt-px flex h-6 w-6 shrink-0 items-center justify-center rounded-md ${styles.icon}`}
+              style={{ backgroundColor: styles.iconBg }}
+            >
+              <Icon className="h-3.5 w-3.5" />
+            </span>
+            <p className="flex-1 pt-0.5 text-[12.5px] leading-relaxed text-[var(--color-text-primary)]">
+              {toast.message}
+            </p>
             <button
               onClick={() => removeToast(toast.id)}
-              className={`shrink-0 rounded p-1 opacity-70 transition-opacity hover:opacity-100 ${styles.close}`}
+              className="shrink-0 rounded p-1 text-[var(--color-text-dimmed)] opacity-70 transition-all hover:bg-[var(--color-card-hover)] hover:text-[var(--color-text-secondary)] hover:opacity-100"
               aria-label="Dismiss"
             >
-              <X className="h-4 w-4" />
+              <X className="h-3.5 w-3.5" />
             </button>
           </div>
         );

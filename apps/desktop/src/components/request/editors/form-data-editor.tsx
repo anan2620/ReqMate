@@ -68,14 +68,14 @@ export function FormDataEditor({
             type="checkbox"
             checked={pair.enabled}
             onChange={(e) => update(index, "enabled", e.target.checked)}
-            className="h-4 w-4 accent-blue-500"
+            className="h-3.5 w-3.5 shrink-0 cursor-pointer rounded accent-[var(--color-accent)]"
           />
           <input
             type="text"
             value={pair.key}
             onChange={(e) => update(index, "key", e.target.value)}
             placeholder={t("request.field")}
-            className="rounded bg-[var(--color-elevated)] px-2 py-1 text-sm text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none focus:ring-1 focus:ring-blue-500"
+            className="rounded bg-[var(--color-elevated)] px-2 py-1 text-sm text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none focus:ring-1 focus:ring-[var(--color-accent)]"
           />
           <div className="flex items-center gap-1">
             <input
@@ -88,7 +88,7 @@ export function FormDataEditor({
                 onChange(updated);
               }}
               placeholder={pair.valueType === "file" ? t("request.filePath") : t("request.value")}
-              className={`min-w-0 flex-1 rounded bg-[var(--color-elevated)] px-2 py-1 text-sm outline-none focus:ring-1 focus:ring-blue-500 ${
+              className={`min-w-0 flex-1 rounded bg-[var(--color-elevated)] px-2 py-1 text-sm outline-none focus:ring-1 focus:ring-[var(--color-accent)] ${
                 pair.valueType === "file"
                   ? "text-violet-400 placeholder-violet-400/50"
                   : "text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)]"

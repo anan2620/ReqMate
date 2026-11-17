@@ -48,41 +48,50 @@ export function RequestPanel() {
   return (
     <div className="flex flex-1 flex-col overflow-hidden">
       {/* Tab bar */}
-      <div className="flex gap-0 overflow-x-auto border-b border-[var(--color-border)] bg-[var(--color-surface)]">
-        {TAB_IDS.map((tabId) => (
-          <button
-            key={tabId}
-            data-tour={`tab-${tabId}`}
-            onClick={() => setActiveTab(tabId)}
-            className={`shrink-0 whitespace-nowrap px-3 py-2 text-sm transition-colors ${
-              activeTab === tabId
-                ? "border-b-2 border-blue-500 text-[var(--color-text-primary)]"
-                : "text-[var(--color-text-muted)] hover:text-[var(--color-text-secondary)]"
-            }`}
-          >
-            {t(TAB_LABEL_KEYS[tabId])}
-            {tabId === "params" && params.filter((p) => p.key).length > 0 && (
-              <span className="ml-1 text-xs text-[var(--color-text-dimmed)]">
-                ({params.filter((p) => p.key).length})
+      <div className="flex shrink-0 items-center gap-0.5 overflow-x-auto border-b border-[var(--color-border)] bg-[var(--color-surface)] px-2">
+        {TAB_IDS.map((tabId) => {
+          const isActive = activeTab === tabId;
+          const count =
+            tabId === "params"
+              ? params.filter((p) => p.key).length
+              : tabId === "headers"
+                ? headers.filter((h) => h.key).length
+                : 0;
+          const hasDot =
+            (tabId === "scripts" && Boolean(tab.preRequestScript || tab.postResponseScript)) ||
+            (tabId === "tests" && Boolean(tab.testScript || tab.assertions));
+          return (
+            <button
+              key={tabId}
+              data-tour={`tab-${tabId}`}
+              onClick={() => setActiveTab(tabId)}
+              className={`relative shrink-0 whitespace-nowrap px-3 py-[9px] text-[12.5px] transition-colors duration-150 ${
+                isActive
+                  ? "font-medium text-[var(--color-text-primary)]"
+                  : "text-[var(--color-text-muted)] hover:text-[var(--color-text-secondary)]"
+              }`}
+            >
+              <span className="flex items-center gap-1.5">
+                {t(TAB_LABEL_KEYS[tabId])}
+                {count > 0 && (
+                  <span className="tabular rounded-full bg-[color-mix(in_srgb,var(--color-text-primary)_8%,transparent)] px-1.5 text-[10px] font-medium leading-[15px] text-[var(--color-text-muted)]">
+                    {count}
+                  </span>
+                )}
+                {hasDot && (
+                  <span className="inline-block h-1.5 w-1.5 rounded-full bg-[var(--color-accent)]" />
+                )}
               </span>
-            )}
-            {tabId === "headers" && headers.filter((h) => h.key).length > 0 && (
-              <span className="ml-1 text-xs text-[var(--color-text-dimmed)]">
-                ({headers.filter((h) => h.key).length})
-              </span>
-            )}
-            {tabId === "scripts" && (tab.preRequestScript || tab.postResponseScript) && (
-              <span className="ml-1 inline-block h-1.5 w-1.5 rounded-full bg-blue-500" />
-            )}
-            {tabId === "tests" && (tab.testScript || tab.assertions) && (
-              <span className="ml-1 inline-block h-1.5 w-1.5 rounded-full bg-blue-500" />
-            )}
-          </button>
-        ))}
+              {isActive && (
+                <span className="absolute inset-x-2 -bottom-px h-[2px] rounded-full bg-[var(--color-accent)] shadow-[0_0_8px_var(--color-accent-ring)]" />
+              )}
+            </button>
+          );
+        })}
       </div>
 
       {/* Tab content */}
-      <div className="flex-1 overflow-auto p-3">
+      <div className="flex-1 overflow-auto p-4">
         {activeTab === "params" && (
           <div className="relative space-y-4">
             <PathVariablesEditor

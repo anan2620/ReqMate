@@ -415,7 +415,7 @@ export function AiAssistantDialog({ open, onOpenChange }: AiAssistantDialogProps
                     onChange={(e) => setInput(e.target.value)}
                     placeholder="Describe an API request..."
                     disabled={loading}
-                    className="flex-1 resize-none rounded-lg bg-[var(--color-elevated)] px-3 py-2 text-sm text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none focus:ring-1 focus:ring-purple-500 disabled:opacity-50"
+                    className="flex-1 resize-none rounded-lg bg-[var(--color-elevated)] px-3 py-2 text-sm text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none focus:ring-1 focus:ring-[var(--color-accent)] disabled:opacity-50"
                     rows={2}
                     onKeyDown={(e) => {
                       if (e.key === "Enter" && !e.shiftKey) {

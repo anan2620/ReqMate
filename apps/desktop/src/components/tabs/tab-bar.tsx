@@ -1,8 +1,21 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
+import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
 import type { HttpMethod, Tab } from "@reqmate/types";
 import { useTabStore } from "@/stores/tab-store";
-import { Plus, X, Globe, Zap, Radio, ChevronDown, Pin, Save, Terminal } from "lucide-react";
+import {
+  Plus,
+  X,
+  Globe,
+  Zap,
+  Radio,
+  ChevronDown,
+  ChevronLeft,
+  ChevronRight,
+  Pin,
+  Save,
+  Terminal,
+} from "lucide-react";
 import {
   DndContext,
   closestCenter,
@@ -19,40 +32,43 @@ import {
 import { CSS } from "@dnd-kit/utilities";
 
 const METHOD_COLORS: Record<HttpMethod, string> = {
-  GET: "bg-emerald-500/15 text-emerald-400",
-  POST: "bg-amber-500/15 text-amber-400",
-  PUT: "bg-blue-500/15 text-blue-400",
-  PATCH: "bg-purple-500/15 text-purple-400",
-  DELETE: "bg-red-500/15 text-red-400",
-  HEAD: "bg-cyan-500/15 text-cyan-400",
-  OPTIONS: "bg-gray-500/15 text-gray-400",
+  GET: "method-get",
+  POST: "method-post",
+  PUT: "method-put",
+  PATCH: "method-patch",
+  DELETE: "method-delete",
+  HEAD: "method-head",
+  OPTIONS: "method-options",
 };
 
 function TabBadge({ tab }: { tab: Tab }) {
-  const badges: Record<string, { bg: string; label: string }> = {
-    graphql: { bg: "bg-violet-500/15 text-violet-400", label: "GQL" },
-    websocket: { bg: "bg-cyan-500/15 text-cyan-400", label: "WS" },
-    sse: { bg: "bg-orange-500/15 text-orange-400", label: "SSE" },
-    grpc: { bg: "bg-emerald-500/15 text-emerald-400", label: "gRPC" },
-    mqtt: { bg: "bg-purple-500/15 text-purple-400", label: "MQTT" },
-    socketio: { bg: "bg-pink-500/15 text-pink-400", label: "SIO" },
+  const badges: Record<string, { cls: string; label: string }> = {
+    graphql: { cls: "method-graphql", label: "GQL" },
+    websocket: { cls: "method-websocket", label: "WS" },
+    sse: { cls: "method-sse", label: "SSE" },
+    grpc: { cls: "method-grpc", label: "gRPC" },
+    mqtt: { cls: "method-mqtt", label: "MQTT" },
+    socketio: { cls: "method-socketio", label: "SIO" },
   };
 
   if (tab.protocol !== "http") {
     const badge = badges[tab.protocol];
     return (
-      <span className={`rounded px-1.5 py-0.5 text-[10px] font-bold ${badge?.bg ?? ""}`}>
+      <span className={`pill !px-1.5 !py-0 !text-[9.5px] !leading-[14px] ${badge?.cls ?? ""}`}>
         {badge?.label ?? tab.protocol}
       </span>
     );
   }
 
   return (
-    <span className={`rounded px-1.5 py-0.5 text-[10px] font-bold ${METHOD_COLORS[tab.method]}`}>
+    <span className={`pill !px-1.5 !py-0 !text-[9.5px] !leading-[14px] ${METHOD_COLORS[tab.method]}`}>
       {tab.method}
     </span>
   );
 }
+
+const MENU_WIDTH = 194;
+const MENU_HEIGHT = 258;
 
 function SortableTab({
   tab,
@@ -96,25 +112,50 @@ function SortableTab({
 
   useEffect(() => {
     if (!contextMenu) return;
-    const handleClick = (e: MouseEvent) => {
-      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
-        setContextMenu(null);
-      }
+    const dismiss = (e: Event) => {
+      if (e instanceof MouseEvent && menuRef.current?.contains(e.target as Node)) return;
+      setContextMenu(null);
     };
-    document.addEventListener("mousedown", handleClick);
-    return () => document.removeEventListener("mousedown", handleClick);
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setContextMenu(null);
+    };
+    document.addEventListener("mousedown", dismiss);
+    window.addEventListener("resize", dismiss);
+    window.addEventListener("scroll", dismiss, true);
+    window.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("mousedown", dismiss);
+      window.removeEventListener("resize", dismiss);
+      window.removeEventListener("scroll", dismiss, true);
+      window.removeEventListener("keydown", onKey);
+    };
   }, [contextMenu]);
 
   const handleContextMenu = (e: React.MouseEvent) => {
     e.preventDefault();
-    setContextMenu({ x: e.clientX, y: e.clientY });
+    setContextMenu({
+      x: Math.min(e.clientX, window.innerWidth - MENU_WIDTH - 8),
+      y: Math.min(e.clientY, window.innerHeight - MENU_HEIGHT - 8),
+    });
   };
+
+  const menuItems: Array<{ label: string; action: () => void } | null> = [
+    { label: tab.pinned ? t("tabs.unpinTab") : t("tabs.pinTab"), action: onTogglePin },
+    { label: t("tabs.duplicateTab"), action: onDuplicate },
+    null,
+    { label: t("tabs.close"), action: onClose },
+    { label: t("tabs.closeOthers"), action: onCloseOthers },
+    { label: t("tabs.closeAll"), action: onCloseAll },
+    null,
+    { label: t("tabs.moveToNewWindow"), action: onDetach },
+  ];
 
   return (
     <>
       <button
         ref={setNodeRef}
         style={style}
+        data-tab-id={tab.id}
         {...attributes}
         {...listeners}
         onClick={onActivate}
@@ -125,62 +166,72 @@ function SortableTab({
           }
         }}
         onContextMenu={handleContextMenu}
-        className={`group relative flex shrink-0 items-center gap-2 rounded-t-lg px-4 py-2 text-[13px] transition-all ${
+        className={`group relative flex h-full shrink-0 select-none items-center gap-2 rounded-t-[9px] border-x border-b-0 border-t-2 border-transparent pl-2.5 text-[12.5px] transition-[background-color,color,box-shadow] duration-150 ${
+          tab.pinned ? "pr-2.5" : "pr-7"
+        } ${
           isActive
-            ? "bg-[var(--color-card)] text-[var(--color-text-primary)] shadow-[0_-1px_4px_rgba(0,0,0,0.1)]"
-            : "text-[var(--color-text-muted)] hover:text-[var(--color-text-secondary)]"
+            ? "tab-item-active font-medium text-[var(--color-text-primary)]"
+            : "text-[var(--color-text-muted)] hover:bg-[color-mix(in_srgb,var(--color-text-primary)_5%,transparent)] hover:text-[var(--color-text-secondary)]"
         }`}
       >
         {tab.pinned && (
           <Pin className="h-3 w-3 shrink-0 rotate-45 text-[var(--color-accent)]" />
         )}
         <TabBadge tab={tab} />
-        <span className="max-w-[140px] truncate">{tab.name}</span>
-        {tab.isDirty && (
-          <span className="h-2 w-2 shrink-0 rounded-full bg-[var(--color-accent)]" />
-        )}
+        <span className="max-w-[168px] truncate leading-none">{tab.name}</span>
+
+        {/* Trailing affordance — dirty dot swaps to a close button on hover */}
         {!tab.pinned && (
-          <span
-            onClick={(e) => {
-              e.stopPropagation();
-              onClose();
-            }}
-            className="ml-0.5 rounded-md p-0.5 opacity-0 transition-opacity hover:bg-[var(--color-border)] group-hover:opacity-100"
-          >
-            <X className="h-3 w-3" />
+          <span className="absolute right-1.5 top-1/2 flex h-4 w-4 -translate-y-1/2 items-center justify-center">
+            {tab.isDirty && (
+              <span className="h-[6px] w-[6px] rounded-full bg-[var(--color-accent)] transition-opacity duration-150 group-hover:opacity-0" />
+            )}
+            <span
+              onClick={(e) => {
+                e.stopPropagation();
+                onClose();
+              }}
+              aria-label={t("tabs.close")}
+              className={`absolute inset-0 flex items-center justify-center rounded-[5px] text-[var(--color-text-muted)] transition-all duration-150 hover:bg-[color-mix(in_srgb,var(--color-text-primary)_10%,transparent)] hover:text-[var(--color-text-primary)] ${
+                isActive && !tab.isDirty ? "opacity-50 group-hover:opacity-100" : "opacity-0 group-hover:opacity-100"
+              }`}
+            >
+              <X className="h-3 w-3" />
+            </span>
           </span>
         )}
       </button>
-      {contextMenu && (
-        <div
-          ref={menuRef}
-          className="fixed z-50 min-w-[180px] overflow-hidden rounded-lg border border-[var(--color-border)] bg-[var(--color-elevated)] py-1 shadow-xl"
-          style={{ left: contextMenu.x, top: contextMenu.y }}
-        >
-          {[
-            { label: tab.pinned ? t("tabs.unpinTab") : t("tabs.pinTab"), action: onTogglePin },
-            { label: t("tabs.duplicateTab"), action: onDuplicate },
-            null,
-            { label: t("tabs.close"), action: onClose },
-            { label: t("tabs.closeOthers"), action: onCloseOthers },
-            { label: t("tabs.closeAll"), action: onCloseAll },
-            null,
-            { label: t("tabs.moveToNewWindow"), action: onDetach },
-          ].map((item, i) =>
-            item === null ? (
-              <div key={i} className="my-1 border-t border-[var(--color-border)]" />
-            ) : (
-              <button
-                key={item.label}
-                onClick={() => { item.action(); setContextMenu(null); }}
-                className="flex w-full px-3 py-1.5 text-left text-sm text-[var(--color-text-primary)] hover:bg-[var(--color-accent-glow)]"
-              >
-                {item.label}
-              </button>
-            ),
-          )}
-        </div>
-      )}
+
+      {/* Rendered in a portal so the scrolling tab strip can't clip or mask it */}
+      {contextMenu &&
+        createPortal(
+          <div
+            ref={menuRef}
+            role="menu"
+            onContextMenu={(e) => e.preventDefault()}
+            className="surface-pop animate-panel-in fixed z-[90] min-w-[194px] overflow-hidden rounded-xl py-1"
+            style={{ left: contextMenu.x, top: contextMenu.y }}
+          >
+            {menuItems.map((item, i) =>
+              item === null ? (
+                <div key={i} className="my-1 border-t border-[var(--color-border-strong)]/60" />
+              ) : (
+                <button
+                  key={item.label}
+                  role="menuitem"
+                  onClick={() => {
+                    item.action();
+                    setContextMenu(null);
+                  }}
+                  className="flex w-full items-center px-3 py-[7px] text-left text-[12.5px] text-[var(--color-text-secondary)] transition-colors hover:bg-[var(--color-accent-soft)] hover:text-[var(--color-text-primary)]"
+                >
+                  {item.label}
+                </button>
+              ),
+            )}
+          </div>,
+          document.body,
+        )}
     </>
   );
 }
@@ -216,15 +267,15 @@ function NewTabDropdown() {
     <div ref={ref} className="relative flex items-center">
       <button
         onClick={() => setOpen(!open)}
-        className="ml-1 flex shrink-0 items-center gap-1.5 rounded-lg bg-[var(--color-accent)] px-3 py-1.5 text-xs font-semibold text-white transition-all hover:bg-[var(--color-accent-hover)] active:scale-95"
+        className="btn-accent ml-1 flex shrink-0 items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-semibold"
         title="New Tab"
       >
-        <Plus className="h-4 w-4" strokeWidth={2.5} />
+        <Plus className="h-3.5 w-3.5" strokeWidth={2.6} />
         <span>{t("sidebar.new")}</span>
         <ChevronDown className="h-3 w-3 opacity-70" />
       </button>
       {open && (
-        <div className="absolute right-0 top-full z-50 mt-2 min-w-[180px] overflow-hidden rounded-xl border border-[var(--color-border)] bg-[var(--color-elevated)] py-1 shadow-xl">
+        <div className="surface-pop animate-panel-in absolute right-0 top-full z-50 mt-2 min-w-[186px] overflow-hidden rounded-xl py-1.5">
           {items.map((item) => (
             <button
               key={item.label}
@@ -260,12 +311,59 @@ export function TabBar() {
   const { tabs, activeTabId, setActiveTab, closeTab, closeOtherTabs, closeAllTabs, reorderTabs, detachTab, togglePin, duplicateTab, save } = useTabStore();
   const activeTab = tabs.find((t) => t.id === activeTabId);
 
+  const scrollerRef = useRef<HTMLDivElement>(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(false);
+
   // Sort: pinned tabs first, preserving order within each group
   const sortedTabs = [...tabs].sort((a, b) => {
     if (a.pinned && !b.pinned) return -1;
     if (!a.pinned && b.pinned) return 1;
     return 0;
   });
+
+  const updateScrollState = useCallback(() => {
+    const el = scrollerRef.current;
+    if (!el) return;
+    setCanScrollLeft(el.scrollLeft > 2);
+    setCanScrollRight(el.scrollLeft + el.clientWidth < el.scrollWidth - 2);
+  }, []);
+
+  useEffect(() => {
+    const el = scrollerRef.current;
+    if (!el) return;
+    updateScrollState();
+    el.addEventListener("scroll", updateScrollState, { passive: true });
+    const ro = new ResizeObserver(updateScrollState);
+    ro.observe(el);
+    return () => {
+      el.removeEventListener("scroll", updateScrollState);
+      ro.disconnect();
+    };
+  }, [updateScrollState, tabs.length]);
+
+  // Keep the active tab reachable even when the strip overflows. Runs on every
+  // tab mutation (rename, add, close) because widths change without a scroll event.
+  useEffect(() => {
+    const id = requestAnimationFrame(() => {
+      const c = scrollerRef.current;
+      const el = c?.querySelector<HTMLElement>(`[data-tab-id="${activeTabId}"]`);
+      if (c && el) {
+        const left = el.offsetLeft;
+        const right = left + el.offsetWidth;
+        if (left < c.scrollLeft + 8) c.scrollLeft = Math.max(0, left - 8);
+        else if (right > c.scrollLeft + c.clientWidth - 8) c.scrollLeft = right - c.clientWidth + 8;
+      }
+      updateScrollState();
+    });
+    return () => cancelAnimationFrame(id);
+  }, [tabs, activeTabId, updateScrollState]);
+
+  const scrollTabs = (direction: -1 | 1) => {
+    const el = scrollerRef.current;
+    if (!el) return;
+    el.scrollBy({ left: direction * Math.max(160, el.clientWidth * 0.7), behavior: "smooth" });
+  };
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -286,7 +384,10 @@ export function TabBar() {
   if (tabs.length === 0) return null;
 
   return (
-    <div data-tour="tabs" className="flex items-end gap-1 bg-[var(--color-surface)] px-2 pt-2">
+    <div
+      data-tour="tabs"
+      className="flex h-9 shrink-0 items-stretch gap-2 bg-[var(--color-surface)] pl-2 pr-2"
+    >
       <DndContext
         sensors={sensors}
         collisionDetection={closestCenter}
@@ -296,24 +397,65 @@ export function TabBar() {
           items={sortedTabs.map((t) => t.id)}
           strategy={horizontalListSortingStrategy}
         >
-          <div className="flex flex-1 items-end gap-0.5 overflow-x-auto">
-            {sortedTabs.map((tab) => (
-              <SortableTab
-                key={tab.id}
-                tab={tab}
-                isActive={tab.id === activeTabId}
-                onActivate={() => setActiveTab(tab.id)}
-                onClose={() => closeTab(tab.id)}
-                onDetach={() => detachTab(tab.id)}
-                onCloseOthers={() => closeOtherTabs(tab.id)}
-                onCloseAll={() => closeAllTabs()}
-                onTogglePin={() => togglePin(tab.id)}
-                onDuplicate={() => duplicateTab(tab.id)}
-              />
-            ))}
+          <div className="flex min-w-0 flex-1 items-stretch gap-0.5">
+            {canScrollLeft && (
+              <button
+                onClick={() => scrollTabs(-1)}
+                aria-label="Scroll tabs left"
+                className="flex w-6 shrink-0 items-center justify-center self-stretch rounded-md text-[var(--color-text-dimmed)] transition-colors hover:bg-[color-mix(in_srgb,var(--color-text-primary)_6%,transparent)] hover:text-[var(--color-text-primary)]"
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </button>
+            )}
+
+            <div
+              ref={scrollerRef}
+              onWheel={(e) => {
+                const el = e.currentTarget;
+                if (el.scrollWidth <= el.clientWidth) return;
+                if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) el.scrollLeft += e.deltaY;
+              }}
+              className={`no-scrollbar flex min-w-0 shrink items-stretch gap-[3px] overflow-x-auto ${
+                canScrollLeft && canScrollRight
+                  ? "tabs-fade-lr"
+                  : canScrollLeft
+                    ? "tabs-fade-l"
+                    : canScrollRight
+                      ? "tabs-fade-r"
+                      : ""
+              }`}
+            >
+              {sortedTabs.map((tab) => (
+                <SortableTab
+                  key={tab.id}
+                  tab={tab}
+                  isActive={tab.id === activeTabId}
+                  onActivate={() => setActiveTab(tab.id)}
+                  onClose={() => closeTab(tab.id)}
+                  onDetach={() => detachTab(tab.id)}
+                  onCloseOthers={() => closeOtherTabs(tab.id)}
+                  onCloseAll={() => closeAllTabs()}
+                  onTogglePin={() => togglePin(tab.id)}
+                  onDuplicate={() => duplicateTab(tab.id)}
+                />
+              ))}
+            </div>
+
+            {canScrollRight && (
+              <button
+                onClick={() => scrollTabs(1)}
+                aria-label="Scroll tabs right"
+                className="flex w-6 shrink-0 items-center justify-center self-stretch rounded-md text-[var(--color-text-dimmed)] transition-colors hover:bg-[color-mix(in_srgb,var(--color-text-primary)_6%,transparent)] hover:text-[var(--color-text-primary)]"
+              >
+                <ChevronRight className="h-4 w-4" />
+              </button>
+            )}
+
+            {/* Sits right after the last tab; the strip shrinks before this does,
+                so it stays pinned at the right edge once tabs overflow. */}
             <button
               onClick={() => useTabStore.getState().newTab()}
-              className="mb-0.5 ml-1 shrink-0 rounded-md p-1.5 text-[var(--color-text-muted)] transition-colors hover:bg-[var(--color-elevated)] hover:text-[var(--color-text-secondary)]"
+              className="ml-0.5 flex h-6 w-6 shrink-0 items-center justify-center self-center rounded-md text-[var(--color-text-muted)] transition-colors hover:bg-[color-mix(in_srgb,var(--color-text-primary)_7%,transparent)] hover:text-[var(--color-text-primary)]"
               title="New Tab (Ctrl+T)"
             >
               <Plus className="h-4 w-4" />
@@ -321,7 +463,8 @@ export function TabBar() {
           </div>
         </SortableContext>
       </DndContext>
-      <div className="flex items-center gap-1 pb-1.5">
+
+      <div className="flex items-center gap-1.5">
         {activeTab?.isDirty && (
           <button
             onClick={() => {
@@ -331,7 +474,7 @@ export function TabBar() {
                 save();
               }
             }}
-            className="flex shrink-0 items-center gap-1.5 rounded-lg bg-[var(--color-elevated)] px-3 py-1.5 text-xs font-medium text-[var(--color-text-secondary)] transition-colors hover:bg-[var(--color-border)] hover:text-[var(--color-text-primary)]"
+            className="flex h-7 shrink-0 items-center gap-1.5 rounded-lg border border-[var(--color-border-strong)] bg-[color-mix(in_srgb,var(--color-elevated)_60%,transparent)] px-2.5 text-xs font-medium text-[var(--color-text-secondary)] transition-colors hover:bg-[var(--color-card-hover)] hover:text-[var(--color-text-primary)]"
             title="Save (Ctrl+S)"
           >
             <Save className="h-3.5 w-3.5" />

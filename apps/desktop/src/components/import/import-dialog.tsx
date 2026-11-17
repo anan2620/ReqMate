@@ -304,7 +304,7 @@ function SelectStep({
         <button
           onClick={onNext}
           disabled={!filePath || !format}
-          className="rounded bg-blue-600 px-4 py-1.5 text-sm text-white hover:bg-blue-500 disabled:opacity-40 disabled:cursor-not-allowed"
+          className="btn-accent rounded-lg px-4 py-1.5 text-[13px] font-semibold disabled:opacity-40 disabled:cursor-not-allowed"
         >
           {t("import.next")}
         </button>
@@ -386,7 +386,7 @@ function PreviewStep({
         <button
           onClick={onImport}
           disabled={!targetDir}
-          className="rounded bg-blue-600 px-4 py-1.5 text-sm text-white hover:bg-blue-500 disabled:opacity-40 disabled:cursor-not-allowed"
+          className="btn-accent rounded-lg px-4 py-1.5 text-[13px] font-semibold disabled:opacity-40 disabled:cursor-not-allowed"
         >
           {t("sidebar.import")}
         </button>
@@ -424,7 +424,7 @@ function ImportingStep({
           <p className="truncate text-xs text-[var(--color-text-dimmed)]">{result}</p>
           <button
             onClick={onClose}
-            className="mt-2 rounded bg-blue-600 px-4 py-1.5 text-sm text-white hover:bg-blue-500"
+            className="btn-accent mt-2 rounded-lg px-4 py-1.5 text-[13px] font-semibold"
           >
             {t("import.done")}
           </button>

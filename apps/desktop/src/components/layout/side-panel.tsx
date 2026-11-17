@@ -15,10 +15,11 @@ import type { ActivityView } from "./activity-bar";
 import { ProxySidePanel as ProxySidePanelView } from "@/components/proxy/proxy-panel";
 import { GitPanel as GitPanelView } from "@/components/git/git-panel";
 import { AuditPanel } from "@/components/audit/audit-panel";
+import { Select } from "@/components/ui/select";
 
 interface SidePanelProps {
   activeView: ActivityView;
-  envSelectorRef?: React.RefObject<HTMLSelectElement | null>;
+  envSelectorRef?: React.RefObject<HTMLButtonElement | null>;
   onOpenMock?: () => void;
   onOpenMonitor?: () => void;
   onOpenDocs?: () => void;
@@ -50,18 +51,23 @@ export function SidePanel({
 
   return (
     <div
-      className="flex shrink-0 flex-col border-r border-[var(--color-border)] bg-[var(--color-surface)]"
+      className="chrome-surface flex shrink-0 flex-col border-r border-[var(--color-border)]"
       style={{ width: `${sidebarWidth}px` }}
     >
       {/* Panel header */}
-      <div className="flex h-11 shrink-0 items-center px-4">
-        <span className="text-sm font-semibold uppercase tracking-wider text-[var(--color-text-muted)]">
-          {titles[activeView]}
-        </span>
+      <div className="flex h-12 shrink-0 items-center gap-2 px-4">
+        <span className="h-1.5 w-1.5 rounded-full bg-[var(--color-accent)] shadow-[0_0_6px_var(--color-accent)]" />
+        <span className="label-caps">{titles[activeView]}</span>
       </div>
 
       {/* Panel content */}
-      <div className="flex-1 overflow-y-auto">
+      <div
+        className={
+          activeView === "collections"
+            ? "flex min-h-0 flex-1 flex-col overflow-hidden"
+            : "flex-1 overflow-y-auto"
+        }
+      >
         {activeView === "collections" && <CollectionsPanel onOpenImport={onOpenImport} />}
         {activeView === "environments" && <EnvironmentsPanel envSelectorRef={envSelectorRef} />}
         {activeView === "history" && <HistoryPanel />}
@@ -73,6 +79,36 @@ export function SidePanel({
         {activeView === "audit" && <AuditPanel />}
       </div>
     </div>
+  );
+}
+
+function PanelAction({
+  icon: Icon,
+  label,
+  title,
+  onClick,
+  primary,
+}: {
+  icon: React.ComponentType<{ className?: string }>;
+  label: string;
+  title: string;
+  onClick: () => void;
+  primary?: boolean;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      title={title}
+      aria-label={title}
+      className={`flex min-w-0 flex-1 items-center justify-center gap-1 rounded-[6px] px-1.5 py-[6px] text-[11.5px] font-medium transition-colors ${
+        primary
+          ? "text-[var(--color-accent)] hover:bg-[var(--color-accent-soft)]"
+          : "text-[var(--color-text-muted)] hover:bg-[var(--color-card-hover)] hover:text-[var(--color-text-primary)]"
+      }`}
+    >
+      <Icon className="h-3.5 w-3.5 shrink-0" />
+      <span className="truncate">{label}</span>
+    </button>
   );
 }
 
@@ -99,144 +135,127 @@ function CollectionsPanel({ onOpenImport }: { onOpenImport?: () => void }) {
   };
 
   return (
-    <div className="flex flex-col gap-2 px-2">
-      {/* Search */}
-      {collections.length > 0 && (
-        <div className="relative">
-          <Search className="absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-[var(--color-text-dimmed)]" />
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder={t("sidebar.search")}
-            className="w-full rounded-lg bg-[var(--color-elevated)] py-1.5 pl-8 pr-7 text-xs text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none transition-colors focus:bg-[var(--color-card)] focus:ring-1 focus:ring-[var(--color-accent)]/50"
-          />
-          {searchQuery && (
-            <button
-              onClick={() => setSearchQuery("")}
-              className="absolute right-2 top-1/2 -translate-y-1/2 text-[var(--color-text-dimmed)] hover:text-[var(--color-text-secondary)]"
-            >
-              <X className="h-3 w-3" />
-            </button>
-          )}
-        </div>
-      )}
-
-      {collections.length === 0 ? (
-        <div className="flex flex-col items-center gap-3 px-2 py-8 text-center">
-          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[var(--color-accent-glow)]">
-            <FolderOpen className="h-6 w-6 text-[var(--color-accent)]" />
-          </div>
-          <div>
-            <p className="text-sm font-medium text-[var(--color-text-secondary)]">{t("sidebar.noCollections")}</p>
-            <p className="mt-0.5 text-xs text-[var(--color-text-dimmed)]">
-              {t("sidebar.noCollectionsDesc")}
-            </p>
-          </div>
-          <button
+    <div className="flex min-h-0 flex-1 flex-col">
+      {/* Pinned actions — stay put while the collection list scrolls */}
+      <div className="shrink-0 space-y-2 border-b border-[var(--color-border)] px-2.5 pb-2">
+        <div className="flex items-center gap-0.5 rounded-lg border border-[var(--color-border)] bg-[color-mix(in_srgb,var(--color-card)_65%,transparent)] p-0.5">
+          <PanelAction
+            icon={FolderPlus}
+            label={t("sidebar.new")}
+            title={t("sidebar.newCollection")}
             onClick={() => setNewCollectionOpen(true)}
-            className="flex items-center gap-2 rounded-lg bg-[var(--color-accent)] px-4 py-2 text-xs font-medium text-white transition-all hover:brightness-110 active:scale-[0.98]"
-          >
-            <FolderPlus className="h-3.5 w-3.5" />
-            {t("sidebar.newCollection")}
-          </button>
-          <button
+            primary
+          />
+          <PanelAction
+            icon={FolderOpen}
+            label={t("sidebar.open")}
+            title={t("sidebar.openFolder")}
             onClick={handleOpenFolder}
-            className="flex items-center gap-2 rounded-lg border border-[var(--color-border)] px-4 py-2 text-xs font-medium text-[var(--color-text-secondary)] transition-all hover:bg-[var(--color-elevated)]"
-          >
-            <FolderOpen className="h-3.5 w-3.5" />
-            {t("sidebar.openFolder")}
-          </button>
+          />
           {onOpenImport && (
-            <button
+            <PanelAction
+              icon={Upload}
+              label={t("sidebar.import")}
+              title={t("sidebar.importCollection")}
               onClick={onOpenImport}
-              className="flex items-center gap-2 rounded-lg border border-[var(--color-border)] px-4 py-2 text-xs font-medium text-[var(--color-text-secondary)] transition-all hover:bg-[var(--color-elevated)]"
-            >
-              <Upload className="h-3.5 w-3.5" />
-              {t("sidebar.importCollection")}
-            </button>
+            />
           )}
         </div>
-      ) : (
-        <>
-          {collections.map((collection) => (
-            <CollectionHeader
-              key={collection.path}
-              collection={collection}
-              searchQuery={searchQuery}
-              onContextMenu={(e) => {
-                e.preventDefault();
-                setCollectionMenu({ x: e.clientX, y: e.clientY, path: collection.path, name: collection.name });
-              }}
-              onDelete={() => setDeleteCollectionTarget({ path: collection.path, name: collection.name })}
-              onClose={() => closeCollection(collection.path)}
+
+        {/* Search */}
+        {collections.length > 0 && (
+          <div className="ring-focus relative flex items-center rounded-lg border border-transparent bg-[color-mix(in_srgb,var(--color-text-primary)_5%,transparent)] transition-all">
+            <Search className="absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-[var(--color-text-dimmed)]" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder={t("sidebar.search")}
+              className="w-full bg-transparent py-1.5 pl-8 pr-7 text-xs text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none"
             />
-          ))}
-          {/* Collection context menu */}
-          {collectionMenu && (
-            <>
-              <div className="fixed inset-0 z-40" onClick={() => setCollectionMenu(null)} />
-              <div
-                className="fixed z-50 min-w-[160px] rounded border border-[var(--color-border)] bg-[var(--color-elevated)] py-1 shadow-lg"
-                style={{ left: collectionMenu.x, top: collectionMenu.y }}
-              >
-                <button
-                  onClick={() => {
-                    setDefaultsPath(collectionMenu.path);
-                    setCollectionMenu(null);
-                  }}
-                  className="flex w-full items-center gap-2 px-3 py-1.5 text-left text-sm text-[var(--color-text-primary)] hover:bg-[var(--color-border)]"
-                >
-                  <Settings className="h-3.5 w-3.5" />
-                  Collection Defaults
-                </button>
-                <button
-                  onClick={() => {
-                    closeCollection(collectionMenu.path);
-                    setCollectionMenu(null);
-                  }}
-                  className="flex w-full items-center gap-2 px-3 py-1.5 text-left text-sm text-[var(--color-text-primary)] hover:bg-[var(--color-border)]"
-                >
-                  <FolderX className="h-3.5 w-3.5" />
-                  {t("sidebar.closeCollection")}
-                </button>
-                <button
-                  onClick={() => {
-                    setDeleteCollectionTarget({ path: collectionMenu.path, name: collectionMenu.name });
-                    setCollectionMenu(null);
-                  }}
-                  className="flex w-full items-center gap-2 px-3 py-1.5 text-left text-sm text-red-400 hover:bg-[var(--color-border)]"
-                >
-                  <Trash2 className="h-3.5 w-3.5" />
-                  {t("sidebar.deleteCollection")}
-                </button>
-              </div>
-            </>
-          )}
-          <div className="mx-1 mt-2 flex flex-wrap gap-1.5">
-            <button
-              onClick={() => setNewCollectionOpen(true)}
-              className="flex items-center gap-1.5 rounded-md px-2.5 py-2 text-sm text-[var(--color-text-dimmed)] transition-colors hover:bg-[var(--color-elevated)] hover:text-[var(--color-text-secondary)]"
-            >
-              <FolderPlus className="h-4 w-4" />
-              {t("sidebar.new")}
-            </button>
-            <button
-              onClick={handleOpenFolder}
-              className="flex items-center gap-1.5 rounded-md px-2.5 py-2 text-sm text-[var(--color-text-dimmed)] transition-colors hover:bg-[var(--color-elevated)] hover:text-[var(--color-text-secondary)]"
-            >
-              <FolderOpen className="h-4 w-4" />
-              {t("sidebar.open")}
-            </button>
-            {onOpenImport && (
+            {searchQuery && (
               <button
-                onClick={onOpenImport}
-                className="flex items-center gap-1.5 rounded-md px-2.5 py-2 text-sm text-[var(--color-text-dimmed)] transition-colors hover:bg-[var(--color-elevated)] hover:text-[var(--color-text-secondary)]"
+                onClick={() => setSearchQuery("")}
+                className="absolute right-2 top-1/2 -translate-y-1/2 text-[var(--color-text-dimmed)] hover:text-[var(--color-text-secondary)]"
               >
-                <Upload className="h-4 w-4" />
-                {t("sidebar.import")}
+                <X className="h-3 w-3" />
               </button>
             )}
+          </div>
+        )}
+      </div>
+
+      {/* Scrollable list */}
+      <div className="min-h-0 flex-1 overflow-y-auto px-2.5 pb-3 pt-2">
+        {collections.length === 0 ? (
+          <div className="flex h-full flex-col items-center justify-center gap-3 px-2 text-center">
+            <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] elev-sm">
+              <FolderOpen className="h-5 w-5 text-[var(--color-accent)]" />
+            </div>
+            <div>
+              <p className="text-sm font-medium text-[var(--color-text-secondary)]">{t("sidebar.noCollections")}</p>
+              <p className="mt-1 text-xs leading-relaxed text-[var(--color-text-muted)]">
+                {t("sidebar.noCollectionsDesc")}
+              </p>
+            </div>
+          </div>
+        ) : (
+          <div className="space-y-0.5">
+            {collections.map((collection) => (
+              <CollectionHeader
+                key={collection.path}
+                collection={collection}
+                searchQuery={searchQuery}
+                onContextMenu={(e) => {
+                  e.preventDefault();
+                  setCollectionMenu({ x: e.clientX, y: e.clientY, path: collection.path, name: collection.name });
+                }}
+                onDelete={() => setDeleteCollectionTarget({ path: collection.path, name: collection.name })}
+                onClose={() => closeCollection(collection.path)}
+              />
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Collection context menu */}
+      {collectionMenu && (
+        <>
+          <div className="fixed inset-0 z-40" onClick={() => setCollectionMenu(null)} />
+          <div
+            className="fixed z-50 min-w-[160px] rounded-lg border border-[var(--color-border-strong)] bg-[var(--color-elevated)] py-1 shadow-xl"
+            style={{ left: collectionMenu.x, top: collectionMenu.y }}
+          >
+            <button
+              onClick={() => {
+                setDefaultsPath(collectionMenu.path);
+                setCollectionMenu(null);
+              }}
+              className="flex w-full items-center gap-2 px-3 py-1.5 text-left text-[12.5px] text-[var(--color-text-primary)] hover:bg-[var(--color-accent-soft)]"
+            >
+              <Settings className="h-3.5 w-3.5" />
+              Collection Defaults
+            </button>
+            <button
+              onClick={() => {
+                closeCollection(collectionMenu.path);
+                setCollectionMenu(null);
+              }}
+              className="flex w-full items-center gap-2 px-3 py-1.5 text-left text-[12.5px] text-[var(--color-text-primary)] hover:bg-[var(--color-accent-soft)]"
+            >
+              <FolderX className="h-3.5 w-3.5" />
+              {t("sidebar.closeCollection")}
+            </button>
+            <button
+              onClick={() => {
+                setDeleteCollectionTarget({ path: collectionMenu.path, name: collectionMenu.name });
+                setCollectionMenu(null);
+              }}
+              className="flex w-full items-center gap-2 px-3 py-1.5 text-left text-[12.5px] text-[var(--color-error)] hover:bg-[var(--color-error)]/10"
+            >
+              <Trash2 className="h-3.5 w-3.5" />
+              {t("sidebar.deleteCollection")}
+            </button>
           </div>
         </>
       )}
@@ -368,16 +387,18 @@ function CollectionDefaultsDialog({
                 <label className="mb-1 block text-xs font-medium text-[var(--color-text-muted)]">
                   {t("auth.type")}
                 </label>
-                <select
+                <Select
+                  size="md"
                   value={authType}
-                  onChange={(e) => setAuthType(e.target.value)}
-                  className="w-full rounded bg-[var(--color-elevated)] px-3 py-1.5 text-sm text-[var(--color-text-primary)] outline-none"
-                >
-                  <option value="none">{t("auth.none")}</option>
-                  <option value="bearer">{t("auth.bearer")}</option>
-                  <option value="basic">{t("auth.basic")}</option>
-                  <option value="api-key">{t("auth.apiKey")}</option>
-                </select>
+                  onChange={setAuthType}
+                  options={[
+                    { value: "none", label: t("auth.none") },
+                    { value: "bearer", label: t("auth.bearer") },
+                    { value: "basic", label: t("auth.basic") },
+                    { value: "api-key", label: t("auth.apiKey") },
+                  ]}
+                  aria-label={t("auth.type")}
+                />
               </div>
 
               {authType === "bearer" && (
@@ -457,7 +478,7 @@ function CollectionHeader({
       <button
         onClick={() => toggleExpand(collection.path)}
         onContextMenu={onContextMenu}
-        className="group flex w-full items-center gap-1.5 rounded px-2 py-1 text-left text-sm hover:bg-[var(--color-elevated)]"
+        className="group flex w-full items-center gap-1.5 rounded-md px-2 py-[5px] text-left text-[12.5px] transition-colors hover:bg-[color-mix(in_srgb,var(--color-text-primary)_6%,transparent)]"
       >
         {isExpanded ? (
           <ChevronDown className="h-3.5 w-3.5 shrink-0 text-[var(--color-text-muted)]" />
@@ -479,7 +500,7 @@ function CollectionHeader({
               if (e.key === "Enter") submitRename();
               if (e.key === "Escape") setRenaming(false);
             }}
-            className="min-w-0 flex-1 rounded bg-[var(--color-elevated)] px-1 text-sm text-[var(--color-text-primary)] outline-none ring-1 ring-blue-500"
+            className="min-w-0 flex-1 rounded bg-[var(--color-elevated)] px-1 text-sm text-[var(--color-text-primary)] outline-none ring-1 ring-[var(--color-accent)]"
             onClick={(e) => e.stopPropagation()}
           />
         ) : (
@@ -659,7 +680,7 @@ function NewCollectionDialog({
 function EnvironmentsPanel({
   envSelectorRef,
 }: {
-  envSelectorRef?: React.RefObject<HTMLSelectElement | null>;
+  envSelectorRef?: React.RefObject<HTMLButtonElement | null>;
 }) {
   const { t } = useTranslation();
   const { environments, activeEnvironmentName, setActiveEnvironment, loadEnvironments } =

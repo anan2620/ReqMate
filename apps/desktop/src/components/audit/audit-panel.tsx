@@ -56,7 +56,7 @@ export function AuditPanel() {
   };
 
   return (
-    <div className="flex h-full flex-col px-2">
+    <div className="flex h-full flex-col px-2 pt-2">
       {/* Header actions */}
       <div className="mb-1 flex items-center justify-between">
         <span className="text-xs text-[var(--color-text-dimmed)]">

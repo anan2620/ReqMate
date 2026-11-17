@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { useActiveTab, useTabStore } from "@/stores/tab-store";
 import { AlertCircle, ClipboardCopy, Download, Check, ArrowLeftRight, BookmarkPlus } from "lucide-react";
@@ -16,14 +16,6 @@ import { CodeEditor } from "@/components/ui/code-editor";
 import type { KeyValuePair } from "@reqmate/types";
 
 type ResponseTab = "body" | "headers" | "cookies" | "tests" | "timing" | "console" | "code";
-
-function statusColor(status: number): string {
-  if (status < 200) return "text-blue-400";
-  if (status < 300) return "text-green-500";
-  if (status < 400) return "text-yellow-500";
-  if (status < 500) return "text-red-400";
-  return "text-red-500";
-}
 
 function formatSize(bytes: number): string {
   if (bytes < 1024) return `${bytes} B`;
@@ -99,12 +91,20 @@ export function ResponsePanel() {
 
       {/* Status bar — below tabs, always visible when response exists */}
       {response && (
-        <div className="flex items-center gap-3 border-b border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-1.5" role="status" aria-live="polite">
-          <span className={`text-sm font-semibold animate-status-pulse ${statusColor(response.status)}`} aria-label={`Response: ${response.status} ${response.statusText}, ${response.status < 300 ? "success" : response.status < 400 ? "redirect" : response.status < 500 ? "client error" : "server error"}`}>
+        <div className="flex items-center gap-2 border-b border-[var(--color-border)] bg-[color-mix(in_srgb,var(--color-surface)_65%,var(--color-card))] px-3 py-1.5" role="status" aria-live="polite">
+          <span
+            className={`pill animate-status-pulse px-2 py-0.5 !text-[11px] ${
+              response.status < 300 ? "method-get" : response.status < 400 ? "method-post" : "method-delete"
+            }`}
+            aria-label={`Response: ${response.status} ${response.statusText}, ${response.status < 300 ? "success" : response.status < 400 ? "redirect" : response.status < 500 ? "client error" : "server error"}`}
+          >
             {response.status} {response.statusText}
           </span>
-          <span className="text-xs text-[var(--color-text-muted)]">{response.timeMs}ms</span>
-          <span className="text-xs text-[var(--color-text-muted)]">
+          <span className="tabular text-[11px] font-medium text-[var(--color-text-muted)]">
+            {response.timeMs} ms
+          </span>
+          <span aria-hidden className="h-3 w-px bg-[var(--color-border-strong)]" />
+          <span className="tabular text-[11px] text-[var(--color-text-muted)]">
             {formatSize(response.sizeBytes)}
           </span>
         </div>
@@ -329,40 +329,43 @@ function ResponseTabs({
   };
 
   return (
-    <div className="flex gap-0 overflow-x-auto border-b border-[var(--color-border)] bg-[var(--color-surface)]">
-      {TAB_IDS.map((tabId) => (
-        <button
-          key={tabId}
-          onClick={() => setActiveTab(tabId)}
-          className={`shrink-0 whitespace-nowrap px-4 py-2 text-sm transition-colors ${
-            activeTab === tabId
-              ? "border-b-2 border-blue-500 text-[var(--color-text-primary)]"
-              : "text-[var(--color-text-muted)] hover:text-[var(--color-text-secondary)]"
-          }`}
-        >
-          {t(TAB_LABEL_KEYS[tabId])}
-          {tabId === "headers" && response && (
-            <span className="ml-1 text-xs text-[var(--color-text-dimmed)]">
-              ({response.headers.length})
+    <div className="flex shrink-0 items-center gap-0.5 overflow-x-auto border-b border-[var(--color-border)] bg-[var(--color-surface)] px-2">
+      {TAB_IDS.map((tabId) => {
+        const isActive = activeTab === tabId;
+        let meta: ReactNode = null;
+        if (tabId === "headers" && response) {
+          meta = <span className="tabular text-[10px] text-[var(--color-text-dimmed)]">{response.headers.length}</span>;
+        } else if (tabId === "cookies" && response && response.cookies.length > 0) {
+          meta = <span className="tabular text-[10px] text-[var(--color-text-dimmed)]">{response.cookies.length}</span>;
+        } else if (tabId === "tests" && hasTestResults) {
+          meta = (
+            <span className={`pill ${failedCount > 0 ? "method-delete" : "method-get"} !py-0 !text-[9px]`}>
+              {failedCount > 0 ? `${failedCount} FAIL` : "PASS"}
             </span>
-          )}
-          {tabId === "cookies" && response && response.cookies.length > 0 && (
-            <span className="ml-1 text-xs text-[var(--color-text-dimmed)]">
-              ({response.cookies.length})
+          );
+        } else if (tabId === "console" && consoleCount > 0) {
+          meta = <span className="tabular text-[10px] text-[var(--color-text-dimmed)]">{consoleCount}</span>;
+        }
+        return (
+          <button
+            key={tabId}
+            onClick={() => setActiveTab(tabId)}
+            className={`relative shrink-0 whitespace-nowrap px-3 py-[9px] text-[12.5px] transition-colors duration-150 ${
+              isActive
+                ? "font-medium text-[var(--color-text-primary)]"
+                : "text-[var(--color-text-muted)] hover:text-[var(--color-text-secondary)]"
+            }`}
+          >
+            <span className="flex items-center gap-1.5">
+              {t(TAB_LABEL_KEYS[tabId])}
+              {meta}
             </span>
-          )}
-          {tabId === "tests" && hasTestResults && (
-            <span className={`ml-1 text-xs ${failedCount > 0 ? "text-red-400" : "text-green-500"}`}>
-              {failedCount > 0 ? `${failedCount} fail` : "pass"}
-            </span>
-          )}
-          {tabId === "console" && consoleCount > 0 && (
-            <span className="ml-1 text-xs text-[var(--color-text-dimmed)]">
-              ({consoleCount})
-            </span>
-          )}
-        </button>
-      ))}
+            {isActive && (
+              <span className="absolute inset-x-2 -bottom-px h-[2px] rounded-full bg-[var(--color-accent)] shadow-[0_0_8px_var(--color-accent-ring)]" />
+            )}
+          </button>
+        );
+      })}
     </div>
   );
 }

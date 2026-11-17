@@ -73,7 +73,7 @@ export function BottomPanel({ terminalOpen, onTerminalOpenChange }: BottomPanelP
 
   return (
     <div
-      className="flex flex-col border-t border-[var(--color-border)] bg-[var(--color-surface)]"
+      className="flex flex-col border-t border-[var(--color-border)] bg-[var(--color-card)] shadow-[0_-8px_24px_-18px_rgba(0,0,0,0.5)]"
       style={{ height }}
     >
       {/* Resize handle */}
@@ -83,7 +83,7 @@ export function BottomPanel({ terminalOpen, onTerminalOpenChange }: BottomPanelP
       />
 
       {/* Tab bar */}
-      <div className="flex items-center border-b border-[var(--color-border)] px-1">
+      <div className="flex items-center border-b border-[var(--color-border)] bg-[var(--color-surface)] px-1.5">
         <PanelTab
           icon={ScrollText}
           label={t("console.title")}
@@ -104,7 +104,7 @@ export function BottomPanel({ terminalOpen, onTerminalOpenChange }: BottomPanelP
 
         <button
           onClick={closePanel}
-          className="rounded-md p-1 text-[var(--color-text-muted)] transition-colors hover:bg-[var(--color-elevated)] hover:text-[var(--color-text-secondary)]"
+          className="rounded-md p-1 text-[var(--color-text-muted)] transition-colors hover:bg-[color-mix(in_srgb,var(--color-text-primary)_7%,transparent)] hover:text-[var(--color-text-secondary)]"
           title={t("console.closePanel")}
         >
           <ChevronDown className="h-4 w-4" />
@@ -145,14 +145,17 @@ function PanelTab({
   return (
     <button
       onClick={onClick}
-      className={`flex items-center gap-1.5 px-3 py-2 text-sm font-medium transition-colors ${
+      className={`relative flex items-center gap-1.5 px-3 py-[9px] text-[12.5px] font-medium transition-colors ${
         active
-          ? "border-b-2 border-[var(--color-accent)] text-[var(--color-text-primary)]"
+          ? "text-[var(--color-text-primary)]"
           : "text-[var(--color-text-muted)] hover:text-[var(--color-text-secondary)]"
       }`}
     >
-      <Icon className="h-4 w-4" />
+      <Icon className={`h-3.5 w-3.5 ${active ? "text-[var(--color-accent)]" : ""}`} />
       {label}
+      {active && (
+        <span className="absolute inset-x-2 -bottom-px h-[2px] rounded-full bg-[var(--color-accent)]" />
+      )}
     </button>
   );
 }

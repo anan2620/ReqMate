@@ -7,6 +7,7 @@ import { Loader2, Send, AlertCircle, Check } from "lucide-react";
 import * as Popover from "@radix-ui/react-popover";
 import { HintTooltip } from "@/components/ui/hint-tooltip";
 import { saveEnvironment } from "@/lib/tauri-api";
+import { Select } from "@/components/ui/select";
 
 const METHODS: HttpMethod[] = [
   "GET",
@@ -17,26 +18,6 @@ const METHODS: HttpMethod[] = [
   "HEAD",
   "OPTIONS",
 ];
-
-const METHOD_COLORS: Record<HttpMethod, string> = {
-  GET: "text-emerald-400",
-  POST: "text-amber-400",
-  PUT: "text-blue-400",
-  PATCH: "text-purple-400",
-  DELETE: "text-red-400",
-  HEAD: "text-cyan-400",
-  OPTIONS: "text-gray-400",
-};
-
-const METHOD_BG: Record<HttpMethod, string> = {
-  GET: "bg-emerald-500/10",
-  POST: "bg-amber-500/10",
-  PUT: "bg-blue-500/10",
-  PATCH: "bg-purple-500/10",
-  DELETE: "bg-red-500/10",
-  HEAD: "bg-cyan-500/10",
-  OPTIONS: "bg-gray-500/10",
-};
 
 /** Extract all {{variableName}} references from a tab's fields */
 function extractVariableRefs(tab: {
@@ -146,7 +127,7 @@ function VariableEditor({
       </Popover.Trigger>
       <Popover.Portal>
         <Popover.Content
-          className="z-50 w-72 rounded-xl border border-[var(--color-border)] bg-[var(--color-elevated)] p-3 shadow-xl"
+          className="surface-pop animate-panel-in z-50 w-72 rounded-xl p-3"
           sideOffset={8}
           align="start"
           onOpenAutoFocus={(e) => e.preventDefault()}
@@ -303,82 +284,77 @@ export const UrlBar = forwardRef<HTMLInputElement, UrlBarProps>(function UrlBar(
   };
 
   return (
-    <div data-tour="url-bar" className="flex items-center gap-3 bg-[var(--color-card)] px-4 py-3">
-      {/* Method selector — show static badge for non-HTTP protocols */}
-      {tab.protocol === "graphql" ? (
-        <span className="rounded-lg bg-violet-500/15 px-3 py-2 text-sm font-bold text-violet-400">
-          GQL
-        </span>
-      ) : tab.protocol === "websocket" ? (
-        <span className="rounded-lg bg-cyan-500/15 px-3 py-2 text-sm font-bold text-cyan-400">
-          WS
-        </span>
-      ) : tab.protocol === "sse" ? (
-        <span className="rounded-lg bg-orange-500/15 px-3 py-2 text-sm font-bold text-orange-400">
-          SSE
-        </span>
-      ) : tab.protocol === "grpc" ? (
-        <span className="rounded-lg bg-green-500/15 px-3 py-2 text-sm font-bold text-green-400">
-          gRPC
-        </span>
-      ) : (
-        <select
-          value={tab.method}
-          onChange={(e) => setMethod(e.target.value as HttpMethod)}
-          className={`${METHOD_COLORS[tab.method]} ${METHOD_BG[tab.method]} cursor-pointer rounded-lg px-3 py-2 text-sm font-bold outline-none transition-colors focus:ring-2 focus:ring-[var(--color-accent)]/50`}
-        >
-          {METHODS.map((m) => (
-            <option key={m} value={m} className="text-[var(--color-text-primary)] bg-[var(--color-elevated)]">
-              {m}
-            </option>
-          ))}
-        </select>
-      )}
-
-      {/* URL input with variable highlighting overlay */}
-      <div className="relative flex-1">
-        <input
-          ref={setRefs}
-          type="text"
-          value={tab.url}
-          onChange={(e) => setUrl(e.target.value)}
-          onKeyDown={handleKeyDown}
-          onFocus={() => setInputFocused(true)}
-          onBlur={() => setInputFocused(false)}
-          disabled={urlDisabled}
-          placeholder={t("request.urlPlaceholder")}
-          className={`w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-elevated)] px-4 py-2 text-sm outline-none transition-all focus:border-[var(--color-accent)]/50 focus:ring-2 focus:ring-[var(--color-accent)]/20 disabled:opacity-60 ${
-            hasVariablesInUrl && !inputFocused
-              ? "text-transparent caret-[var(--color-text-primary)]"
-              : "text-[var(--color-text-primary)]"
-          } placeholder-[var(--color-text-dimmed)]`}
-        />
-        {/* Colored overlay — visible when input is NOT focused and URL has variables */}
-        {hasVariablesInUrl && !inputFocused && (
-          <div
-            className="pointer-events-none absolute inset-0 flex items-center px-4 text-sm"
-            aria-hidden="true"
-          >
-            <div className="flex items-center overflow-hidden whitespace-nowrap">
-              {urlSegments.map((seg, i) =>
-                seg.type === "text" ? (
-                  <span key={i} className="text-[var(--color-text-primary)]">
-                    {seg.value}
-                  </span>
-                ) : (
-                  <span key={i} className="pointer-events-auto">
-                    <VariableEditor
-                      varName={seg.value}
-                      resolved={resolvedVars[seg.value]}
-                      onSave={handleSaveVariable}
-                      activeEnvName={activeEnvName}
-                    />
-                  </span>
-                ),
-              )}
-            </div>
-          </div>
+    <div data-tour="url-bar" className="flex items-center gap-2.5 bg-[var(--color-card)] px-3 pb-2.5 pt-1">
+      {/* Command bar — method + URL in one focused surface */}
+      <div className="ring-focus flex min-w-0 flex-1 items-center gap-2 rounded-xl border border-[var(--color-border-strong)] bg-[color-mix(in_srgb,var(--color-elevated)_55%,var(--color-card))] px-2 py-1.5 elev-xs transition-all duration-200">
+        {/* Method selector — show static badge for non-HTTP protocols */}
+        {tab.protocol === "graphql" ? (
+          <span className="pill method-graphql px-2.5 py-1 text-[11px]">GQL</span>
+        ) : tab.protocol === "websocket" ? (
+          <span className="pill method-websocket px-2.5 py-1 text-[11px]">WS</span>
+        ) : tab.protocol === "sse" ? (
+          <span className="pill method-sse px-2.5 py-1 text-[11px]">SSE</span>
+        ) : tab.protocol === "grpc" ? (
+          <span className="pill method-grpc px-2.5 py-1 text-[11px]">gRPC</span>
+        ) : (
+          <Select
+            variant="plain"
+            value={tab.method}
+            onChange={(value) => setMethod(value as HttpMethod)}
+            options={METHODS.map((m) => ({ value: m, label: m }))}
+            className={`method-select method-${tab.method.toLowerCase()} shrink-0 px-2.5 py-1 text-[11px]`}
+            aria-label="HTTP method"
+          />
         )}
+
+        <span aria-hidden className="h-5 w-px shrink-0 bg-[var(--color-border-strong)]" />
+
+        {/* URL input with variable highlighting overlay */}
+        <div className="relative min-w-0 flex-1">
+          <input
+            ref={setRefs}
+            type="text"
+            value={tab.url}
+            onChange={(e) => setUrl(e.target.value)}
+            onKeyDown={handleKeyDown}
+            onFocus={() => setInputFocused(true)}
+            onBlur={() => setInputFocused(false)}
+            disabled={urlDisabled}
+            spellCheck={false}
+            placeholder={t("request.urlPlaceholder")}
+            className={`w-full border-0 bg-transparent px-2 py-0.5 font-mono text-[13px] outline-none disabled:opacity-60 ${
+              hasVariablesInUrl && !inputFocused
+                ? "text-transparent caret-[var(--color-text-primary)]"
+                : "text-[var(--color-text-primary)]"
+            } placeholder-[var(--color-text-dimmed)] placeholder:font-sans`}
+          />
+          {/* Colored overlay — visible when input is NOT focused and URL has variables */}
+          {hasVariablesInUrl && !inputFocused && (
+            <div
+              className="pointer-events-none absolute inset-0 flex items-center px-2 font-mono text-[13px]"
+              aria-hidden="true"
+            >
+              <div className="flex items-center overflow-hidden whitespace-nowrap">
+                {urlSegments.map((seg, i) =>
+                  seg.type === "text" ? (
+                    <span key={i} className="text-[var(--color-text-primary)]">
+                      {seg.value}
+                    </span>
+                  ) : (
+                    <span key={i} className="pointer-events-auto">
+                      <VariableEditor
+                        varName={seg.value}
+                        resolved={resolvedVars[seg.value]}
+                        onSave={handleSaveVariable}
+                        activeEnvName={activeEnvName}
+                      />
+                    </span>
+                  ),
+                )}
+              </div>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Extra protocol-specific actions */}
@@ -392,16 +368,16 @@ export const UrlBar = forwardRef<HTMLInputElement, UrlBarProps>(function UrlBar(
             data-tour="send-btn"
             onClick={send}
             disabled={tab.loading || !tab.url.trim()}
-            className="flex items-center gap-2 rounded-lg bg-[var(--color-accent)] px-5 py-2 text-sm font-semibold text-white transition-all hover:bg-[var(--color-accent-hover)] disabled:cursor-not-allowed disabled:opacity-50 active:scale-[0.98]"
+            className="btn-accent flex h-[38px] items-center gap-2 rounded-xl px-4 text-[13px] font-semibold disabled:cursor-not-allowed disabled:opacity-45 disabled:shadow-none disabled:grayscale-[0.25]"
           >
             {tab.loading ? (
               <Loader2 className="h-4 w-4 animate-spin" />
             ) : (
-              <Send className="h-4 w-4" />
+              <Send className="h-3.5 w-3.5" />
             )}
             {t("request.send")}
           </button>
-          <HintTooltip hintId="send-shortcut" message="Tip: Press Ctrl+Enter to send requests quickly" />
+          <HintTooltip hintId="send-shortcut" message="Tip: Press Ctrl+Enter to send requests quickly" align="right" />
         </div>
       )}
     </div>

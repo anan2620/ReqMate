@@ -3,6 +3,7 @@ import * as Dialog from "@radix-ui/react-dialog";
 import { X, ArrowLeftRight } from "lucide-react";
 import { useDiffStore, type SavedSnapshot } from "@/stores/diff-store";
 import { computeLineDiff, type DiffLine } from "@/lib/diff";
+import { Select } from "@/components/ui/select";
 
 function tryFormat(body: string): string {
   try {
@@ -130,26 +131,26 @@ function SnapshotSelector({
   snapshots: SavedSnapshot[];
   onSelect: (snapshot: SavedSnapshot) => void;
 }) {
+  const [value, setValue] = useState("");
   return (
     <div className="flex flex-1 items-center gap-2">
       <span className="text-xs font-medium text-[var(--color-text-muted)]">{label}:</span>
-      <select
-        onChange={(e) => {
-          const idx = parseInt(e.target.value);
-          if (!isNaN(idx) && snapshots[idx]) {
-            onSelect(snapshots[idx]);
-          }
-        }}
-        className="flex-1 rounded bg-[var(--color-elevated)] px-2 py-1 text-xs text-[var(--color-text-primary)] outline-none"
-        defaultValue=""
-      >
-        <option value="" disabled>Select snapshot...</option>
-        {snapshots.map((s, i) => (
-          <option key={i} value={i}>
-            {s.label} ({new Date(s.savedAt).toLocaleTimeString()})
-          </option>
-        ))}
-      </select>
+      <div className="flex-1">
+        <Select
+          value={value}
+          onChange={(v) => {
+            setValue(v);
+            const snapshot = snapshots[parseInt(v)];
+            if (snapshot) onSelect(snapshot);
+          }}
+          options={snapshots.map((s, i) => ({
+            value: String(i),
+            label: `${s.label} (${new Date(s.savedAt).toLocaleTimeString()})`,
+          }))}
+          placeholder="Select snapshot..."
+          aria-label={label}
+        />
+      </div>
     </div>
   );
 }

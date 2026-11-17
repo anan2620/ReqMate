@@ -39,10 +39,10 @@ export function KeyValueEditor({
   return (
     <div className="space-y-1">
       {/* Header row */}
-      <div className="grid grid-cols-[auto_1fr_1fr_auto] items-center gap-2 px-1 text-xs text-[var(--color-text-muted)]">
-        <span className="w-5" />
-        <span>{keyPlaceholder}</span>
-        <span>{valuePlaceholder}</span>
+      <div className="grid grid-cols-[auto_1fr_1fr_auto] items-center gap-2 border-b border-[var(--color-border)] px-1 pb-1.5">
+        <span className="w-3.5" />
+        <span className="text-[10.5px] font-semibold uppercase tracking-[0.1em] text-[var(--color-text-dimmed)]">{keyPlaceholder}</span>
+        <span className="text-[10.5px] font-semibold uppercase tracking-[0.1em] text-[var(--color-text-dimmed)]">{valuePlaceholder}</span>
         <span className="w-7" />
       </div>
 
@@ -50,31 +50,32 @@ export function KeyValueEditor({
       {pairs.map((pair, index) => (
         <div
           key={pair.id}
-          className="grid grid-cols-[auto_1fr_1fr_auto] items-center gap-2 px-1"
+          className="group grid grid-cols-[auto_1fr_1fr_auto] items-center gap-2 rounded-md px-1 py-0.5 transition-colors hover:bg-[color-mix(in_srgb,var(--color-text-primary)_3%,transparent)]"
         >
           <input
             type="checkbox"
             checked={pair.enabled}
             onChange={(e) => update(index, "enabled", e.target.checked)}
-            className="h-4 w-4 accent-blue-500"
+            className="h-3.5 w-3.5 shrink-0 cursor-pointer rounded accent-[var(--color-accent)]"
           />
           <input
             type="text"
             value={pair.key}
             onChange={(e) => update(index, "key", e.target.value)}
             placeholder={keyPlaceholder}
-            className="rounded bg-[var(--color-elevated)] px-2 py-1 text-sm text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none focus:ring-1 focus:ring-blue-500"
+            className="field-soft min-w-0 rounded-md border border-transparent bg-[color-mix(in_srgb,var(--color-elevated)_70%,transparent)] px-2.5 py-1.5 text-[12.5px] text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none transition-all focus:border-[var(--color-accent-line)] focus:bg-[var(--color-elevated)] focus:ring-2 focus:ring-[var(--color-accent-ring)]"
           />
           <input
             type="text"
             value={pair.value}
             onChange={(e) => update(index, "value", e.target.value)}
             placeholder={valuePlaceholder}
-            className="rounded bg-[var(--color-elevated)] px-2 py-1 text-sm text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none focus:ring-1 focus:ring-blue-500"
+            className="field-soft min-w-0 rounded-md border border-transparent bg-[color-mix(in_srgb,var(--color-elevated)_70%,transparent)] px-2.5 py-1.5 text-[12.5px] text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none transition-all focus:border-[var(--color-accent-line)] focus:bg-[var(--color-elevated)] focus:ring-2 focus:ring-[var(--color-accent-ring)]"
           />
           <button
             onClick={() => removeRow(index)}
-            className="rounded p-1 text-[var(--color-text-muted)] hover:bg-[var(--color-border)] hover:text-red-400"
+            className="rounded-md p-1.5 text-[var(--color-text-dimmed)] opacity-0 transition-all hover:bg-[var(--color-error)]/12 hover:text-[var(--color-error)] group-hover:opacity-100 focus-visible:opacity-100"
+            aria-label="Remove row"
           >
             <Trash2 className="h-3.5 w-3.5" />
           </button>
@@ -84,9 +85,9 @@ export function KeyValueEditor({
       {/* Add row button */}
       <button
         onClick={addRow}
-        className="flex items-center gap-1 px-1 pt-1 text-xs text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)]"
+        className="mt-1.5 flex w-full items-center gap-1.5 rounded-md border border-dashed border-[var(--color-border-strong)] px-2.5 py-1.5 text-[11.5px] text-[var(--color-text-muted)] transition-colors hover:border-[var(--color-accent-line)] hover:bg-[var(--color-accent-soft)] hover:text-[var(--color-accent)]"
       >
-        <Plus className="h-3 w-3" /> Add
+        <Plus className="h-3.5 w-3.5" /> Add
       </button>
     </div>
   );

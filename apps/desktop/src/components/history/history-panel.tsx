@@ -75,17 +75,17 @@ export function HistoryPanel() {
   });
 
   return (
-    <div className="px-2">
+    <div className="px-2 pb-2 pt-2">
       {/* Search + clear */}
       <div className="mb-1 flex items-center gap-1">
-        <div className="flex flex-1 items-center rounded bg-[var(--color-elevated)] px-2">
-          <Search className="h-3 w-3 text-[var(--color-text-dimmed)]" />
+        <div className="ring-focus flex flex-1 items-center rounded-lg border border-transparent bg-[color-mix(in_srgb,var(--color-text-primary)_5%,transparent)] pl-2 transition-colors hover:bg-[color-mix(in_srgb,var(--color-text-primary)_7%,transparent)]">
+          <Search className="h-3.5 w-3.5 shrink-0 text-[var(--color-text-dimmed)]" />
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => handleSearch(e.target.value)}
             placeholder={t("history.search")}
-            className="w-full bg-transparent px-1.5 py-1 text-xs text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none"
+            className="w-full bg-transparent px-1.5 py-1.5 text-xs text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none"
           />
         </div>
         {entries.length > 0 && (

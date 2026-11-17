@@ -17,8 +17,13 @@ interface StatusBarProps {
 
 export function StatusBar({ onToggleTerminal, terminalOpen }: StatusBarProps) {
   const { t } = useTranslation();
-  const [appVersion, setAppVersion] = useState("");
-  useEffect(() => { getVersion().then(setAppVersion); }, []);
+  // Injected at build time, so the shell still shows a version without Tauri
+  const [appVersion, setAppVersion] = useState(__APP_VERSION__);
+  useEffect(() => {
+    getVersion()
+      .then((v) => v && setAppVersion(v))
+      .catch(() => {});
+  }, []);
   const activeEnv = useEnvironmentStore((s) => s.activeEnvironmentName);
   const collections = useCollectionStore((s) => s.collections);
   const mockServers = useMockStore((s) => s.servers);
@@ -40,30 +45,30 @@ export function StatusBar({ onToggleTerminal, terminalOpen }: StatusBarProps) {
   };
 
   return (
-    <div className="flex h-9 shrink-0 items-center border-t border-[var(--color-border)] bg-[var(--color-activity-bar)] px-3 text-[13px]">
+    <div className="flex h-8 shrink-0 items-center gap-1 border-t border-[var(--color-border)] bg-[var(--color-activity-bar)] px-2.5 text-[11.5px] text-[var(--color-text-muted)]">
       {/* Left side */}
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-1">
         {activeEnv && (
-          <span className="flex items-center gap-1 text-[var(--color-text-muted)]">
-            <Globe className="h-4 w-4" />
+          <span className="flex items-center gap-1.5 rounded-md px-1.5 py-1 transition-colors hover:bg-[color-mix(in_srgb,var(--color-text-primary)_6%,transparent)]">
+            <Globe className="h-3.5 w-3.5 opacity-80" />
             {activeEnv}
           </span>
         )}
         {collections.length > 0 && (
-          <span className="flex items-center gap-1 text-[var(--color-text-muted)]">
-            <FolderOpen className="h-4 w-4" />
+          <span className="flex items-center gap-1.5 rounded-md px-1.5 py-1 transition-colors hover:bg-[color-mix(in_srgb,var(--color-text-primary)_6%,transparent)]">
+            <FolderOpen className="h-3.5 w-3.5 opacity-80" />
             {collections.length} collection{collections.length !== 1 ? "s" : ""}
           </span>
         )}
         {runningMocks > 0 && (
-          <span className="flex items-center gap-1 text-[var(--color-success)]">
-            <Server className="h-4 w-4" />
+          <span className="flex items-center gap-1.5 rounded-md px-1.5 py-1 text-[var(--color-success)]">
+            <Server className="h-3.5 w-3.5" />
             {runningMocks} mock{runningMocks !== 1 ? "s" : ""}
           </span>
         )}
         {activeMonitors > 0 && (
-          <span className="flex items-center gap-1 text-[var(--color-success)]">
-            <Activity className="h-4 w-4" />
+          <span className="flex items-center gap-1.5 rounded-md px-1.5 py-1 text-[var(--color-success)]">
+            <Activity className="h-3.5 w-3.5" />
             {activeMonitors} monitor{activeMonitors !== 1 ? "s" : ""}
           </span>
         )}
@@ -72,20 +77,20 @@ export function StatusBar({ onToggleTerminal, terminalOpen }: StatusBarProps) {
       <div className="flex-1" />
 
       {/* Right side */}
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-0.5">
         {/* Console toggle */}
         <button
           onClick={toggleConsole}
-          className={`flex items-center gap-1 rounded px-2 py-1 transition-colors ${
+          className={`flex items-center gap-1 rounded-md px-1.5 py-1 transition-colors ${
             consoleOpen
-              ? "bg-[var(--color-accent)]/20 text-[var(--color-accent)]"
-              : "text-[var(--color-text-dimmed)] hover:text-[var(--color-text-secondary)]"
+              ? "bg-[var(--color-accent-soft)] text-[var(--color-accent)]"
+              : "text-[var(--color-text-dimmed)] hover:bg-[color-mix(in_srgb,var(--color-text-primary)_6%,transparent)] hover:text-[var(--color-text-secondary)]"
           }`}
           title={t("commandPalette.toggleConsole")}
         >
-          <ScrollText className="h-4 w-4" />
+          <ScrollText className="h-3.5 w-3.5" />
           {consoleEntries.length > 0 && (
-            <span className={`text-[11px] font-bold ${hasErrors ? "text-[var(--color-error)]" : ""}`}>
+            <span className={`tabular text-[10px] font-semibold ${hasErrors ? "text-[var(--color-error)]" : ""}`}>
               {consoleEntries.length}
             </span>
           )}
@@ -95,21 +100,21 @@ export function StatusBar({ onToggleTerminal, terminalOpen }: StatusBarProps) {
         {onToggleTerminal && (
           <button
             onClick={onToggleTerminal}
-            className={`flex items-center gap-1 rounded px-2 py-1 transition-colors ${
+            className={`flex items-center gap-1 rounded-md px-1.5 py-1 transition-colors ${
               terminalOpen
-                ? "bg-[var(--color-accent)]/20 text-[var(--color-accent)]"
-                : "text-[var(--color-text-dimmed)] hover:text-[var(--color-text-secondary)]"
+                ? "bg-[var(--color-accent-soft)] text-[var(--color-accent)]"
+                : "text-[var(--color-text-dimmed)] hover:bg-[color-mix(in_srgb,var(--color-text-primary)_6%,transparent)] hover:text-[var(--color-text-secondary)]"
             }`}
             title="Toggle Terminal (Ctrl+`)"
           >
-            <Terminal className="h-4 w-4" />
+            <Terminal className="h-3.5 w-3.5" />
           </button>
         )}
 
         {/* Layout toggle */}
         <button
           onClick={toggleLayout}
-          className="flex items-center gap-1 text-[var(--color-text-dimmed)] transition-colors hover:text-[var(--color-text-secondary)]"
+          className="flex items-center gap-1 rounded-md px-1.5 py-1 text-[var(--color-text-dimmed)] transition-colors hover:bg-[color-mix(in_srgb,var(--color-text-primary)_6%,transparent)] hover:text-[var(--color-text-secondary)]"
           title={
             layout === "horizontal"
               ? "Switch to stacked layout"
@@ -119,15 +124,18 @@ export function StatusBar({ onToggleTerminal, terminalOpen }: StatusBarProps) {
           }
         >
           {layout === "horizontal" ? (
-            <Columns2 className="h-4 w-4" />
+            <Columns2 className="h-3.5 w-3.5" />
           ) : layout === "vertical" ? (
-            <Rows2 className="h-4 w-4" />
+            <Rows2 className="h-3.5 w-3.5" />
           ) : (
-            <LayoutList className="h-4 w-4" />
+            <LayoutList className="h-3.5 w-3.5" />
           )}
         </button>
 
-        <span className="text-[var(--color-text-dimmed)]">ReqMate v{appVersion}</span>
+        <span aria-hidden className="mx-1.5 h-3 w-px bg-[var(--color-border-strong)]" />
+        <span className="tabular select-none text-[10.5px] text-[var(--color-text-dimmed)]">
+          ReqMate v{appVersion}
+        </span>
       </div>
     </div>
   );

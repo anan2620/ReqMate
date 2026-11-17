@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
+import { Select } from "@/components/ui/select";
 import { useMockStore } from "@/stores/mock-store";
 import { useCollectionStore } from "@/stores/collection-store";
 import { startMockServer, stopMockServer, listMockServers } from "@/lib/tauri-api";
@@ -104,15 +105,13 @@ export function MockServerDialog() {
             {/* Start new server */}
             <div className="space-y-2 border-b border-[var(--color-border)] p-3">
               <label className="block text-xs font-medium text-[var(--color-text-muted)]">{t("mock.collection")}</label>
-              <select
+              <Select
                 value={selectedCollection}
-                onChange={(e) => setSelectedCollection(e.target.value)}
-                className="w-full rounded bg-[var(--color-elevated)] px-2 py-1.5 text-xs text-[var(--color-text-primary)] outline-none"
-              >
-                {collections.map((c) => (
-                  <option key={c.path} value={c.path}>{c.name}</option>
-                ))}
-              </select>
+                onChange={setSelectedCollection}
+                options={collections.map((c) => ({ value: c.path, label: c.name }))}
+                placeholder={t("mock.selectCollection", "Select a collection")}
+                aria-label={t("sidebar.collections")}
+              />
 
               <div className="flex gap-2">
                 <div className="flex-1">
@@ -149,7 +148,7 @@ export function MockServerDialog() {
               <button
                 onClick={handleStart}
                 disabled={starting || !selectedCollection}
-                className="flex w-full items-center justify-center gap-1 rounded bg-green-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-green-700 disabled:opacity-50"
+                className="btn-success flex w-full items-center justify-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold disabled:opacity-50"
               >
                 <Play className="h-3 w-3" />
                 {starting ? t("mock.starting") : t("mock.start")}

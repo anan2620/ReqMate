@@ -68,10 +68,8 @@ export function WebSocketView() {
           <button
             onClick={handleConnect}
             disabled={status === "connecting" || !tab.url.trim()}
-            className={`flex items-center gap-1.5 rounded-lg px-5 py-2 text-sm font-semibold text-white disabled:opacity-50 ${
-              status === "connected"
-                ? "bg-red-600 hover:bg-red-700"
-                : "bg-green-600 hover:bg-green-700"
+            className={`flex items-center gap-1.5 rounded-xl px-4 py-2 text-[13px] font-semibold disabled:opacity-50 ${
+              status === "connected" ? "btn-danger" : "btn-accent"
             }`}
           >
             {status === "connected" ? (
@@ -127,7 +125,7 @@ export function WebSocketView() {
           onChange={(e) => setMessageInput(e.target.value)}
           placeholder={status === "connected" ? "Type a message..." : "Connect first to send messages"}
           disabled={status !== "connected"}
-          className="flex-1 resize-none rounded bg-[var(--color-elevated)] p-2 font-mono text-sm text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none focus:ring-1 focus:ring-cyan-500 disabled:opacity-50"
+          className="flex-1 resize-none rounded bg-[var(--color-elevated)] p-2 font-mono text-sm text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none focus:ring-1 focus:ring-[var(--color-accent)] disabled:opacity-50"
           rows={2}
           onKeyDown={(e) => {
             if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
@@ -139,7 +137,7 @@ export function WebSocketView() {
         <button
           onClick={handleSend}
           disabled={status !== "connected" || !messageInput.trim()}
-          className="flex items-center gap-1 rounded bg-cyan-600 px-3 py-2 text-sm font-medium text-white hover:bg-cyan-700 disabled:opacity-50"
+          className="btn-accent flex items-center gap-1.5 rounded-lg px-3 py-2 text-[13px] font-semibold disabled:opacity-50"
         >
           <Send className="h-3.5 w-3.5" />
           Send

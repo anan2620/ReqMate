@@ -57,55 +57,85 @@ export function WelcomeScreen({
   };
 
   return (
-    <div className="flex h-screen flex-col items-center justify-center bg-[var(--color-bg)] text-[var(--color-text-primary)]">
-      <div className="flex max-w-md flex-col items-center gap-8 text-center">
-        <div>
-          <h1 className="text-2xl font-bold">{t("onboarding.welcome")}</h1>
-          <p className="mt-2 text-sm text-[var(--color-text-secondary)]">
-            {t("onboarding.tagline")}
-          </p>
+    <div className="app-canvas relative flex h-screen flex-col items-center justify-center overflow-hidden text-[var(--color-text-primary)]">
+      {/* Ambient backdrop */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 opacity-80"
+        style={{
+          backgroundImage:
+            "radial-gradient(45% 40% at 50% 8%, var(--color-accent-soft), transparent 70%)",
+        }}
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 opacity-[0.4]"
+        style={{
+          backgroundImage:
+            "linear-gradient(to right, color-mix(in srgb, var(--color-text-primary) 5%, transparent) 1px, transparent 1px), linear-gradient(to bottom, color-mix(in srgb, var(--color-text-primary) 5%, transparent) 1px, transparent 1px)",
+          backgroundSize: "40px 40px",
+          maskImage: "radial-gradient(60% 50% at 50% 35%, black, transparent 78%)",
+          WebkitMaskImage: "radial-gradient(60% 50% at 50% 35%, black, transparent 78%)",
+        }}
+      />
+
+      <div className="relative flex w-[440px] max-w-[88vw] flex-col items-center gap-9">
+        {/* Logo + wordmark */}
+        <div className="flex flex-col items-center gap-5">
+          <div className="relative">
+            <div
+              aria-hidden
+              className="absolute -inset-5 rounded-[30px] opacity-70 blur-2xl"
+              style={{ background: "var(--color-accent-ring)" }}
+            />
+            <img
+              src="/app-icon.png"
+              alt="ReqMate"
+              className="relative h-[68px] w-[68px] rounded-[20px] elev-lg ring-1 ring-[color-mix(in_srgb,var(--color-text-primary)_12%,transparent)]"
+            />
+          </div>
+          <div className="text-center">
+            <h1 className="text-[26px] font-semibold leading-tight tracking-[-0.02em]">
+              {t("onboarding.welcome")}
+            </h1>
+            <p className="mx-auto mt-2 max-w-[340px] text-[13px] leading-relaxed text-[var(--color-text-muted)]">
+              {t("onboarding.tagline")}
+            </p>
+          </div>
         </div>
 
-        <div className="flex w-full flex-col gap-3">
-          <button
-            onClick={handleStartFresh}
-            disabled={loading}
-            className="flex items-center gap-3 rounded-lg border border-[var(--color-border)] bg-[var(--color-elevated)] px-4 py-3 text-left transition hover:border-blue-500/50 hover:bg-[var(--color-border)]"
-          >
-            <Plus className="h-5 w-5 shrink-0 text-blue-400" />
-            <div>
-              <div className="text-sm font-medium">{t("onboarding.startScratch")}</div>
-              <div className="text-xs text-[var(--color-text-dimmed)]">
-                {t("onboarding.startScratchDesc")}
-              </div>
-            </div>
-          </button>
-
-          <button
-            onClick={handleImport}
-            className="flex items-center gap-3 rounded-lg border border-[var(--color-border)] bg-[var(--color-elevated)] px-4 py-3 text-left transition hover:border-blue-500/50 hover:bg-[var(--color-border)]"
-          >
-            <Download className="h-5 w-5 shrink-0 text-green-400" />
-            <div>
-              <div className="text-sm font-medium">{t("onboarding.importExisting")}</div>
-              <div className="text-xs text-[var(--color-text-dimmed)]">
-                {t("onboarding.importExistingDesc")}
-              </div>
-            </div>
-          </button>
-
-          <button
-            onClick={handleOpenFolder}
-            className="flex items-center gap-3 rounded-lg border border-[var(--color-border)] bg-[var(--color-elevated)] px-4 py-3 text-left transition hover:border-blue-500/50 hover:bg-[var(--color-border)]"
-          >
-            <FolderOpen className="h-5 w-5 shrink-0 text-yellow-400" />
-            <div>
-              <div className="text-sm font-medium">{t("onboarding.openFolder")}</div>
-              <div className="text-xs text-[var(--color-text-dimmed)]">
-                {t("onboarding.openFolderDesc")}
-              </div>
-            </div>
-          </button>
+        <div className="flex w-full flex-col gap-2.5">
+          {[
+            { icon: Plus, onClick: handleStartFresh, title: t("onboarding.startScratch"), desc: t("onboarding.startScratchDesc"), primary: true },
+            { icon: Download, onClick: handleImport, title: t("onboarding.importExisting"), desc: t("onboarding.importExistingDesc") },
+            { icon: FolderOpen, onClick: handleOpenFolder, title: t("onboarding.openFolder"), desc: t("onboarding.openFolderDesc") },
+          ].map((opt) => (
+            <button
+              key={opt.title}
+              onClick={opt.onClick}
+              disabled={opt.primary ? loading : false}
+              className={`group flex w-full items-center gap-3.5 rounded-xl border px-4 py-3.5 text-left elev-xs transition-all duration-200 hover:-translate-y-px hover:elev-md disabled:opacity-60 ${
+                opt.primary
+                  ? "border-[var(--color-accent-line)] bg-[color-mix(in_srgb,var(--color-accent)_7%,var(--color-card))]"
+                  : "border-[var(--color-border)] bg-[var(--color-card)] hover:border-[var(--color-border-strong)]"
+              }`}
+            >
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[var(--color-accent-soft)] text-[var(--color-accent)] transition-transform duration-200 group-hover:scale-105">
+                <opt.icon className="h-[18px] w-[18px]" strokeWidth={1.9} />
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="block text-[13px] font-medium text-[var(--color-text-primary)]">
+                  {opt.title}
+                </span>
+                <span className="mt-0.5 block text-[11.5px] leading-snug text-[var(--color-text-muted)]">
+                  {opt.desc}
+                </span>
+              </span>
+              <span className="text-[var(--color-text-dimmed)] opacity-0 transition-all duration-200 group-hover:translate-x-0.5 group-hover:opacity-100">
+                →
+              </span>
+            </button>
+          ))}
         </div>
 
         <button
@@ -113,7 +143,7 @@ export function WelcomeScreen({
             await updateSettings({ onboardingComplete: true });
             onComplete();
           }}
-          className="text-xs text-[var(--color-text-dimmed)] hover:text-[var(--color-text-secondary)]"
+          className="rounded-md px-3 py-1.5 text-[11.5px] text-[var(--color-text-dimmed)] transition-colors hover:bg-[color-mix(in_srgb,var(--color-text-primary)_6%,transparent)] hover:text-[var(--color-text-secondary)]"
         >
           {t("common.skipForNow")}
         </button>

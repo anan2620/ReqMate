@@ -70,10 +70,8 @@ export function SSEView() {
           <button
             onClick={handleConnect}
             disabled={status === "connecting" || !tab.url.trim()}
-            className={`flex items-center gap-1.5 rounded-lg px-5 py-2 text-sm font-semibold text-white disabled:opacity-50 ${
-              status === "connected"
-                ? "bg-red-600 hover:bg-red-700"
-                : "bg-orange-600 hover:bg-orange-700"
+            className={`flex items-center gap-1.5 rounded-xl px-4 py-2 text-[13px] font-semibold disabled:opacity-50 ${
+              status === "connected" ? "btn-danger" : "btn-accent"
             }`}
           >
             {status === "connected" ? (

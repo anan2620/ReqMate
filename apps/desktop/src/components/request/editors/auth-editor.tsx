@@ -2,11 +2,10 @@ import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { oauthClearToken, oauthGetTokenStatus, oauthStartFlow } from "@/lib/tauri-api";
 import type { AuthConfig, OAuth2GrantType, OAuthTokenStatus } from "@reqmate/types";
+import { Select } from "@/components/ui/select";
 
 const INPUT_CLASS =
-  "w-full rounded bg-[var(--color-elevated)] px-3 py-1.5 text-sm text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none focus:ring-1 focus:ring-blue-500";
-const SELECT_CLASS =
-  "rounded bg-[var(--color-elevated)] px-3 py-1.5 text-sm text-[var(--color-text-primary)] outline-none focus:ring-1 focus:ring-blue-500";
+  "w-full rounded bg-[var(--color-elevated)] px-3 py-1.5 text-sm text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none focus:ring-1 focus:ring-[var(--color-accent)]";
 
 /** Auth type switcher plus the fields for the selected type. */
 export function AuthEditor({
@@ -20,10 +19,11 @@ export function AuthEditor({
   return (
     <div className="space-y-3">
       {/* Auth type selector */}
-      <select
+      <Select
+        size="md"
         value={auth.type}
-        onChange={(e) => {
-          const type = e.target.value as AuthConfig["type"];
+        onChange={(v) => {
+          const type = v as AuthConfig["type"];
           switch (type) {
             case "none":
               onChange({ type: "none" });
@@ -96,19 +96,19 @@ export function AuthEditor({
               break;
           }
         }}
-        className={SELECT_CLASS}
-      >
-        <option value="none">{t("auth.none")}</option>
-        <option value="bearer">{t("auth.bearer")}</option>
-        <option value="basic">{t("auth.basic")}</option>
-        <option value="api-key">{t("auth.apiKey")}</option>
-        <option value="oauth2">{t("auth.oauth2")}</option>
-        <option value="digest">{t("auth.digest")}</option>
-        <option value="aws-v4">{t("auth.awsV4")}</option>
-        <option value="jwt-bearer">{t("auth.jwtBearer")}</option>
-        <option value="ntlm">{t("auth.ntlm")}</option>
-        <option value="saml">{t("auth.saml")}</option>
-      </select>
+        options={[
+          { value: "none", label: t("auth.none") },
+          { value: "bearer", label: t("auth.bearer") },
+          { value: "basic", label: t("auth.basic") },
+          { value: "api-key", label: t("auth.apiKey") },
+          { value: "oauth2", label: t("auth.oauth2") },
+          { value: "digest", label: t("auth.digest") },
+          { value: "aws-v4", label: t("auth.awsV4") },
+          { value: "jwt-bearer", label: t("auth.jwtBearer") },
+          { value: "ntlm", label: t("auth.ntlm") },
+          { value: "saml", label: t("auth.saml") },
+        ]}
+      />
 
       {/* Auth fields */}
       {auth.type === "bearer" && (
@@ -156,16 +156,17 @@ export function AuthEditor({
             placeholder={t("request.value")}
             className={INPUT_CLASS}
           />
-          <select
+          <Select
+            size="md"
             value={auth.addTo}
-            onChange={(e) =>
-              onChange({ ...auth, addTo: e.target.value as "header" | "query" })
+            onChange={(v) =>
+              onChange({ ...auth, addTo: v as "header" | "query" })
             }
-            className={SELECT_CLASS}
-          >
-            <option value="header">{t("auth.addToHeader")}</option>
-            <option value="query">{t("auth.addToQuery")}</option>
-          </select>
+        options={[
+          { value: "header", label: t("auth.addToHeader") },
+          { value: "query", label: t("auth.addToQuery") },
+        ]}
+      />
         </div>
       )}
 
@@ -234,20 +235,21 @@ export function AuthEditor({
 
       {auth.type === "jwt-bearer" && (
         <div className="space-y-2">
-          <select
+          <Select
+            size="md"
             value={auth.algorithm}
-            onChange={(e) => onChange({ ...auth, algorithm: e.target.value })}
-            className={SELECT_CLASS}
-          >
-            <option value="HS256">HS256</option>
-            <option value="HS384">HS384</option>
-            <option value="HS512">HS512</option>
-            <option value="RS256">RS256</option>
-            <option value="RS384">RS384</option>
-            <option value="RS512">RS512</option>
-            <option value="ES256">ES256</option>
-            <option value="ES384">ES384</option>
-          </select>
+            onChange={(v) => onChange({ ...auth, algorithm: v })}
+            options={[
+              { value: "HS256", label: "HS256" },
+              { value: "HS384", label: "HS384" },
+              { value: "HS512", label: "HS512" },
+              { value: "RS256", label: "RS256" },
+              { value: "RS384", label: "RS384" },
+              { value: "RS512", label: "RS512" },
+              { value: "ES256", label: "ES256" },
+              { value: "ES384", label: "ES384" },
+            ]}
+          />
           <input
             type="password"
             value={auth.secret}
@@ -420,18 +422,19 @@ function OAuth2Editor({
       {/* Grant Type */}
       <label className="block">
         <span className="text-xs text-[var(--color-text-secondary)]">{t("auth.grantType")}</span>
-        <select
+        <Select
+          size="md"
           value={auth.grantType}
-          onChange={(e) =>
-            onChange({ ...auth, grantType: e.target.value as OAuth2GrantType })
+          onChange={(v) =>
+            onChange({ ...auth, grantType: v as OAuth2GrantType })
           }
-          className={SELECT_CLASS + " w-full"}
-        >
-          <option value="authorization_code">{t("auth.authorizationCode")}</option>
-          <option value="client_credentials">{t("auth.clientCredentials")}</option>
-          <option value="implicit">{t("auth.implicit")}</option>
-          <option value="password">{t("auth.passwordGrant")}</option>
-        </select>
+          options={[
+            { value: "authorization_code", label: t("auth.authorizationCode") },
+            { value: "client_credentials", label: t("auth.clientCredentials") },
+            { value: "implicit", label: t("auth.implicit") },
+            { value: "password", label: t("auth.passwordGrant") },
+          ]}
+        />
       </label>
 
       {/* Auth URL */}
@@ -556,7 +559,7 @@ function OAuth2Editor({
         <button
           onClick={handleGetToken}
           disabled={loading}
-          className="rounded bg-blue-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
+          className="btn-accent rounded-lg px-3 py-1.5 text-[13px] font-semibold disabled:opacity-50"
         >
           {loading ? t("auth.authenticating") : t("auth.getToken")}
         </button>

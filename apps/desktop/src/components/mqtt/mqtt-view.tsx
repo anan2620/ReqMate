@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useActiveTab } from "@/stores/tab-store";
 import { useMqtt, type MqttMessage } from "@/hooks/use-mqtt";
+import { Select } from "@/components/ui/select";
 import {
   Send,
   Plug,
@@ -14,6 +15,12 @@ import {
   ChevronRight,
 } from "lucide-react";
 import { Breadcrumb } from "@/components/layout/breadcrumb";
+
+const QOS_OPTIONS = [
+  { value: "0", label: "QoS 0" },
+  { value: "1", label: "QoS 1" },
+  { value: "2", label: "QoS 2" },
+];
 
 export function MqttView() {
   const tab = useActiveTab();
@@ -112,7 +119,7 @@ export function MqttView() {
             onChange={(e) => setBrokerUrl(e.target.value)}
             placeholder="Broker host"
             disabled={status === "connected"}
-            className="flex-1 rounded bg-[var(--color-elevated)] px-2.5 py-1.5 text-sm text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none focus:ring-1 focus:ring-purple-500 disabled:opacity-50"
+            className="flex-1 rounded bg-[var(--color-elevated)] px-2.5 py-1.5 text-sm text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none focus:ring-1 focus:ring-[var(--color-accent)] disabled:opacity-50"
           />
           <span className="text-xs text-[var(--color-text-dimmed)]">:</span>
           <input
@@ -121,7 +128,7 @@ export function MqttView() {
             onChange={(e) => setPort(e.target.value)}
             placeholder="1883"
             disabled={status === "connected"}
-            className="w-16 rounded bg-[var(--color-elevated)] px-2.5 py-1.5 text-sm text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none focus:ring-1 focus:ring-purple-500 disabled:opacity-50"
+            className="w-16 rounded bg-[var(--color-elevated)] px-2.5 py-1.5 text-sm text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none focus:ring-1 focus:ring-[var(--color-accent)] disabled:opacity-50"
           />
         </div>
         <div className="flex items-center gap-1.5">
@@ -139,10 +146,8 @@ export function MqttView() {
         <button
           onClick={handleConnect}
           disabled={status === "connecting" || !brokerUrl.trim()}
-          className={`flex items-center gap-1.5 rounded-lg px-4 py-1.5 text-sm font-semibold text-white disabled:opacity-50 ${
-            status === "connected"
-              ? "bg-red-600 hover:bg-red-700"
-              : "bg-purple-600 hover:bg-purple-700"
+          className={`flex items-center gap-1.5 rounded-lg px-4 py-1.5 text-[13px] font-semibold disabled:opacity-50 ${
+            status === "connected" ? "btn-danger" : "btn-accent"
           }`}
         >
           {status === "connected" ? (
@@ -177,7 +182,7 @@ export function MqttView() {
                 value={clientId}
                 onChange={(e) => setClientId(e.target.value)}
                 disabled={status === "connected"}
-                className="w-full rounded bg-[var(--color-elevated)] px-2 py-1 text-sm text-[var(--color-text-primary)] outline-none focus:ring-1 focus:ring-purple-500 disabled:opacity-50"
+                className="w-full rounded bg-[var(--color-elevated)] px-2 py-1 text-sm text-[var(--color-text-primary)] outline-none focus:ring-1 focus:ring-[var(--color-accent)] disabled:opacity-50"
               />
             </div>
             <div>
@@ -195,7 +200,7 @@ export function MqttView() {
                     onChange={(e) => setUsername(e.target.value)}
                     placeholder="Username"
                     disabled={status === "connected"}
-                    className="flex-1 rounded bg-[var(--color-elevated)] px-2 py-1 text-sm text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none focus:ring-1 focus:ring-purple-500 disabled:opacity-50"
+                    className="h-8 flex-1 rounded-md bg-[var(--color-elevated)] px-2.5 text-[12.5px] text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none focus:ring-1 focus:ring-[var(--color-accent)] disabled:opacity-50"
                   />
                   <input
                     type="password"
@@ -203,7 +208,7 @@ export function MqttView() {
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="Password"
                     disabled={status === "connected"}
-                    className="flex-1 rounded bg-[var(--color-elevated)] px-2 py-1 text-sm text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none focus:ring-1 focus:ring-purple-500 disabled:opacity-50"
+                    className="h-8 flex-1 rounded-md bg-[var(--color-elevated)] px-2.5 text-[12.5px] text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none focus:ring-1 focus:ring-[var(--color-accent)] disabled:opacity-50"
                   />
                 </div>
               )}
@@ -233,25 +238,23 @@ export function MqttView() {
               onChange={(e) => setSubTopic(e.target.value)}
               placeholder="Topic (e.g. sensor/#)"
               disabled={status !== "connected"}
-              className="flex-1 rounded bg-[var(--color-elevated)] px-2 py-1 text-sm text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none focus:ring-1 focus:ring-purple-500 disabled:opacity-50"
+              className="h-8 flex-1 rounded-md bg-[var(--color-elevated)] px-2.5 text-[12.5px] text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none focus:ring-1 focus:ring-[var(--color-accent)] disabled:opacity-50"
               onKeyDown={(e) => {
                 if (e.key === "Enter") handleSubscribe();
               }}
             />
-            <select
-              value={subQos}
-              onChange={(e) => setSubQos(Number(e.target.value))}
+            <Select
+              value={String(subQos)}
+              onChange={(v) => setSubQos(Number(v))}
+              options={QOS_OPTIONS}
               disabled={status !== "connected"}
-              className="rounded bg-[var(--color-elevated)] px-1.5 py-1 text-xs text-[var(--color-text-primary)] outline-none disabled:opacity-50"
-            >
-              <option value={0}>QoS 0</option>
-              <option value={1}>QoS 1</option>
-              <option value={2}>QoS 2</option>
-            </select>
+              className="!w-[86px] shrink-0"
+              aria-label="QoS"
+            />
             <button
               onClick={handleSubscribe}
               disabled={status !== "connected" || !subTopic.trim()}
-              className="rounded bg-purple-600 p-1.5 text-white hover:bg-purple-700 disabled:opacity-50"
+              className="btn-accent flex h-8 w-8 shrink-0 items-center justify-center rounded-md disabled:opacity-40"
               title="Subscribe"
             >
               <Plus className="h-3.5 w-3.5" />
@@ -291,18 +294,16 @@ export function MqttView() {
               onChange={(e) => setPubTopic(e.target.value)}
               placeholder="Topic"
               disabled={status !== "connected"}
-              className="flex-1 rounded bg-[var(--color-elevated)] px-2 py-1 text-sm text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none focus:ring-1 focus:ring-purple-500 disabled:opacity-50"
+              className="h-8 flex-1 rounded-md bg-[var(--color-elevated)] px-2.5 text-[12.5px] text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none focus:ring-1 focus:ring-[var(--color-accent)] disabled:opacity-50"
             />
-            <select
-              value={pubQos}
-              onChange={(e) => setPubQos(Number(e.target.value))}
+            <Select
+              value={String(pubQos)}
+              onChange={(v) => setPubQos(Number(v))}
+              options={QOS_OPTIONS}
               disabled={status !== "connected"}
-              className="rounded bg-[var(--color-elevated)] px-1.5 py-1 text-xs text-[var(--color-text-primary)] outline-none disabled:opacity-50"
-            >
-              <option value={0}>QoS 0</option>
-              <option value={1}>QoS 1</option>
-              <option value={2}>QoS 2</option>
-            </select>
+              className="!w-[86px] shrink-0"
+              aria-label="QoS"
+            />
             <label className="flex items-center gap-1 text-[10px] text-[var(--color-text-muted)]">
               <input
                 type="checkbox"
@@ -320,7 +321,7 @@ export function MqttView() {
               onChange={(e) => setPubPayload(e.target.value)}
               placeholder="Message payload"
               disabled={status !== "connected"}
-              className="flex-1 resize-none rounded bg-[var(--color-elevated)] p-2 font-mono text-xs text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none focus:ring-1 focus:ring-purple-500 disabled:opacity-50"
+              className="flex-1 resize-none rounded bg-[var(--color-elevated)] p-2 font-mono text-xs text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none focus:ring-1 focus:ring-[var(--color-accent)] disabled:opacity-50"
               rows={2}
               onKeyDown={(e) => {
                 if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
@@ -332,7 +333,7 @@ export function MqttView() {
             <button
               onClick={handlePublish}
               disabled={status !== "connected" || !pubTopic.trim()}
-              className="flex items-center gap-1 rounded bg-purple-600 px-3 py-2 text-sm font-medium text-white hover:bg-purple-700 disabled:opacity-50"
+              className="btn-accent flex items-center gap-1.5 rounded-lg px-3 py-2 text-[13px] font-semibold disabled:opacity-50"
             >
               <Send className="h-3.5 w-3.5" />
               Publish
