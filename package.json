@@ -1,0 +1,28 @@
+{
+  "name": "reqmate",
+  "private": true,
+  "version": "0.4.6",
+  "description": "Local-first API development platform",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/anan2620/ReqMate"
+  },
+  "homepage": "https://github.com/anan2620/ReqMate",
+  "bugs": {
+    "url": "https://github.com/anan2620/ReqMate/issues"
+  },
+  "license": "MIT",
+  "scripts": {
+    "dev": "pnpm --filter @reqmate/desktop dev",
+    "build": "pnpm --filter @reqmate/desktop build",
+    "tauri": "pnpm --filter @reqmate/desktop tauri",
+    "lint": "pnpm --filter @reqmate/desktop lint",
+    "check:versions": "node scripts/check-versions.mjs",
+    "check:models": "node scripts/check-model-drift.mjs",
+    "preview": "pnpm --filter @reqmate/desktop preview"
+  },
+  "engines": {
+    "node": ">=22.0.0",
+    "pnpm": ">=10.0.0"
+  }
+}

@@ -1,0 +1,73 @@
+{
+  "name": "reqmate-vscode",
+  "displayName": "ReqMate",
+  "description": "ReqMate integration for VS Code — browse collections, send requests, and run tests",
+  "version": "0.4.6",
+  "publisher": "reqmate",
+  "license": "MIT",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": ["Testing", "Other"],
+  "keywords": ["api", "rest", "http", "graphql", "grpc", "testing"],
+  "activationEvents": [
+    "workspaceContains:**/.reqmate/reqmate.yaml"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "reqmate.openCollection",
+        "title": "ReqMate: Open Collection"
+      },
+      {
+        "command": "reqmate.sendRequest",
+        "title": "ReqMate: Send Request"
+      },
+      {
+        "command": "reqmate.runCollection",
+        "title": "ReqMate: Run Collection Tests"
+      },
+      {
+        "command": "reqmate.openInApp",
+        "title": "ReqMate: Open in Desktop App"
+      }
+    ],
+    "menus": {
+      "explorer/context": [
+        {
+          "command": "reqmate.sendRequest",
+          "when": "resourceExtname == .yaml && resourcePath =~ /.*(?<!\\.reqmate).*\\.yaml$/",
+          "group": "reqmate"
+        }
+      ]
+    },
+    "views": {
+      "explorer": [
+        {
+          "id": "reqmateCollections",
+          "name": "ReqMate Collections",
+          "when": "reqmate.hasCollections"
+        }
+      ]
+    },
+    "languages": [
+      {
+        "id": "reqmate-yaml",
+        "aliases": ["ReqMate Request"],
+        "filenamePatterns": ["*.yaml"],
+        "configuration": "./language-configuration.json"
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@types/vscode": "^1.85.0",
+    "typescript": "^5.3.0"
+  }
+}

@@ -1,0 +1,7 @@
+Origin: ReqMate
+Label: ReqMate
+Codename: stable
+Architectures: amd64
+Components: main
+Description: ReqMate APT repository
+SignWith: default

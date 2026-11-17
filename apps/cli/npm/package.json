@@ -1,0 +1,22 @@
+{
+  "name": "@reqmate/cli",
+  "version": "0.4.6",
+  "description": "ReqMate CLI — run collections, import/export API specs from the command line",
+  "keywords": ["api", "rest", "cli", "testing", "postman", "reqmate"],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/anan2620/ReqMate"
+  },
+  "bin": {
+    "reqmate": "bin/reqmate.js"
+  },
+  "scripts": {
+    "postinstall": "node install.js"
+  },
+  "os": ["darwin", "linux", "win32"],
+  "cpu": ["x64", "arm64"],
+  "engines": {
+    "node": ">=18"
+  }
+}
