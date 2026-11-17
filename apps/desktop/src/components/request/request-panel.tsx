@@ -5,7 +5,7 @@ import { KeyValueEditor } from "./key-value-editor";
 import { HintTooltip } from "@/components/ui/hint-tooltip";
 import { AuthEditor } from "./editors/auth-editor";
 import { BodyEditor } from "./editors/body-editor";
-import { extractPathVariables } from "./editors/url-utils";
+import { extractPathVariables } from "@/lib/url";
 import { PathVariablesEditor } from "./editors/path-variables-editor";
 import { ScriptsEditor, TestsEditor } from "./editors/scripts-editors";
 

@@ -27,6 +27,7 @@ import {
   tabToRequestFile,
 } from "./tab/tab-serialization";
 import { markRecentlySaved } from "./tab/recently-saved";
+import { resolvePathVariables } from "@/lib/url";
 import {
   getPersistableGeometry,
   isMaximizedCached,
@@ -425,12 +426,7 @@ export const useTabStore = create<TabState>((set, get) => ({
     }
 
     // Resolve path variables (:paramName → value) in the URL before sending
-    let resolvedUrl = tab.url.trim();
-    for (const [key, value] of Object.entries(tab.pathVariables)) {
-      if (value) {
-        resolvedUrl = resolvedUrl.replace(new RegExp(`:${key}\\b`, "g"), encodeURIComponent(value));
-      }
-    }
+    const resolvedUrl = resolvePathVariables(tab.url, tab.pathVariables);
 
     const requestParams = {
       method: tab.protocol === "graphql" ? ("POST" as const) : tab.method,
