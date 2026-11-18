@@ -33,6 +33,13 @@ jobs:
       - name: Run benchmarks
         working-directory: apps/desktop/src-tauri
         run: |
+          set -o pipefail
+          # rust-cache can restore a partial target/criterion tree without the
+          # local baseline files. Criterion then writes errors into the bench
+          # output, splitting the line the benchmark-action parser expects.
+          # The comparison uses gh-pages history, so the local cache is safe to
+          # discard.
+          rm -rf target/criterion
           cargo bench \
             --bench interpolation \
             --bench collection_loading \
