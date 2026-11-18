@@ -43,6 +43,9 @@ jobs:
     runs-on: ${{ matrix.platform }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          # 生成发布说明要读「上一个 tag..本次 tag」的提交，浅克隆拿不到历史与 tag
+          fetch-depth: 0
 
       - uses: pnpm/action-setup@v4
 
@@ -71,6 +74,16 @@ jobs:
       - name: Install frontend dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Generate release notes
+        id: notes
+        run: |
+          node scripts/release-notes.mjs "${GITHUB_REF_NAME}" > release-notes.md
+          {
+            echo 'body<<__NOTES_EOF__'
+            cat release-notes.md
+            echo '__NOTES_EOF__'
+          } >> "$GITHUB_OUTPUT"
+
       - uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -80,7 +93,8 @@ jobs:
           projectPath: apps/desktop
           tagName: ${{ github.ref_name }}
           releaseName: "ReqMate ${{ github.ref_name }}"
-          releaseBody: "See the assets to download and install this version."
+          # 由 scripts/release-notes.mjs 生成：安装包下载表 + 按 conventional commit 分组的变更清单
+          releaseBody: ${{ steps.notes.outputs.body }}
           releaseDraft: false
           prerelease: false
           updaterJsonPreferNsis: true
