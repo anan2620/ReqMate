@@ -12,7 +12,10 @@ import {
   Shield,
   GitBranch,
   ClipboardList,
+  Sun,
+  Moon,
 } from "lucide-react";
+import { useSettingsStore } from "@/stores/settings-store";
 
 export type ActivityView = "collections" | "environments" | "history" | "git" | "mock" | "monitor" | "docs" | "proxy" | "audit";
 
@@ -47,6 +50,21 @@ export function ActivityBar({
   onToggleConsole,
 }: ActivityBarProps) {
   const { t } = useTranslation();
+  const theme = useSettingsStore((s) => s.settings.theme);
+  const updateSettings = useSettingsStore((s) => s.updateSettings);
+
+  // "black" resolves to a dark surface too, so treat it as dark for the toggle.
+  const isDark =
+    theme === "dark" ||
+    theme === "black" ||
+    (theme === "system" &&
+      typeof window !== "undefined" &&
+      window.matchMedia("(prefers-color-scheme: dark)").matches);
+
+  const toggleTheme = () => {
+    updateSettings({ theme: isDark ? "light" : "dark" });
+  };
+
   return (
     <div className="relative flex w-[54px] shrink-0 flex-col items-center border-r border-[var(--color-border)] bg-[var(--color-activity-bar)] pb-3 pt-3.5">
       {/* Logo */}
@@ -97,6 +115,11 @@ export function ActivityBar({
       <div className="flex flex-col items-center gap-1">
         <ActivityBarButton icon={MessageSquare} label={`${t("ai.title")} (Ctrl+Shift+A)`} onClick={onOpenAi} />
         <ActivityBarButton icon={Terminal} label={`${t("console.title")} (Ctrl+\`)`} onClick={onToggleConsole} />
+        <ActivityBarButton
+          icon={isDark ? Sun : Moon}
+          label={`${t("settings.toggleTheme")} — ${isDark ? t("settings.light") : t("settings.dark")}`}
+          onClick={toggleTheme}
+        />
         <ActivityBarButton icon={Settings} label={`${t("settings.title")} (Ctrl+,)`} onClick={onOpenSettings} />
       </div>
     </div>

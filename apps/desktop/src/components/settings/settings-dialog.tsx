@@ -1,6 +1,22 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import * as Dialog from "@radix-ui/react-dialog";
-import { X, FolderOpen, Download, Upload, RefreshCw, ExternalLink, Check } from "lucide-react";
+import {
+  X,
+  FolderOpen,
+  Download,
+  Upload,
+  RefreshCw,
+  ExternalLink,
+  Check,
+  Palette,
+  Save,
+  Network,
+  ShieldCheck,
+  Sparkles,
+  Keyboard,
+  SlidersHorizontal,
+  DatabaseBackup,
+} from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { LANGUAGES } from "@/lib/i18n";
 import { useSettingsStore } from "@/stores/settings-store";
@@ -20,9 +36,38 @@ interface SettingsDialogProps {
   onOpenChange: (open: boolean) => void;
 }
 
+type SettingsSectionId =
+  | "appearance"
+  | "saving"
+  | "network"
+  | "certificates"
+  | "ai"
+  | "updates"
+  | "shortcuts"
+  | "backup"
+  | "tokens";
+
+const SETTINGS_SECTIONS: {
+  id: SettingsSectionId;
+  icon: typeof Palette;
+  labelKey: string;
+}[] = [
+  { id: "appearance", icon: Palette, labelKey: "settings.appearance" },
+  { id: "saving", icon: Save, labelKey: "settings.saving" },
+  { id: "network", icon: Network, labelKey: "settings.network" },
+  { id: "certificates", icon: ShieldCheck, labelKey: "settings.certificates" },
+  { id: "ai", icon: Sparkles, labelKey: "settings.aiAssistant" },
+  { id: "updates", icon: RefreshCw, labelKey: "settings.updates" },
+  { id: "shortcuts", icon: Keyboard, labelKey: "settings.shortcuts" },
+  { id: "backup", icon: DatabaseBackup, labelKey: "settings.backup" },
+  { id: "tokens", icon: SlidersHorizontal, labelKey: "settings.designTokens" },
+];
+
 export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
   const { settings, updateSettings } = useSettingsStore();
   const { t, i18n } = useTranslation();
+  const [section, setSection] = useState<SettingsSectionId>("appearance");
+  const scrollRef = useRef<HTMLDivElement>(null);
 
   const update = (patch: Partial<AppSettings>) => {
     updateSettings(patch);
@@ -32,9 +77,9 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
       <Dialog.Portal>
         <Dialog.Overlay className="fixed inset-0 z-50 bg-[var(--color-overlay)]" />
-        <Dialog.Content className="animate-panel-in fixed left-1/2 top-1/2 z-50 flex h-[82vh] max-h-[780px] w-[760px] max-w-[94vw] -translate-x-1/2 -translate-y-1/2 flex-col overflow-hidden rounded-xl border border-[var(--color-border-strong)] bg-[var(--color-card)] elev-pop focus:outline-none">
+        <Dialog.Content className="animate-panel-in fixed left-1/2 top-1/2 z-50 flex h-[86vh] max-h-[860px] w-[1040px] max-w-[94vw] -translate-x-1/2 -translate-y-1/2 flex-col overflow-hidden rounded-xl border border-[var(--color-border-strong)] bg-[var(--color-card)] elev-pop focus:outline-none">
           {/* Header — fixed, the body scrolls beneath it */}
-          <div className="flex shrink-0 items-center justify-between border-b border-[var(--color-border)] px-7 py-4">
+          <div className="flex shrink-0 items-center justify-between border-b border-[var(--color-border)] px-6 py-3.5">
             <Dialog.Title className="text-[15px] font-semibold tracking-[-0.01em] text-[var(--color-text-primary)]">
               {t("settings.title")}
             </Dialog.Title>
@@ -43,368 +88,410 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
             </Dialog.Close>
           </div>
 
-          <div className="divided-sections min-h-0 flex-1 space-y-6 overflow-y-auto px-7 py-6">
-            {/* Appearance Section */}
-            <section>
-              <h3 className="label-caps mb-3 block">
-                {t("settings.appearance")}
-              </h3>
-
-              {/* Theme */}
-              <div className="mb-4">
-                <label className="mb-2 block text-sm text-[var(--color-text-secondary)]">
-                  {t("settings.theme")}
-                </label>
-                <div className="flex gap-2">
-                  {(["system", "light", "dark", "black"] as const).map((themeOption) => (
-                    <button
-                      key={themeOption}
-                      onClick={() => update({ theme: themeOption })}
-                      className={`rounded-md border px-3.5 py-1.5 text-[12.5px] capitalize transition-colors ${
-                        settings.theme === themeOption
-                          ? "border-transparent bg-[var(--color-accent)] font-medium text-white"
-                          : "border-[var(--color-border)] bg-[var(--color-card)] text-[var(--color-text-secondary)] hover:border-[var(--color-border-strong)] hover:bg-[var(--color-card-hover)] hover:text-[var(--color-text-primary)]"
-                      }`}
-                    >
-                      {themeOption === "black"
-                        ? t("settings.black")
-                        : themeOption === "light"
-                          ? t("settings.light")
-                          : themeOption === "dark"
-                            ? t("settings.dark")
-                            : t("settings.system")}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Accent Color */}
-              <div className="mb-4">
-                <label className="mb-2 block text-sm text-[var(--color-text-secondary)]">
-                  {t("settings.accentColor")}
-                </label>
-                <div className="flex gap-2">
-                  {([
-                    { name: "indigo", color: "#5b5bd6" },
-                    { name: "blue", color: "#2f6fed" },
-                    { name: "emerald", color: "#0d9d70" },
-                    { name: "amber", color: "#d98313" },
-                    { name: "rose", color: "#e23b57" },
-                    { name: "violet", color: "#7c4ddb" },
-                    { name: "cyan", color: "#0a91ad" },
-                    { name: "orange", color: "#e2661a" },
-                  ] as const).map((a) => (
-                    <button
-                      key={a.name}
-                      onClick={() => update({ accentColor: a.name })}
-                      title={a.name.charAt(0).toUpperCase() + a.name.slice(1)}
-                      aria-pressed={settings.accentColor === a.name}
-                      className={`flex h-7 w-7 items-center justify-center rounded-full transition-opacity ${
-                        settings.accentColor === a.name
-                          ? "opacity-100"
-                          : "opacity-75 hover:opacity-100"
-                      }`}
-                      style={{ backgroundColor: a.color }}
-                    >
-                      {settings.accentColor === a.name && (
-                        <Check className="h-3.5 w-3.5 text-white" strokeWidth={3} />
-                      )}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Layout */}
-              <div className="mb-4">
-                <label className="mb-2 block text-sm text-[var(--color-text-secondary)]">
-                  {t("settings.panelLayout")}
-                </label>
-                <div className="flex gap-2">
-                  {([
-                    { value: "horizontal" as const, label: t("settings.sideBySide") },
-                    { value: "vertical" as const, label: t("settings.stacked") },
-                    { value: "tabbed" as const, label: t("settings.tabbed") },
-                  ]).map((l) => (
-                    <button
-                      key={l.value}
-                      onClick={() => update({ layout: l.value })}
-                      className={`rounded-md border px-3.5 py-1.5 text-[12.5px] transition-all ${
-                        settings.layout === l.value
-                          ? "border-transparent bg-[var(--color-accent)] font-medium text-white"
-                          : "border-[var(--color-border-strong)] bg-transparent text-[var(--color-text-muted)] hover:border-[color-mix(in_srgb,var(--color-border-strong)_60%,var(--color-text-muted))] hover:text-[var(--color-text-secondary)]"
-                      }`}
-                    >
-                      {l.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Sidebar width */}
-              <div className="mb-4">
-                <label className="mb-2 block text-sm text-[var(--color-text-secondary)]">
-                  {t("settings.sidebarWidth")}: {settings.sidebarWidth}px
-                </label>
-                <input
-                  type="range"
-                  min={180}
-                  max={400}
-                  step={4}
-                  value={settings.sidebarWidth}
-                  onChange={(e) => update({ sidebarWidth: Number(e.target.value) })}
-                  className="w-full accent-[var(--color-accent)]"
-                />
-              </div>
-
-              {/* Language */}
-              <div>
-                <label className="mb-2 block text-sm text-[var(--color-text-secondary)]">
-                  {t("settings.language")}
-                </label>
-                <div className="flex flex-wrap gap-2">
-                  {LANGUAGES.map((lang) => (
-                    <button
-                      key={lang.code}
-                      onClick={() => {
-                        i18n.changeLanguage(lang.code);
-                        localStorage.setItem("reqmate-language", lang.code);
-                      }}
-                      className={`rounded-md border px-3 py-1.5 text-[12.5px] transition-colors ${
-                        i18n.language === lang.code
-                          ? "border-transparent bg-[var(--color-accent)] text-white"
-                          : "border-[var(--color-border)] bg-[var(--color-card)] text-[var(--color-text-secondary)] hover:border-[var(--color-border-strong)] hover:bg-[var(--color-card-hover)] hover:text-[var(--color-text-primary)]"
-                      }`}
-                    >
-                      {lang.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </section>
-
-            {/* Saving Section */}
-            <section>
-              <h3 className="label-caps mb-3 block">
-                {t("settings.saving")}
-              </h3>
-              <div className="flex items-start justify-between gap-8">
-                <div className="min-w-0">
-                  <label
-                    htmlFor="setting-auto-save"
-                    className="text-sm text-[var(--color-text-secondary)]"
+          <div className="flex min-h-0 flex-1">
+            {/* Section menu */}
+            <nav
+              aria-label={t("settings.title")}
+              className="flex w-[210px] shrink-0 flex-col gap-0.5 overflow-y-auto border-r border-[var(--color-border)] bg-[var(--color-surface)] p-2.5"
+            >
+              {SETTINGS_SECTIONS.map((item) => {
+                const active = section === item.id;
+                const Icon = item.icon;
+                return (
+                  <button
+                    key={item.id}
+                    onClick={() => {
+                      setSection(item.id);
+                      if (scrollRef.current) scrollRef.current.scrollTop = 0;
+                    }}
+                    aria-current={active ? "true" : undefined}
+                    className={`flex items-center gap-2.5 rounded-md px-2.5 py-2 text-left text-[12.5px] transition-colors ${
+                      active
+                        ? "bg-[var(--color-accent-soft)] font-medium text-[var(--color-accent-text)]"
+                        : "text-[var(--color-text-secondary)] hover:bg-[var(--color-card-hover)] hover:text-[var(--color-text-primary)]"
+                    }`}
                   >
-                    {t("settings.autoSave")}
-                  </label>
-                  <p className="mt-1 text-[11.5px] leading-relaxed text-[var(--color-text-muted)]">
-                    {t("settings.autoSaveDesc")}
-                  </p>
-                </div>
-                <div id="setting-auto-save">
-                  <ToggleSwitch
-                    checked={settings.autoSave}
-                    onChange={(v) => update({ autoSave: v })}
-                  />
-                </div>
-              </div>
-            </section>
+                    <Icon className="h-4 w-4 shrink-0" strokeWidth={active ? 2 : 1.7} />
+                    <span className="truncate">{t(item.labelKey)}</span>
+                  </button>
+                );
+              })}
+            </nav>
 
-            {/* Network Section */}
-            <section>
-              <h3 className="label-caps mb-3 block">
-                {t("settings.network")}
-              </h3>
+            {/* Active section */}
+            <div ref={scrollRef} className="min-h-0 flex-1 overflow-y-auto">
+              <div className="max-w-[680px] px-7 py-6">
+                {/* Appearance Section */}
+                <section hidden={section !== "appearance"}>
+                  <h3 className="label-caps mb-3 block">
+                    {t("settings.appearance")}
+                  </h3>
 
-              {/* SSL Verification */}
-              <div className="mb-3 flex items-center justify-between">
-                <label className="text-sm text-[var(--color-text-secondary)]">
-                  {t("settings.sslVerification")}
-                </label>
-                <ToggleSwitch
-                  checked={settings.verifySsl}
-                  onChange={(v) => update({ verifySsl: v })}
-                />
-              </div>
+                  {/* Theme */}
+                  <div className="mb-4">
+                    <label className="mb-2 block text-sm text-[var(--color-text-secondary)]">
+                      {t("settings.theme")}
+                    </label>
+                    <div className="flex gap-2">
+                      {(["system", "light", "dark", "black"] as const).map((themeOption) => (
+                        <button
+                          key={themeOption}
+                          onClick={() => update({ theme: themeOption })}
+                          className={`rounded-md border px-3.5 py-1.5 text-[12.5px] capitalize transition-colors ${
+                            settings.theme === themeOption
+                              ? "border-transparent bg-[var(--color-accent)] font-medium text-white"
+                              : "border-[var(--color-border)] bg-[var(--color-card)] text-[var(--color-text-secondary)] hover:border-[var(--color-border-strong)] hover:bg-[var(--color-card-hover)] hover:text-[var(--color-text-primary)]"
+                          }`}
+                        >
+                          {themeOption === "black"
+                            ? t("settings.black")
+                            : themeOption === "light"
+                              ? t("settings.light")
+                              : themeOption === "dark"
+                                ? t("settings.dark")
+                                : t("settings.system")}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
 
-              {/* Follow Redirects */}
-              <div className="mb-3 flex items-center justify-between">
-                <label className="text-sm text-[var(--color-text-secondary)]">
-                  {t("settings.followRedirects")}
-                </label>
-                <ToggleSwitch
-                  checked={settings.followRedirects}
-                  onChange={(v) => update({ followRedirects: v })}
-                />
-              </div>
+                  {/* Accent Color */}
+                  <div className="mb-4">
+                    <label className="mb-2 block text-sm text-[var(--color-text-secondary)]">
+                      {t("settings.accentColor")}
+                    </label>
+                    <div className="flex gap-2">
+                      {([
+                        { name: "indigo", color: "#5b5bd6" },
+                        { name: "blue", color: "#2f6fed" },
+                        { name: "emerald", color: "#0d9d70" },
+                        { name: "amber", color: "#d98313" },
+                        { name: "rose", color: "#e23b57" },
+                        { name: "violet", color: "#7c4ddb" },
+                        { name: "cyan", color: "#0a91ad" },
+                        { name: "orange", color: "#e2661a" },
+                      ] as const).map((a) => (
+                        <button
+                          key={a.name}
+                          onClick={() => update({ accentColor: a.name })}
+                          title={a.name.charAt(0).toUpperCase() + a.name.slice(1)}
+                          aria-pressed={settings.accentColor === a.name}
+                          className={`flex h-7 w-7 items-center justify-center rounded-full transition-opacity ${
+                            settings.accentColor === a.name
+                              ? "opacity-100"
+                              : "opacity-75 hover:opacity-100"
+                          }`}
+                          style={{ backgroundColor: a.color }}
+                        >
+                          {settings.accentColor === a.name && (
+                            <Check className="h-3.5 w-3.5 text-white" strokeWidth={3} />
+                          )}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
 
-              {/* Timeout */}
-              <div className="mb-4">
-                <label className="mb-2 block text-sm text-[var(--color-text-secondary)]">
-                  {t("settings.timeout")}
-                </label>
-                <input
-                  type="number"
-                  min={0}
-                  step={1000}
-                  value={settings.timeoutMs}
-                  onChange={(e) => update({ timeoutMs: Number(e.target.value) || 30000 })}
-                  className="w-full rounded-md border border-[var(--color-border)] bg-[var(--color-card)] px-3 py-1.5 text-sm text-[var(--color-text-primary)] outline-none transition-colors focus:border-[var(--color-accent)]"
-                />
-              </div>
+                  {/* Layout */}
+                  <div className="mb-4">
+                    <label className="mb-2 block text-sm text-[var(--color-text-secondary)]">
+                      {t("settings.panelLayout")}
+                    </label>
+                    <div className="flex gap-2">
+                      {([
+                        { value: "horizontal" as const, label: t("settings.sideBySide") },
+                        { value: "vertical" as const, label: t("settings.stacked") },
+                        { value: "tabbed" as const, label: t("settings.tabbed") },
+                      ]).map((l) => (
+                        <button
+                          key={l.value}
+                          onClick={() => update({ layout: l.value })}
+                          className={`rounded-md border px-3.5 py-1.5 text-[12.5px] transition-all ${
+                            settings.layout === l.value
+                              ? "border-transparent bg-[var(--color-accent)] font-medium text-white"
+                              : "border-[var(--color-border-strong)] bg-transparent text-[var(--color-text-muted)] hover:border-[color-mix(in_srgb,var(--color-border-strong)_60%,var(--color-text-muted))] hover:text-[var(--color-text-secondary)]"
+                          }`}
+                        >
+                          {l.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
 
-              {/* Proxy */}
-              <div>
-                <label className="mb-2 block text-sm text-[var(--color-text-secondary)]">
-                  {t("settings.proxyUrl")}
-                </label>
-                <input
-                  type="text"
-                  value={settings.proxyUrl ?? ""}
-                  onChange={(e) => update({ proxyUrl: e.target.value || null })}
-                  placeholder="http://proxy.example.com:8080"
-                                    className="mb-2 w-full rounded border border-[var(--color-border)] bg-[var(--color-card)] px-3 py-1.5 text-sm text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none transition-colors focus:border-[var(--color-accent)]"
-                />
-                {settings.proxyUrl && (
-                  <div className="flex gap-2">
+                  {/* Sidebar width */}
+                  <div className="mb-4">
+                    <label className="mb-2 block text-sm text-[var(--color-text-secondary)]">
+                      {t("settings.sidebarWidth")}: {settings.sidebarWidth}px
+                    </label>
                     <input
-                      type="text"
-                      value={settings.proxyUsername ?? ""}
-                      onChange={(e) => update({ proxyUsername: e.target.value || null })}
-                      placeholder={t("settings.proxyUsername")}
-                                            className="flex-1 rounded border border-[var(--color-border)] bg-[var(--color-card)] px-3 py-1.5 text-sm text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none transition-colors focus:border-[var(--color-accent)]"
-                    />
-                    <input
-                      type="password"
-                      value={settings.proxyPassword ?? ""}
-                      onChange={(e) => update({ proxyPassword: e.target.value || null })}
-                      placeholder={t("settings.proxyPassword")}
-                                            className="flex-1 rounded border border-[var(--color-border)] bg-[var(--color-card)] px-3 py-1.5 text-sm text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none transition-colors focus:border-[var(--color-accent)]"
+                      type="range"
+                      min={180}
+                      max={400}
+                      step={4}
+                      value={settings.sidebarWidth}
+                      onChange={(e) => update({ sidebarWidth: Number(e.target.value) })}
+                      className="w-full accent-[var(--color-accent)]"
                     />
                   </div>
-                )}
-              </div>
-            </section>
 
-            {/* Certificates Section */}
-            <section>
-              <h3 className="label-caps mb-3 block">
-                {t("settings.certificates")}
-              </h3>
+                  {/* Language */}
+                  <div>
+                    <label className="mb-2 block text-sm text-[var(--color-text-secondary)]">
+                      {t("settings.language")}
+                    </label>
+                    <div className="flex flex-wrap gap-2">
+                      {LANGUAGES.map((lang) => (
+                        <button
+                          key={lang.code}
+                          onClick={() => {
+                            i18n.changeLanguage(lang.code);
+                            localStorage.setItem("reqmate-language", lang.code);
+                          }}
+                          className={`rounded-md border px-3 py-1.5 text-[12.5px] transition-colors ${
+                            i18n.language === lang.code
+                              ? "border-transparent bg-[var(--color-accent)] text-white"
+                              : "border-[var(--color-border)] bg-[var(--color-card)] text-[var(--color-text-secondary)] hover:border-[var(--color-border-strong)] hover:bg-[var(--color-card-hover)] hover:text-[var(--color-text-primary)]"
+                          }`}
+                        >
+                          {lang.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </section>
 
-              {/* Custom CA Certificate */}
-              <div className="mb-4">
-                <label className="mb-2 block text-sm text-[var(--color-text-secondary)]">
-                  {t("settings.caCert")}
-                </label>
-                <FilePathInput
-                  value={settings.caCertPath ?? ""}
-                  onChange={(v) => update({ caCertPath: v || null })}
-                  placeholder="Path to CA certificate (.pem, .crt)"
-                  filters={[{ name: "Certificates", extensions: ["pem", "crt", "cer"] }]}
-                />
-              </div>
+                {/* Saving Section */}
+                <section hidden={section !== "saving"}>
+                  <h3 className="label-caps mb-3 block">
+                    {t("settings.saving")}
+                  </h3>
+                  <div className="flex items-start justify-between gap-8">
+                    <div className="min-w-0">
+                      <label
+                        htmlFor="setting-auto-save"
+                        className="text-sm text-[var(--color-text-secondary)]"
+                      >
+                        {t("settings.autoSave")}
+                      </label>
+                      <p className="mt-1 text-[11.5px] leading-relaxed text-[var(--color-text-muted)]">
+                        {t("settings.autoSaveDesc")}
+                      </p>
+                    </div>
+                    <div id="setting-auto-save">
+                      <ToggleSwitch
+                        checked={settings.autoSave}
+                        onChange={(v) => update({ autoSave: v })}
+                      />
+                    </div>
+                  </div>
+                </section>
 
-              {/* Client Certificate */}
-              <div className="mb-4">
-                <label className="mb-2 block text-sm text-[var(--color-text-secondary)]">
-                  {t("settings.clientCert")}
-                </label>
-                <FilePathInput
-                  value={settings.clientCertPath ?? ""}
-                  onChange={(v) => update({ clientCertPath: v || null })}
-                  placeholder="Path to client certificate (.pem, .crt, .pfx)"
-                  filters={[{ name: "Certificates", extensions: ["pem", "crt", "cer", "pfx", "p12"] }]}
-                />
-              </div>
+                {/* Network Section */}
+                <section hidden={section !== "network"}>
+                  <h3 className="label-caps mb-3 block">
+                    {t("settings.network")}
+                  </h3>
 
-              {/* Client Key */}
-              <div className="mb-4">
-                <label className="mb-2 block text-sm text-[var(--color-text-secondary)]">
-                  {t("settings.clientKey")}
-                </label>
-                <FilePathInput
-                  value={settings.clientKeyPath ?? ""}
-                  onChange={(v) => update({ clientKeyPath: v || null })}
-                  placeholder="Path to client private key (.pem, .key)"
-                  filters={[{ name: "Keys", extensions: ["pem", "key"] }]}
-                />
-              </div>
+                  {/* SSL Verification */}
+                  <div className="mb-3 flex items-center justify-between">
+                    <label className="text-sm text-[var(--color-text-secondary)]">
+                      {t("settings.sslVerification")}
+                    </label>
+                    <ToggleSwitch
+                      checked={settings.verifySsl}
+                      onChange={(v) => update({ verifySsl: v })}
+                    />
+                  </div>
 
-              {/* PFX Passphrase */}
-              {settings.clientCertPath?.match(/\.(pfx|p12)$/i) && (
-                <div className="mb-4">
-                  <label className="mb-2 block text-sm text-[var(--color-text-secondary)]">
-                    {t("settings.pfxPassphrase")}
-                  </label>
-                  <input
-                    type="password"
-                    value={settings.clientCertPassphrase ?? ""}
-                    onChange={(e) => update({ clientCertPassphrase: e.target.value || null })}
-                    placeholder="Passphrase (optional)"
-                                        className="w-full rounded border border-[var(--color-border)] bg-[var(--color-card)] px-3 py-1.5 text-sm text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none transition-colors focus:border-[var(--color-accent)]"
-                  />
+                  {/* Follow Redirects */}
+                  <div className="mb-3 flex items-center justify-between">
+                    <label className="text-sm text-[var(--color-text-secondary)]">
+                      {t("settings.followRedirects")}
+                    </label>
+                    <ToggleSwitch
+                      checked={settings.followRedirects}
+                      onChange={(v) => update({ followRedirects: v })}
+                    />
+                  </div>
+
+                  {/* Timeout */}
+                  <div className="mb-4">
+                    <label className="mb-2 block text-sm text-[var(--color-text-secondary)]">
+                      {t("settings.timeout")}
+                    </label>
+                    <input
+                      type="number"
+                      min={0}
+                      step={1000}
+                      value={settings.timeoutMs}
+                      onChange={(e) => update({ timeoutMs: Number(e.target.value) || 30000 })}
+                      className="w-full rounded-md border border-[var(--color-border)] bg-[var(--color-card)] px-3 py-1.5 text-sm text-[var(--color-text-primary)] outline-none transition-colors focus:border-[var(--color-accent)]"
+                    />
+                  </div>
+
+                  {/* Proxy */}
+                  <div>
+                    <label className="mb-2 block text-sm text-[var(--color-text-secondary)]">
+                      {t("settings.proxyUrl")}
+                    </label>
+                    <input
+                      type="text"
+                      value={settings.proxyUrl ?? ""}
+                      onChange={(e) => update({ proxyUrl: e.target.value || null })}
+                      placeholder="http://proxy.example.com:8080"
+                                        className="mb-2 w-full rounded border border-[var(--color-border)] bg-[var(--color-card)] px-3 py-1.5 text-sm text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none transition-colors focus:border-[var(--color-accent)]"
+                    />
+                    {settings.proxyUrl && (
+                      <div className="flex gap-2">
+                        <input
+                          type="text"
+                          value={settings.proxyUsername ?? ""}
+                          onChange={(e) => update({ proxyUsername: e.target.value || null })}
+                          placeholder={t("settings.proxyUsername")}
+                                                className="flex-1 rounded border border-[var(--color-border)] bg-[var(--color-card)] px-3 py-1.5 text-sm text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none transition-colors focus:border-[var(--color-accent)]"
+                        />
+                        <input
+                          type="password"
+                          value={settings.proxyPassword ?? ""}
+                          onChange={(e) => update({ proxyPassword: e.target.value || null })}
+                          placeholder={t("settings.proxyPassword")}
+                                                className="flex-1 rounded border border-[var(--color-border)] bg-[var(--color-card)] px-3 py-1.5 text-sm text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none transition-colors focus:border-[var(--color-accent)]"
+                        />
+                      </div>
+                    )}
+                  </div>
+                </section>
+
+                {/* Certificates Section */}
+                <section hidden={section !== "certificates"}>
+                  <h3 className="label-caps mb-3 block">
+                    {t("settings.certificates")}
+                  </h3>
+
+                  {/* Custom CA Certificate */}
+                  <div className="mb-4">
+                    <label className="mb-2 block text-sm text-[var(--color-text-secondary)]">
+                      {t("settings.caCert")}
+                    </label>
+                    <FilePathInput
+                      value={settings.caCertPath ?? ""}
+                      onChange={(v) => update({ caCertPath: v || null })}
+                      placeholder="Path to CA certificate (.pem, .crt)"
+                      filters={[{ name: "Certificates", extensions: ["pem", "crt", "cer"] }]}
+                    />
+                  </div>
+
+                  {/* Client Certificate */}
+                  <div className="mb-4">
+                    <label className="mb-2 block text-sm text-[var(--color-text-secondary)]">
+                      {t("settings.clientCert")}
+                    </label>
+                    <FilePathInput
+                      value={settings.clientCertPath ?? ""}
+                      onChange={(v) => update({ clientCertPath: v || null })}
+                      placeholder="Path to client certificate (.pem, .crt, .pfx)"
+                      filters={[{ name: "Certificates", extensions: ["pem", "crt", "cer", "pfx", "p12"] }]}
+                    />
+                  </div>
+
+                  {/* Client Key */}
+                  <div className="mb-4">
+                    <label className="mb-2 block text-sm text-[var(--color-text-secondary)]">
+                      {t("settings.clientKey")}
+                    </label>
+                    <FilePathInput
+                      value={settings.clientKeyPath ?? ""}
+                      onChange={(v) => update({ clientKeyPath: v || null })}
+                      placeholder="Path to client private key (.pem, .key)"
+                      filters={[{ name: "Keys", extensions: ["pem", "key"] }]}
+                    />
+                  </div>
+
+                  {/* PFX Passphrase */}
+                  {settings.clientCertPath?.match(/\.(pfx|p12)$/i) && (
+                    <div className="mb-4">
+                      <label className="mb-2 block text-sm text-[var(--color-text-secondary)]">
+                        {t("settings.pfxPassphrase")}
+                      </label>
+                      <input
+                        type="password"
+                        value={settings.clientCertPassphrase ?? ""}
+                        onChange={(e) => update({ clientCertPassphrase: e.target.value || null })}
+                        placeholder="Passphrase (optional)"
+                                            className="w-full rounded border border-[var(--color-border)] bg-[var(--color-card)] px-3 py-1.5 text-sm text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none transition-colors focus:border-[var(--color-accent)]"
+                      />
+                    </div>
+                  )}
+                </section>
+
+                {/* AI Section */}
+                <section id="settings-ai" hidden={section !== "ai"}>
+                  <h3 className="label-caps mb-3 block">
+                    {t("settings.aiAssistant")}
+                  </h3>
+                  <div className="space-y-3">
+                    <div>
+                      <label className="mb-1 block text-sm text-[var(--color-text-secondary)]">
+                        API Endpoint
+                      </label>
+                      <input
+                        type="text"
+                        value={settings.aiEndpoint ?? ""}
+                        onChange={(e) => update({ aiEndpoint: e.target.value.trim() || null })}
+                        placeholder="https://api.openai.com/v1"
+                        className="w-full rounded border border-[var(--color-border)] bg-[var(--color-bg)] px-3 py-1.5 text-sm text-[var(--color-text-primary)] placeholder:text-[var(--color-text-dimmed)]"
+                      />
+                      <p className="mt-0.5 text-xs text-[var(--color-text-dimmed)]">
+                        Any OpenAI-compatible endpoint (OpenAI, Ollama, LM Studio, etc.)
+                      </p>
+                    </div>
+                    <div>
+                      <label className="mb-1 block text-sm text-[var(--color-text-secondary)]">
+                        API Key
+                      </label>
+                      <input
+                        type="password"
+                        value={settings.aiApiKey ?? ""}
+                        onChange={(e) => update({ aiApiKey: e.target.value || null })}
+                        placeholder="sk-..."
+                        className="w-full rounded border border-[var(--color-border)] bg-[var(--color-bg)] px-3 py-1.5 text-sm text-[var(--color-text-primary)] placeholder:text-[var(--color-text-dimmed)]"
+                      />
+                    </div>
+                    <div>
+                      <label className="mb-1 block text-sm text-[var(--color-text-secondary)]">
+                        Model
+                      </label>
+                      <input
+                        type="text"
+                        value={settings.aiModel ?? ""}
+                        onChange={(e) => update({ aiModel: e.target.value || null })}
+                        placeholder="gpt-4o-mini"
+                        className="w-full rounded border border-[var(--color-border)] bg-[var(--color-bg)] px-3 py-1.5 text-sm text-[var(--color-text-primary)] placeholder:text-[var(--color-text-dimmed)]"
+                      />
+                    </div>
+                  </div>
+                </section>
+
+                {/* Updates Section */}
+                <div hidden={section !== "updates"}>
+                  <UpdateSection settings={settings} update={update} />
                 </div>
-              )}
-            </section>
 
-            {/* AI Section */}
-            <section id="settings-ai">
-              <h3 className="label-caps mb-3 block">
-                AI Assistant
-              </h3>
-              <div className="space-y-3">
-                <div>
-                  <label className="mb-1 block text-sm text-[var(--color-text-secondary)]">
-                    API Endpoint
-                  </label>
-                  <input
-                    type="text"
-                    value={settings.aiEndpoint ?? ""}
-                    onChange={(e) => update({ aiEndpoint: e.target.value.trim() || null })}
-                    placeholder="https://api.openai.com/v1"
-                    className="w-full rounded border border-[var(--color-border)] bg-[var(--color-bg)] px-3 py-1.5 text-sm text-[var(--color-text-primary)] placeholder:text-[var(--color-text-dimmed)]"
-                  />
-                  <p className="mt-0.5 text-xs text-[var(--color-text-dimmed)]">
-                    Any OpenAI-compatible endpoint (OpenAI, Ollama, LM Studio, etc.)
-                  </p>
+                {/* Keyboard Shortcuts */}
+                <div hidden={section !== "shortcuts"}>
+                  <KeyboardShortcutsSection />
                 </div>
-                <div>
-                  <label className="mb-1 block text-sm text-[var(--color-text-secondary)]">
-                    API Key
-                  </label>
-                  <input
-                    type="password"
-                    value={settings.aiApiKey ?? ""}
-                    onChange={(e) => update({ aiApiKey: e.target.value || null })}
-                    placeholder="sk-..."
-                    className="w-full rounded border border-[var(--color-border)] bg-[var(--color-bg)] px-3 py-1.5 text-sm text-[var(--color-text-primary)] placeholder:text-[var(--color-text-dimmed)]"
-                  />
+
+                {/* Backup Section */}
+                <div hidden={section !== "backup"}>
+                  <BackupSection />
                 </div>
-                <div>
-                  <label className="mb-1 block text-sm text-[var(--color-text-secondary)]">
-                    Model
-                  </label>
-                  <input
-                    type="text"
-                    value={settings.aiModel ?? ""}
-                    onChange={(e) => update({ aiModel: e.target.value || null })}
-                    placeholder="gpt-4o-mini"
-                    className="w-full rounded border border-[var(--color-border)] bg-[var(--color-bg)] px-3 py-1.5 text-sm text-[var(--color-text-primary)] placeholder:text-[var(--color-text-dimmed)]"
-                  />
+
+                {/* Design Tokens Reference */}
+                <div hidden={section !== "tokens"}>
+                  <DesignTokensSection />
                 </div>
               </div>
-            </section>
-
-            {/* Updates Section */}
-            <UpdateSection settings={settings} update={update} />
-
-            {/* Keyboard Shortcuts */}
-            <KeyboardShortcutsSection />
-
-            {/* Backup Section */}
-            <BackupSection />
-
-            {/* Design Tokens Reference */}
-            <DesignTokensSection />
+            </div>
           </div>
         </Dialog.Content>
       </Dialog.Portal>
@@ -430,7 +517,7 @@ function UpdateSection({
   const loadBackups = async () => {
     try {
       const { listRollbackVersions } = await import("@/lib/tauri-api");
-      setBackups(await listRollbackVersions());
+      setBackups((await listRollbackVersions()) ?? []);
     } catch { /* ignore */ }
   };
 
@@ -783,10 +870,11 @@ function ToggleSwitch({
 }
 
 function DesignTokensSection() {
+  const { t } = useTranslation();
   return (
     <section>
       <h3 className="label-caps mb-3 block">
-        Design Tokens
+        {t("settings.designTokens")}
       </h3>
       <p className="mb-3 text-xs text-[var(--color-text-dimmed)]">
         Active color palette for the current theme. Useful for theme creators and plugin developers.

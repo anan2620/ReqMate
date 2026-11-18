@@ -268,7 +268,10 @@
     "recording": "Presiona la combinación de teclas...",
     "saving": "Guardado",
     "autoSave": "Guardar los cambios automáticamente",
-    "autoSaveDesc": "Guarda en disco un segundo después de dejar de escribir. Desactívalo para mantener los cambios en el editor hasta que pulses Guardar."
+    "autoSaveDesc": "Guarda en disco un segundo después de dejar de escribir. Desactívalo para mantener los cambios en el editor hasta que pulses Guardar.",
+    "aiAssistant": "Asistente de IA",
+    "designTokens": "Tokens de diseño",
+    "toggleTheme": "Cambiar tema"
   },
   "runner": {
     "title": "Ejecutor de Colección",

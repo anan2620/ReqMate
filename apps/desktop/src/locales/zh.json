@@ -268,7 +268,10 @@
     "recording": "请按下组合键...",
     "saving": "保存",
     "autoSave": "自动保存请求改动",
-    "autoSaveDesc": "停止输入 1 秒后自动写入磁盘。关闭后，改动会保留在编辑器里，直到你点击“保存”。"
+    "autoSaveDesc": "停止输入 1 秒后自动写入磁盘。关闭后，改动会保留在编辑器里，直到你点击“保存”。",
+    "aiAssistant": "AI 助手",
+    "designTokens": "设计令牌",
+    "toggleTheme": "切换主题"
   },
   "runner": {
     "title": "集合运行器",

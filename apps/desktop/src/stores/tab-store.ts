@@ -771,7 +771,8 @@ export const useTabStore = create<TabState>((set, get) => ({
         if (collectionPaths.size > 0) {
           import("@/stores/collection-store").then(({ useCollectionStore }) => {
             for (const path of collectionPaths) {
-              useCollectionStore.getState().openCollection(path).catch(() => {});
+              // Restored collections start collapsed — the tree only opens on demand.
+              useCollectionStore.getState().openCollection(path, { expand: false }).catch(() => {});
             }
           });
         }
@@ -812,7 +813,7 @@ export const useTabStore = create<TabState>((set, get) => ({
       if (collectionPaths.size > 0) {
         import("@/stores/collection-store").then(({ useCollectionStore }) => {
           for (const path of collectionPaths) {
-            useCollectionStore.getState().openCollection(path).catch(() => {});
+            useCollectionStore.getState().openCollection(path, { expand: false }).catch(() => {});
           }
         });
       }

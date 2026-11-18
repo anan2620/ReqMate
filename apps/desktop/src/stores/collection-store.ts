@@ -27,7 +27,7 @@ interface CollectionState {
   /** Pending migration prompt — shown as a dialog */
   migrationPrompt: MigrationPrompt | null;
 
-  openCollection: (path: string) => Promise<void>;
+  openCollection: (path: string, options?: { expand?: boolean }) => Promise<void>;
   closeCollection: (path: string) => void;
   refreshCollection: (path: string) => Promise<void>;
   toggleExpand: (path: string) => void;
@@ -67,12 +67,22 @@ export const useCollectionStore = create<CollectionState>((set, get) => ({
   readOnlyPaths: new Set<string>(),
   migrationPrompt: null,
 
-  openCollection: async (path) => {
+  openCollection: async (path, options) => {
+    // Collections opened on startup stay collapsed; an explicit user action expands.
+    const expand = options?.expand ?? true;
     // Don't open the same collection twice (or concurrently)
     const existing = get().collections.find(
       (c) => c.type === "collection" && c.path === path,
     );
-    if (existing || openingPaths.has(path)) return;
+    if (existing || openingPaths.has(path)) {
+      // Already open: only re-expand when the user explicitly asked for it.
+      if (existing && expand) {
+        set((state) => ({
+          expandedPaths: new Set([...state.expandedPaths, path]),
+        }));
+      }
+      return;
+    }
     openingPaths.add(path);
 
     try {
@@ -95,7 +105,9 @@ export const useCollectionStore = create<CollectionState>((set, get) => ({
       const tree = await openCollectionApi(path);
       set((state) => ({
         collections: [...state.collections, tree],
-        expandedPaths: new Set([...state.expandedPaths, path]),
+        expandedPaths: expand
+          ? new Set([...state.expandedPaths, path])
+          : state.expandedPaths,
       }));
       watchCollection(path).catch((err) =>
         console.warn("Failed to start file watcher:", err),

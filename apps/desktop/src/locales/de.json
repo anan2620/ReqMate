@@ -268,7 +268,10 @@
     "recording": "Drücke eine Tastenkombination...",
     "saving": "Speichern",
     "autoSave": "Änderungen automatisch speichern",
-    "autoSaveDesc": "Schreibt eine Sekunde nach der letzten Eingabe auf die Festplatte. Deaktiviert bleiben Änderungen im Editor, bis du auf Speichern klickst."
+    "autoSaveDesc": "Schreibt eine Sekunde nach der letzten Eingabe auf die Festplatte. Deaktiviert bleiben Änderungen im Editor, bis du auf Speichern klickst.",
+    "aiAssistant": "KI-Assistent",
+    "designTokens": "Design-Tokens",
+    "toggleTheme": "Design wechseln"
   },
   "runner": {
     "title": "Sammlungsausführer",

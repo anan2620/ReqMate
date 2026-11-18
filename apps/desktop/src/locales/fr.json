@@ -268,7 +268,10 @@
     "recording": "Appuyez sur une combinaison de touches...",
     "saving": "Enregistrement",
     "autoSave": "Enregistrer automatiquement les modifications",
-    "autoSaveDesc": "Écrit sur le disque une seconde après la dernière frappe. Désactivez cette option pour garder les modifications dans l’éditeur jusqu’à l’enregistrement manuel."
+    "autoSaveDesc": "Écrit sur le disque une seconde après la dernière frappe. Désactivez cette option pour garder les modifications dans l’éditeur jusqu’à l’enregistrement manuel.",
+    "aiAssistant": "Assistant IA",
+    "designTokens": "Jetons de design",
+    "toggleTheme": "Changer de thème"
   },
   "runner": {
     "title": "Exécuteur de Collection",
