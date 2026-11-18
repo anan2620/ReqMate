@@ -75,7 +75,7 @@ export function FormDataEditor({
             value={pair.key}
             onChange={(e) => update(index, "key", e.target.value)}
             placeholder={t("request.field")}
-            className="rounded bg-[var(--color-elevated)] px-2 py-1 text-sm text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none focus:ring-1 focus:ring-[var(--color-accent)]"
+            className="rounded border border-[var(--color-border)] bg-[var(--color-card)] px-2 py-1 text-sm text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none"
           />
           <div className="flex items-center gap-1">
             <input
@@ -88,7 +88,7 @@ export function FormDataEditor({
                 onChange(updated);
               }}
               placeholder={pair.valueType === "file" ? t("request.filePath") : t("request.value")}
-              className={`min-w-0 flex-1 rounded bg-[var(--color-elevated)] px-2 py-1 text-sm outline-none focus:ring-1 focus:ring-[var(--color-accent)] ${
+              className={`min-w-0 flex-1 rounded border border-[var(--color-border)] bg-[var(--color-card)] px-2 py-1 text-sm outline-none ${
                 pair.valueType === "file"
                   ? "text-violet-400 placeholder-violet-400/50"
                   : "text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)]"

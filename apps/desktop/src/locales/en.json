@@ -52,7 +52,9 @@
     "noEnvironmentsYet": "No environments yet",
     "newEnvironment": "New Environment",
     "addVariable": "Add Variable",
-    "importEnvironment": "Import Environment (Postman JSON)"
+    "importEnvironment": "Import Environment (Postman JSON)",
+    "collectionDefaults": "Collection Defaults",
+    "collectionDefaultsDesc": "Auth configured here is inherited by every request that has no auth of its own."
   },
   "tabs": {
     "untitled": "Untitled Request",
@@ -69,7 +71,9 @@
     "duplicateTab": "Duplicate Tab",
     "moveToNewWindow": "Move to New Window",
     "httpRequest": "HTTP Request",
-    "importCurl": "Import cURL"
+    "importCurl": "Import cURL",
+    "saveAs": "Save as…",
+    "saveOptions": "Save options"
   },
   "request": {
     "send": "Send",
@@ -166,7 +170,8 @@
     "assertionConsumerUrl": "Assertion Consumer Service URL",
     "certificate": "IdP Certificate (PEM)",
     "nameIdFormat": "NameID Format",
-    "samlToken": "SAML Assertion Token"
+    "samlToken": "SAML Assertion Token",
+    "apiKeyHeader": "Header name"
   },
   "response": {
     "body": "Body",
@@ -260,7 +265,10 @@
     "upToDate": "You're up to date",
     "updateAvailable": "Update available: {{version}}",
     "shortcuts": "Keyboard Shortcuts",
-    "recording": "Press key combination..."
+    "recording": "Press key combination...",
+    "saving": "Saving",
+    "autoSave": "Auto-save request changes",
+    "autoSaveDesc": "Write edits to disk one second after you stop typing. Turn this off to keep changes in the editor until you press Save."
   },
   "runner": {
     "title": "Collection Runner",
@@ -359,7 +367,10 @@
     "skipForNow": "Skip for now",
     "getStarted": "Get Started",
     "name": "Name",
-    "value": "Value"
+    "value": "Value",
+    "saved": "Saved",
+    "savedTo": "Saved “{{name}}”",
+    "saveFailed": "Save failed: {{reason}}"
   },
   "errors": {
     "connectionRefused": "Connection refused — is the server running?",
@@ -464,7 +475,15 @@
     "html": "HTML",
     "markdown": "Markdown",
     "generating": "Generating documentation...",
-    "generateDesc": "Generate documentation from collections"
+    "generateDesc": "Pick the collections to include, then generate one combined document.",
+    "pickCollections": "Collections",
+    "selectAll": "All",
+    "clearAll": "None",
+    "selectedCount": "{{n}} selected",
+    "noCollections": "Open a collection first.",
+    "generateFor": "Generate docs ({{n}})",
+    "exported": "Exported to {{path}}",
+    "exportFailed": "Export failed: {{reason}}"
   },
   "diff": {
     "title": "Response Diff",
@@ -552,5 +571,35 @@
   },
   "audit": {
     "title": "Audit Logs"
+  },
+  "proxy": {
+    "title": "Proxy Capture",
+    "running": "Running",
+    "stopped": "Stopped",
+    "startProxy": "Start Proxy",
+    "stop": "Stop",
+    "port": "Proxy port",
+    "proxyHint": "Point your HTTP client at 127.0.0.1:{{port}}",
+    "caTitle": "CA Certificate",
+    "copyPem": "Copy PEM",
+    "copied": "Copied",
+    "generateCa": "Generate CA",
+    "caHint": "Install the CA certificate in your browser to capture HTTPS traffic",
+    "passthrough": "Passthrough Domains",
+    "passthroughPlaceholder": "e.g. github.com, google.com",
+    "passthroughHint": "Comma-separated domains to skip capture",
+    "captured_one": "{{count}} request captured",
+    "captured_other": "{{count}} requests captured",
+    "captures": "Captures",
+    "filter": "Filter…",
+    "clearCaptures": "Clear captures",
+    "waiting": "Waiting for requests…",
+    "startHint": "Start the proxy to capture requests",
+    "selectRequest": "Select a request to view details",
+    "request": "Request",
+    "response": "Response",
+    "headers": "Headers",
+    "body": "Body",
+    "noHeaders": "No headers"
   }
 }

@@ -66,8 +66,8 @@ export function PluginManagerDialog({ open, onOpenChange }: PluginManagerDialogP
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
       <Dialog.Portal>
-        <Dialog.Overlay className="fixed inset-0 z-50 bg-black/50" />
-        <Dialog.Content className="fixed left-1/2 top-1/2 z-50 w-[520px] max-h-[85vh] -translate-x-1/2 -translate-y-1/2 overflow-y-auto rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] shadow-xl focus:outline-none">
+        <Dialog.Overlay className="fixed inset-0 z-50 bg-[var(--color-overlay)]" />
+        <Dialog.Content className="fixed left-1/2 top-1/2 z-50 w-[520px] max-h-[85vh] -translate-x-1/2 -translate-y-1/2 overflow-y-auto rounded-lg border border-[var(--color-border)] bg-[var(--color-card)] elev-pop focus:outline-none">
           <div className="flex items-center justify-between border-b border-[var(--color-border)] px-6 py-4">
             <Dialog.Title className="flex items-center gap-2 text-lg font-semibold text-[var(--color-text-primary)]">
               <Puzzle className="h-5 w-5" />
@@ -164,8 +164,8 @@ export function PluginManagerDialog({ open, onOpenChange }: PluginManagerDialogP
       {/* Uninstall confirmation */}
       <Dialog.Root open={!!uninstallTarget} onOpenChange={(v) => { if (!v) setUninstallTarget(null); }}>
         <Dialog.Portal>
-          <Dialog.Overlay className="fixed inset-0 z-[60] bg-black/50" />
-          <Dialog.Content className="fixed left-1/2 top-1/2 z-[60] w-80 -translate-x-1/2 -translate-y-1/2 rounded-xl border border-[var(--color-border)] bg-[var(--color-elevated)] p-5 shadow-2xl">
+          <Dialog.Overlay className="fixed inset-0 z-[60] bg-[var(--color-overlay)]" />
+          <Dialog.Content className="fixed left-1/2 top-1/2 z-[60] w-80 -translate-x-1/2 -translate-y-1/2 rounded-xl border border-[var(--color-border)] bg-[var(--color-card)] p-5 elev-pop">
             <Dialog.Title className="mb-2 text-sm font-semibold text-[var(--color-text-primary)]">
               Uninstall Plugin
             </Dialog.Title>

@@ -1,18 +1,24 @@
 import { create } from "zustand";
 
+export interface DocsTarget {
+  path: string;
+  name: string;
+}
+
 interface DocsStore {
   open: boolean;
-  collectionPath: string;
-  collectionName: string;
-  openDocs: (collectionPath: string, collectionName: string) => void;
+  /** Collections included in the next generated document */
+  targets: DocsTarget[];
+  openDocs: (targets: DocsTarget[]) => void;
+  /** Convenience for the collection context menu: docs for a single collection */
+  openDocsForCollection: (path: string, name: string) => void;
   closeDocs: () => void;
 }
 
 export const useDocsStore = create<DocsStore>((set) => ({
   open: false,
-  collectionPath: "",
-  collectionName: "",
-  openDocs: (collectionPath, collectionName) =>
-    set({ open: true, collectionPath, collectionName }),
+  targets: [],
+  openDocs: (targets) => set({ open: true, targets }),
+  openDocsForCollection: (path, name) => set({ open: true, targets: [{ path, name }] }),
   closeDocs: () => set({ open: false }),
 }));

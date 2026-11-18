@@ -37,6 +37,16 @@ const sections = [
     list.yaml`,
   },
   {
+    title: "Saving & Auto-Save",
+    content: [
+      "Auto-save is on by default: edits are written to disk one second after you stop typing.",
+      "Prefer explicit control? Turn it off in Settings -> Saving and edits stay in the editor until you save.",
+      "Save with Cmd+S (Ctrl+S on Windows/Linux). Dirty tabs show a dot; a saved tab flashes a confirmation and a toast.",
+      "Save as... (Cmd+Shift+S) writes the current request as a new file in any collection — useful for forking an existing request.",
+      "Closing the window warns about requests that were never saved, and about dirty tabs while auto-save is off.",
+    ],
+  },
+  {
     title: "Environment Variables",
     content: [
       "Define variables in .reqmate/environments/*.yaml files.",
@@ -121,6 +131,26 @@ req.env.set("userId", id);`,
     ],
   },
   {
+    title: "API Documentation",
+    content: [
+      "Open Docs in the activity bar, tick the collections you want, and press Generate docs.",
+      "One combined document is produced: each collection becomes its own section and keeps its folder nesting.",
+      "The in-app preview includes an endpoint index — clicking a request jumps straight to it.",
+      "Export as a self-contained HTML file or as Markdown. Empty collections are skipped automatically.",
+      "Right-click a single collection for docs scoped to just that collection.",
+    ],
+  },
+  {
+    title: "Proxy Capture",
+    content: [
+      "Start the built-in proxy (default 127.0.0.1:8888) and point your browser, mobile app, or CLI at it.",
+      "Generate and install the ReqMate CA certificate to record HTTPS traffic.",
+      "Add comma-separated passthrough domains for hosts you never want captured.",
+      "Captures stream into a filterable list; open any entry for request and response headers and bodies.",
+      "The listener binds to localhost only — nothing is exposed to the network and nothing leaves the machine.",
+    ],
+  },
+  {
     title: "CLI",
     content: [
       "Install: npm install -g @reqmate/cli",
@@ -128,6 +158,14 @@ req.env.set("userId", id);`,
       "Supports JSON, JUnit XML, and HTML reporters.",
     ],
     link: { label: "Full CLI Reference", href: "/docs/cli" },
+  },
+  {
+    title: "Interface Language",
+    content: [
+      "Nine languages ship with the app: English, Español, Français, Deutsch, Português, 中文, 日本語, 한국어, العربية.",
+      "Switch in Settings -> Appearance; the choice is stored per machine and applies instantly.",
+      "Only the UI is translated — request files, variables, and scripts stay exactly as you wrote them.",
+    ],
   },
   {
     title: "Import & Export",

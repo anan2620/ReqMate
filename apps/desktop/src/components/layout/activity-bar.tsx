@@ -49,32 +49,21 @@ export function ActivityBar({
   const { t } = useTranslation();
   return (
     <div className="relative flex w-[54px] shrink-0 flex-col items-center border-r border-[var(--color-border)] bg-[var(--color-activity-bar)] pb-3 pt-3.5">
-      {/* Right-edge hairline light for depth */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-y-0 right-0 w-px bg-gradient-to-b from-transparent via-[color-mix(in_srgb,var(--color-text-primary)_8%,transparent)] to-transparent"
-      />
-
       {/* Logo */}
       <button
         onClick={() => onViewChange("collections")}
         title="ReqMate"
-        className="group relative mb-5 flex h-9 w-9 items-center justify-center rounded-[11px] transition-transform duration-200 active:scale-95"
+        className="group relative mb-5 flex h-9 w-9 items-center justify-center rounded-[10px] transition-transform duration-200 active:scale-95"
       >
-        <span
-          aria-hidden
-          className="absolute inset-0 rounded-[11px] opacity-60 blur-md transition-opacity duration-300 group-hover:opacity-100"
-          style={{ background: "var(--color-accent-ring)" }}
-        />
         <img
           src="/app-icon.png"
           alt="ReqMate"
-          className="relative h-9 w-9 rounded-[11px] ring-1 ring-[color-mix(in_srgb,var(--color-text-primary)_12%,transparent)]"
+          className="h-9 w-9 rounded-[10px] ring-1 ring-[color-mix(in_srgb,var(--color-text-primary)_10%,transparent)]"
         />
       </button>
 
       {/* Top nav items */}
-      <div className="flex flex-col items-center gap-1.5">
+      <div className="flex flex-col items-center gap-1">
         {TOP_ITEMS.map((item) => (
           <ActivityBarButton
             key={item.id}
@@ -86,10 +75,10 @@ export function ActivityBar({
         ))}
       </div>
 
-      <div className="my-3 h-px w-5 bg-gradient-to-r from-transparent via-[var(--color-border-strong)] to-transparent" />
+      <div className="my-3 h-px w-6 bg-[var(--color-border)]" />
 
       {/* Bottom nav items */}
-      <div className="flex flex-col items-center gap-1.5">
+      <div className="flex flex-col items-center gap-1">
         {BOTTOM_ITEMS.map((item) => (
           <ActivityBarButton
             key={item.id}
@@ -105,7 +94,7 @@ export function ActivityBar({
       <div className="flex-1" />
 
       {/* Bottom actions */}
-      <div className="flex flex-col items-center gap-1.5">
+      <div className="flex flex-col items-center gap-1">
         <ActivityBarButton icon={MessageSquare} label={`${t("ai.title")} (Ctrl+Shift+A)`} onClick={onOpenAi} />
         <ActivityBarButton icon={Terminal} label={`${t("console.title")} (Ctrl+\`)`} onClick={onToggleConsole} />
         <ActivityBarButton icon={Settings} label={`${t("settings.title")} (Ctrl+,)`} onClick={onOpenSettings} />
@@ -131,17 +120,17 @@ function ActivityBarButton({
       title={label}
       aria-label={label}
       aria-pressed={active}
-      className={`group relative flex h-9 w-9 items-center justify-center rounded-[10px] transition-all duration-200 ${
+      className={`group relative flex h-9 w-9 items-center justify-center rounded-[8px] transition-colors duration-150 ${
         active
-          ? "bg-[var(--color-accent-soft)] text-[var(--color-accent)] shadow-[inset_0_0_0_1px_var(--color-accent-ring)]"
+          ? "bg-[var(--color-accent-soft)] text-[var(--color-accent-text)]"
           : "text-[var(--color-text-muted)] hover:bg-[color-mix(in_srgb,var(--color-text-primary)_6%,transparent)] hover:text-[var(--color-text-secondary)]"
       }`}
     >
       {/* Active indicator rail */}
       <span
         aria-hidden
-        className={`absolute -left-[7px] top-1/2 w-[2.5px] -translate-y-1/2 rounded-full bg-[var(--color-accent)] transition-all duration-300 ${
-          active ? "h-5 opacity-100 shadow-[0_0_8px_var(--color-accent)]" : "h-0 opacity-0"
+        className={`absolute -left-[7px] top-1/2 w-[2px] -translate-y-1/2 bg-[var(--color-accent)] transition-all duration-200 ${
+          active ? "h-5 opacity-100" : "h-0 opacity-0"
         }`}
       />
       <Icon className="h-[18px] w-[18px]" strokeWidth={active ? 2 : 1.6} />

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import * as Dialog from "@radix-ui/react-dialog";
-import { X, FolderOpen, Download, Upload, RefreshCw, ExternalLink } from "lucide-react";
+import { X, FolderOpen, Download, Upload, RefreshCw, ExternalLink, Check } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { LANGUAGES } from "@/lib/i18n";
 import { useSettingsStore } from "@/stores/settings-store";
@@ -31,8 +31,8 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
       <Dialog.Portal>
-        <Dialog.Overlay className="fixed inset-0 z-50 bg-[var(--color-overlay)] backdrop-blur-[3px]" />
-        <Dialog.Content className="animate-panel-in fixed left-1/2 top-1/2 z-50 flex h-[82vh] max-h-[780px] w-[760px] max-w-[94vw] -translate-x-1/2 -translate-y-1/2 flex-col overflow-hidden rounded-2xl border border-[var(--color-border-strong)] bg-[var(--color-surface)] elev-lg focus:outline-none">
+        <Dialog.Overlay className="fixed inset-0 z-50 bg-[var(--color-overlay)]" />
+        <Dialog.Content className="animate-panel-in fixed left-1/2 top-1/2 z-50 flex h-[82vh] max-h-[780px] w-[760px] max-w-[94vw] -translate-x-1/2 -translate-y-1/2 flex-col overflow-hidden rounded-xl border border-[var(--color-border-strong)] bg-[var(--color-card)] elev-pop focus:outline-none">
           {/* Header — fixed, the body scrolls beneath it */}
           <div className="flex shrink-0 items-center justify-between border-b border-[var(--color-border)] px-7 py-4">
             <Dialog.Title className="text-[15px] font-semibold tracking-[-0.01em] text-[var(--color-text-primary)]">
@@ -43,7 +43,7 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
             </Dialog.Close>
           </div>
 
-          <div className="min-h-0 flex-1 space-y-8 overflow-y-auto px-7 py-6">
+          <div className="divided-sections min-h-0 flex-1 space-y-6 overflow-y-auto px-7 py-6">
             {/* Appearance Section */}
             <section>
               <h3 className="label-caps mb-3 block">
@@ -60,13 +60,19 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
                     <button
                       key={themeOption}
                       onClick={() => update({ theme: themeOption })}
-                      className={`rounded-md px-3.5 py-1.5 text-[12.5px] capitalize transition-all ${
+                      className={`rounded-md border px-3.5 py-1.5 text-[12.5px] capitalize transition-colors ${
                         settings.theme === themeOption
-                          ? "bg-[var(--color-accent)] font-medium text-white shadow-[var(--shadow-xs)]"
-                          : "bg-[color-mix(in_srgb,var(--color-elevated)_80%,transparent)] text-[var(--color-text-secondary)] hover:bg-[var(--color-card-hover)] hover:text-[var(--color-text-primary)]"
+                          ? "border-transparent bg-[var(--color-accent)] font-medium text-white"
+                          : "border-[var(--color-border)] bg-[var(--color-card)] text-[var(--color-text-secondary)] hover:border-[var(--color-border-strong)] hover:bg-[var(--color-card-hover)] hover:text-[var(--color-text-primary)]"
                       }`}
                     >
-                      {themeOption === "black" ? t("settings.black") : themeOption}
+                      {themeOption === "black"
+                        ? t("settings.black")
+                        : themeOption === "light"
+                          ? t("settings.light")
+                          : themeOption === "dark"
+                            ? t("settings.dark")
+                            : t("settings.system")}
                     </button>
                   ))}
                 </div>
@@ -79,30 +85,31 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
                 </label>
                 <div className="flex gap-2">
                   {([
-                    { name: "indigo", color: "#6366f1" },
-                    { name: "blue", color: "#3b82f6" },
-                    { name: "emerald", color: "#10b981" },
-                    { name: "amber", color: "#f59e0b" },
-                    { name: "rose", color: "#f43f5e" },
-                    { name: "violet", color: "#8b5cf6" },
-                    { name: "cyan", color: "#06b6d4" },
-                    { name: "orange", color: "#f97316" },
+                    { name: "indigo", color: "#5b5bd6" },
+                    { name: "blue", color: "#2f6fed" },
+                    { name: "emerald", color: "#0d9d70" },
+                    { name: "amber", color: "#d98313" },
+                    { name: "rose", color: "#e23b57" },
+                    { name: "violet", color: "#7c4ddb" },
+                    { name: "cyan", color: "#0a91ad" },
+                    { name: "orange", color: "#e2661a" },
                   ] as const).map((a) => (
                     <button
                       key={a.name}
                       onClick={() => update({ accentColor: a.name })}
                       title={a.name.charAt(0).toUpperCase() + a.name.slice(1)}
-                      className={`h-7 w-7 rounded-full transition-all ${
+                      aria-pressed={settings.accentColor === a.name}
+                      className={`flex h-7 w-7 items-center justify-center rounded-full transition-opacity ${
                         settings.accentColor === a.name
-                          ? "scale-110 ring-2 ring-offset-2 ring-offset-[var(--color-surface)]"
-                          : "hover:scale-110 opacity-70 hover:opacity-100"
+                          ? "opacity-100"
+                          : "opacity-75 hover:opacity-100"
                       }`}
-                      style={{
-                        backgroundColor: a.color,
-                        // Use inline style for ring color since it's dynamic
-                        ...(settings.accentColor === a.name ? { ["--tw-ring-color" as string]: a.color } : {}),
-                      }}
-                    />
+                      style={{ backgroundColor: a.color }}
+                    >
+                      {settings.accentColor === a.name && (
+                        <Check className="h-3.5 w-3.5 text-white" strokeWidth={3} />
+                      )}
+                    </button>
                   ))}
                 </div>
               </div>
@@ -123,7 +130,7 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
                       onClick={() => update({ layout: l.value })}
                       className={`rounded-md border px-3.5 py-1.5 text-[12.5px] transition-all ${
                         settings.layout === l.value
-                          ? "border-transparent bg-[var(--color-accent)] font-medium text-white shadow-[var(--shadow-xs)]"
+                          ? "border-transparent bg-[var(--color-accent)] font-medium text-white"
                           : "border-[var(--color-border-strong)] bg-transparent text-[var(--color-text-muted)] hover:border-[color-mix(in_srgb,var(--color-border-strong)_60%,var(--color-text-muted))] hover:text-[var(--color-text-secondary)]"
                       }`}
                     >
@@ -162,15 +169,41 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
                         i18n.changeLanguage(lang.code);
                         localStorage.setItem("reqmate-language", lang.code);
                       }}
-                      className={`rounded px-3 py-1.5 text-sm transition-colors ${
+                      className={`rounded-md border px-3 py-1.5 text-[12.5px] transition-colors ${
                         i18n.language === lang.code
-                          ? "bg-[var(--color-accent)] text-white"
-                          : "bg-[var(--color-elevated)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]"
+                          ? "border-transparent bg-[var(--color-accent)] text-white"
+                          : "border-[var(--color-border)] bg-[var(--color-card)] text-[var(--color-text-secondary)] hover:border-[var(--color-border-strong)] hover:bg-[var(--color-card-hover)] hover:text-[var(--color-text-primary)]"
                       }`}
                     >
                       {lang.label}
                     </button>
                   ))}
+                </div>
+              </div>
+            </section>
+
+            {/* Saving Section */}
+            <section>
+              <h3 className="label-caps mb-3 block">
+                {t("settings.saving")}
+              </h3>
+              <div className="flex items-start justify-between gap-8">
+                <div className="min-w-0">
+                  <label
+                    htmlFor="setting-auto-save"
+                    className="text-sm text-[var(--color-text-secondary)]"
+                  >
+                    {t("settings.autoSave")}
+                  </label>
+                  <p className="mt-1 text-[11.5px] leading-relaxed text-[var(--color-text-muted)]">
+                    {t("settings.autoSaveDesc")}
+                  </p>
+                </div>
+                <div id="setting-auto-save">
+                  <ToggleSwitch
+                    checked={settings.autoSave}
+                    onChange={(v) => update({ autoSave: v })}
+                  />
                 </div>
               </div>
             </section>
@@ -214,7 +247,7 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
                   step={1000}
                   value={settings.timeoutMs}
                   onChange={(e) => update({ timeoutMs: Number(e.target.value) || 30000 })}
-                  className="w-full rounded bg-[var(--color-elevated)] px-3 py-1.5 text-sm text-[var(--color-text-primary)] outline-none focus:ring-1 focus:ring-[var(--color-accent)]"
+                  className="w-full rounded-md border border-[var(--color-border)] bg-[var(--color-card)] px-3 py-1.5 text-sm text-[var(--color-text-primary)] outline-none transition-colors focus:border-[var(--color-accent)]"
                 />
               </div>
 
@@ -228,7 +261,7 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
                   value={settings.proxyUrl ?? ""}
                   onChange={(e) => update({ proxyUrl: e.target.value || null })}
                   placeholder="http://proxy.example.com:8080"
-                  className="mb-2 w-full rounded bg-[var(--color-elevated)] px-3 py-1.5 text-sm text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none focus:ring-1 focus:ring-[var(--color-accent)]"
+                                    className="mb-2 w-full rounded border border-[var(--color-border)] bg-[var(--color-card)] px-3 py-1.5 text-sm text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none transition-colors focus:border-[var(--color-accent)]"
                 />
                 {settings.proxyUrl && (
                   <div className="flex gap-2">
@@ -237,14 +270,14 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
                       value={settings.proxyUsername ?? ""}
                       onChange={(e) => update({ proxyUsername: e.target.value || null })}
                       placeholder={t("settings.proxyUsername")}
-                      className="flex-1 rounded bg-[var(--color-elevated)] px-3 py-1.5 text-sm text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none focus:ring-1 focus:ring-[var(--color-accent)]"
+                                            className="flex-1 rounded border border-[var(--color-border)] bg-[var(--color-card)] px-3 py-1.5 text-sm text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none transition-colors focus:border-[var(--color-accent)]"
                     />
                     <input
                       type="password"
                       value={settings.proxyPassword ?? ""}
                       onChange={(e) => update({ proxyPassword: e.target.value || null })}
                       placeholder={t("settings.proxyPassword")}
-                      className="flex-1 rounded bg-[var(--color-elevated)] px-3 py-1.5 text-sm text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none focus:ring-1 focus:ring-[var(--color-accent)]"
+                                            className="flex-1 rounded border border-[var(--color-border)] bg-[var(--color-card)] px-3 py-1.5 text-sm text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none transition-colors focus:border-[var(--color-accent)]"
                     />
                   </div>
                 )}
@@ -307,7 +340,7 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
                     value={settings.clientCertPassphrase ?? ""}
                     onChange={(e) => update({ clientCertPassphrase: e.target.value || null })}
                     placeholder="Passphrase (optional)"
-                    className="w-full rounded bg-[var(--color-elevated)] px-3 py-1.5 text-sm text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none focus:ring-1 focus:ring-[var(--color-accent)]"
+                                        className="w-full rounded border border-[var(--color-border)] bg-[var(--color-card)] px-3 py-1.5 text-sm text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none transition-colors focus:border-[var(--color-accent)]"
                   />
                 </div>
               )}
@@ -475,7 +508,7 @@ function UpdateSection({
               href="https://github.com/anan2620/ReqMate/releases/latest"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-[var(--color-accent)] hover:underline inline-flex items-center gap-1"
+              className="text-[var(--color-accent-text)] hover:underline inline-flex items-center gap-1"
             >
               GitHub Releases <ExternalLink className="h-3 w-3" />
             </a>
@@ -492,10 +525,10 @@ function UpdateSection({
             <button
               key={channel}
               onClick={() => update({ updateChannel: channel })}
-              className={`rounded px-4 py-2 text-sm capitalize transition-colors ${
+              className={`rounded-md border px-3.5 py-1.5 text-[12.5px] capitalize transition-colors ${
                 settings.updateChannel === channel
-                  ? "bg-[var(--color-accent)] text-white"
-                  : "bg-[var(--color-elevated)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]"
+                  ? "border-transparent bg-[var(--color-accent)] font-medium text-white"
+                  : "border-[var(--color-border)] bg-[var(--color-card)] text-[var(--color-text-secondary)] hover:border-[var(--color-border-strong)] hover:bg-[var(--color-card-hover)] hover:text-[var(--color-text-primary)]"
               }`}
             >
               {channel}
@@ -508,7 +541,7 @@ function UpdateSection({
         <button
           onClick={checkForUpdates}
           disabled={checking || installing}
-          className="flex items-center gap-1.5 rounded bg-[var(--color-elevated)] px-3 py-1.5 text-sm text-[var(--color-text-secondary)] hover:bg-[var(--color-border)] hover:text-[var(--color-text-primary)] disabled:opacity-50"
+          className="flex items-center gap-1.5 rounded-md border border-[var(--color-border)] bg-[var(--color-card)] px-3 py-1.5 text-[13px] text-[var(--color-text-secondary)] transition-colors hover:border-[var(--color-border-strong)] hover:bg-[var(--color-card-hover)] hover:text-[var(--color-text-primary)] disabled:opacity-50"
         >
           <RefreshCw className={`h-3.5 w-3.5 ${checking ? "animate-spin" : ""}`} />
           {checking ? "Checking..." : t("settings.checkForUpdates")}
@@ -633,14 +666,14 @@ function BackupSection() {
       <div className="flex gap-2">
         <button
           onClick={handleExport}
-          className="flex items-center gap-1.5 rounded bg-[var(--color-elevated)] px-3 py-1.5 text-sm text-[var(--color-text-secondary)] hover:bg-[var(--color-border)] hover:text-[var(--color-text-primary)]"
+          className="flex items-center gap-1.5 rounded-md border border-[var(--color-border)] bg-[var(--color-card)] px-3 py-1.5 text-[13px] text-[var(--color-text-secondary)] transition-colors hover:border-[var(--color-border-strong)] hover:bg-[var(--color-card-hover)] hover:text-[var(--color-text-primary)]"
         >
           <Download className="h-3.5 w-3.5" />
           {t("settings.exportState")}
         </button>
         <button
           onClick={handleImport}
-          className="flex items-center gap-1.5 rounded bg-[var(--color-elevated)] px-3 py-1.5 text-sm text-[var(--color-text-secondary)] hover:bg-[var(--color-border)] hover:text-[var(--color-text-primary)]"
+          className="flex items-center gap-1.5 rounded-md border border-[var(--color-border)] bg-[var(--color-card)] px-3 py-1.5 text-[13px] text-[var(--color-text-secondary)] transition-colors hover:border-[var(--color-border-strong)] hover:bg-[var(--color-card-hover)] hover:text-[var(--color-text-primary)]"
         >
           <Upload className="h-3.5 w-3.5" />
           {t("settings.importState")}
@@ -654,7 +687,7 @@ function BackupSection() {
       {/* Import confirmation dialog */}
       <Dialog.Root open={!!importConfirm} onOpenChange={(v) => { if (!v) setImportConfirm(null); }}>
         <Dialog.Portal>
-          <Dialog.Overlay className="fixed inset-0 z-[60] bg-[var(--color-overlay)] backdrop-blur-[3px]" />
+          <Dialog.Overlay className="fixed inset-0 z-[60] bg-[var(--color-overlay)]" />
           <Dialog.Content className="animate-panel-in surface-pop fixed left-1/2 top-1/2 z-[60] w-80 -translate-x-1/2 -translate-y-1/2 rounded-xl p-5">
             <Dialog.Title className="mb-2 text-sm font-semibold text-[var(--color-text-primary)]">
               {t("settings.importState")}
@@ -711,11 +744,11 @@ function FilePathInput({
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
-        className="flex-1 rounded bg-[var(--color-elevated)] px-3 py-1.5 text-sm text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none focus:ring-1 focus:ring-[var(--color-accent)]"
+                className="flex-1 rounded border border-[var(--color-border)] bg-[var(--color-card)] px-3 py-1.5 text-sm text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none transition-colors focus:border-[var(--color-accent)]"
       />
       <button
         onClick={browse}
-        className="rounded bg-[var(--color-elevated)] px-2 py-1.5 text-[var(--color-text-secondary)] hover:bg-[var(--color-border)] hover:text-[var(--color-text-primary)]"
+        className="rounded-md border border-[var(--color-border)] bg-[var(--color-card)] px-2 py-1.5 text-[var(--color-text-secondary)] transition-colors hover:border-[var(--color-border-strong)] hover:bg-[var(--color-card-hover)] hover:text-[var(--color-text-primary)]"
         title="Browse..."
       >
         <FolderOpen className="h-4 w-4" />
@@ -829,7 +862,7 @@ function KeyboardShortcutsSection() {
               <div className="flex items-center gap-1.5">
                 {isRecording ? (
                   <span
-                    className="rounded border border-[var(--color-accent)] bg-[var(--color-accent)]/10 px-2 py-0.5 text-[10px] text-[var(--color-accent)] animate-pulse"
+                    className="rounded border border-[var(--color-accent)] bg-[var(--color-accent)]/10 px-2 py-0.5 text-[10px] text-[var(--color-accent-text)] animate-pulse"
                     tabIndex={0}
                     ref={(el) => {
                       if (el) {
@@ -891,7 +924,7 @@ function KeyboardShortcutsSection() {
         </span>
         <button
           onClick={resetAll}
-          className="flex items-center gap-1 rounded bg-[var(--color-elevated)] px-2.5 py-1 text-xs text-[var(--color-text-secondary)] hover:bg-[var(--color-border)] hover:text-[var(--color-text-primary)]"
+          className="flex items-center gap-1 rounded-md border border-[var(--color-border)] bg-[var(--color-card)] px-2.5 py-1 text-xs text-[var(--color-text-secondary)] transition-colors hover:border-[var(--color-border-strong)] hover:bg-[var(--color-card-hover)] hover:text-[var(--color-text-primary)]"
         >
           <RefreshCw className="h-3 w-3" />
           Reset to Defaults

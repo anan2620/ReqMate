@@ -5,7 +5,7 @@ import type { AuthConfig, OAuth2GrantType, OAuthTokenStatus } from "@reqmate/typ
 import { Select } from "@/components/ui/select";
 
 const INPUT_CLASS =
-  "w-full rounded bg-[var(--color-elevated)] px-3 py-1.5 text-sm text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none focus:ring-1 focus:ring-[var(--color-accent)]";
+  "w-full rounded border border-[var(--color-border)] bg-[var(--color-card)] px-3 py-1.5 text-sm text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none";
 
 /** Auth type switcher plus the fields for the selected type. */
 export function AuthEditor({
@@ -559,7 +559,7 @@ function OAuth2Editor({
         <button
           onClick={handleGetToken}
           disabled={loading}
-          className="btn-accent rounded-lg px-3 py-1.5 text-[13px] font-semibold disabled:opacity-50"
+          className="btn-accent rounded-md px-3 py-1.5 text-[13px] font-semibold disabled:opacity-50"
         >
           {loading ? t("auth.authenticating") : t("auth.getToken")}
         </button>

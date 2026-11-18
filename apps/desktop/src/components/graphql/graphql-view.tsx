@@ -241,7 +241,7 @@ export function GraphQLView() {
                       setGraphQLOperationName(e.target.value)
                     }
                     placeholder={t("graphql.operationName")}
-                    className="rounded bg-[var(--color-elevated)] px-2 py-1 text-xs text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none"
+                    className="rounded border border-[var(--color-border)] bg-[var(--color-card)] px-2 py-1 text-xs text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none"
                   />
                 </div>
                 <div className="min-h-0 flex-1">
@@ -494,7 +494,7 @@ function AuthEditorCompact({
           value={auth.token}
           onChange={(e) => onChange({ ...auth, token: e.target.value })}
           placeholder={t("auth.token")}
-          className="w-full rounded bg-[var(--color-elevated)] px-3 py-1.5 text-sm text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none focus:ring-1 focus:ring-[var(--color-accent)]"
+          className="w-full rounded border border-[var(--color-border)] bg-[var(--color-card)] px-3 py-1.5 text-sm text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none"
         />
       )}
 
@@ -507,7 +507,7 @@ function AuthEditorCompact({
               onChange({ ...auth, username: e.target.value })
             }
             placeholder={t("auth.username")}
-            className="w-full rounded bg-[var(--color-elevated)] px-3 py-1.5 text-sm text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none"
+            className="w-full rounded border border-[var(--color-border)] bg-[var(--color-card)] px-3 py-1.5 text-sm text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none"
           />
           <input
             type="password"
@@ -516,7 +516,7 @@ function AuthEditorCompact({
               onChange({ ...auth, password: e.target.value })
             }
             placeholder={t("auth.password")}
-            className="w-full rounded bg-[var(--color-elevated)] px-3 py-1.5 text-sm text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none"
+            className="w-full rounded border border-[var(--color-border)] bg-[var(--color-card)] px-3 py-1.5 text-sm text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none"
           />
         </div>
       )}

@@ -2,14 +2,24 @@
   "name": "reqmate-vscode",
   "displayName": "ReqMate",
   "description": "ReqMate integration for VS Code — browse collections, send requests, and run tests",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "publisher": "reqmate",
   "license": "MIT",
   "engines": {
     "vscode": "^1.85.0"
   },
-  "categories": ["Testing", "Other"],
-  "keywords": ["api", "rest", "http", "graphql", "grpc", "testing"],
+  "categories": [
+    "Testing",
+    "Other"
+  ],
+  "keywords": [
+    "api",
+    "rest",
+    "http",
+    "graphql",
+    "grpc",
+    "testing"
+  ],
   "activationEvents": [
     "workspaceContains:**/.reqmate/reqmate.yaml"
   ],
@@ -54,8 +64,12 @@
     "languages": [
       {
         "id": "reqmate-yaml",
-        "aliases": ["ReqMate Request"],
-        "filenamePatterns": ["*.yaml"],
+        "aliases": [
+          "ReqMate Request"
+        ],
+        "filenamePatterns": [
+          "*.yaml"
+        ],
         "configuration": "./language-configuration.json"
       }
     ]
@@ -68,6 +82,6 @@
   "devDependencies": {
     "@types/node": "^22.0.0",
     "@types/vscode": "^1.85.0",
-    "typescript": "^5.3.0"
+    "typescript": "~6.0.3"
   }
 }

@@ -26,13 +26,15 @@
 /* High contrast mode */
 @media (prefers-contrast: more) {
   [data-theme="light"] {
-    --color-border: #71717a;
-    --color-text-muted: #3f3f46;
-    --color-text-dimmed: #52525b;
+    --color-border: #8b93a1;
+    --color-border-strong: #6b7280;
+    --color-text-muted: #374151;
+    --color-text-dimmed: #4b5563;
   }
   [data-theme="dark"],
   [data-theme="black"] {
-    --color-border: #a1a1aa;
+    --color-border: #6b7280;
+    --color-border-strong: #9ca3af;
     --color-text-muted: #d4d4d8;
     --color-text-dimmed: #a1a1aa;
   }
@@ -66,28 +68,29 @@
    ═══════════════════════════════════════════ */
 
 :root {
-  --color-accent: #6366f1;
-  --color-accent-hover: #4f46e5;
-  --color-accent-glow: rgba(99, 102, 241, 0.1);
+  --color-accent: #5b5bd6;
+  --color-accent-hover: #4a4ac0;
+  --color-accent-glow: rgba(91, 91, 214, 0.1);
 
   /* Derived accent helpers — follow [data-accent] automatically */
-  --color-accent-soft: color-mix(in srgb, var(--color-accent) 12%, transparent);
-  --color-accent-line: color-mix(in srgb, var(--color-accent) 45%, transparent);
-  --color-accent-ring: color-mix(in srgb, var(--color-accent) 28%, transparent);
+  --color-accent-text: var(--color-accent);
+  --color-accent-soft: color-mix(in srgb, var(--color-accent) 10%, transparent);
+  --color-accent-line: color-mix(in srgb, var(--color-accent) 48%, transparent);
+  --color-accent-ring: color-mix(in srgb, var(--color-accent) 22%, transparent);
 
-  /* Elevation — tuned per theme below */
-  --shadow-xs: 0 1px 2px rgba(9, 14, 26, 0.06);
-  --shadow-sm: 0 2px 6px -1px rgba(9, 14, 26, 0.08), 0 1px 2px rgba(9, 14, 26, 0.04);
-  --shadow-md: 0 8px 20px -8px rgba(9, 14, 26, 0.18), 0 2px 6px -2px rgba(9, 14, 26, 0.08);
-  --shadow-lg: 0 24px 48px -16px rgba(9, 14, 26, 0.28), 0 8px 16px -8px rgba(9, 14, 26, 0.12);
-  --shadow-pop: 0 18px 44px -14px rgba(9, 14, 26, 0.34), 0 4px 10px -4px rgba(9, 14, 26, 0.14);
+  /* Elevation — flat design keeps this to a whisper, borders do the work */
+  --shadow-xs: 0 1px 1px rgba(16, 24, 40, 0.04);
+  --shadow-sm: 0 1px 2px rgba(16, 24, 40, 0.06);
+  --shadow-md: 0 4px 12px -2px rgba(16, 24, 40, 0.1);
+  --shadow-lg: 0 12px 32px -8px rgba(16, 24, 40, 0.16);
+  --shadow-pop: 0 10px 28px -10px rgba(16, 24, 40, 0.18), 0 2px 6px -2px rgba(16, 24, 40, 0.08);
 
-  /* Radius scale */
-  --radius-xs: 4px;
-  --radius-sm: 6px;
-  --radius-md: 9px;
-  --radius-lg: 12px;
-  --radius-xl: 16px;
+  /* Radius scale — flat UI reads crisper with tighter corners */
+  --radius-xs: 3px;
+  --radius-sm: 5px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-xl: 10px;
 
   /* Fonts */
   --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas,
@@ -99,74 +102,75 @@
 }
 
 [data-accent="blue"] {
-  --color-accent: #3b82f6;
-  --color-accent-hover: #2563eb;
-  --color-accent-glow: rgba(59, 130, 246, 0.1);
+  --color-accent: #2f6fed;
+  --color-accent-hover: #245cd0;
+  --color-accent-glow: rgba(47, 111, 237, 0.1);
 }
 
 [data-accent="emerald"] {
-  --color-accent: #10b981;
-  --color-accent-hover: #059669;
-  --color-accent-glow: rgba(16, 185, 129, 0.1);
+  --color-accent: #0d9d70;
+  --color-accent-hover: #0a835d;
+  --color-accent-glow: rgba(13, 157, 112, 0.1);
 }
 
 [data-accent="amber"] {
-  --color-accent: #f59e0b;
-  --color-accent-hover: #d97706;
-  --color-accent-glow: rgba(245, 158, 11, 0.1);
+  --color-accent: #d98313;
+  --color-accent-hover: #b96d0a;
+  --color-accent-glow: rgba(217, 131, 19, 0.1);
 }
 
 [data-accent="rose"] {
-  --color-accent: #f43f5e;
-  --color-accent-hover: #e11d48;
-  --color-accent-glow: rgba(244, 63, 94, 0.1);
+  --color-accent: #e23b57;
+  --color-accent-hover: #c62a45;
+  --color-accent-glow: rgba(226, 59, 87, 0.1);
 }
 
 [data-accent="violet"] {
-  --color-accent: #8b5cf6;
-  --color-accent-hover: #7c3aed;
-  --color-accent-glow: rgba(139, 92, 246, 0.1);
+  --color-accent: #7c4ddb;
+  --color-accent-hover: #6a3cc4;
+  --color-accent-glow: rgba(124, 77, 219, 0.1);
 }
 
 [data-accent="cyan"] {
-  --color-accent: #06b6d4;
-  --color-accent-hover: #0891b2;
-  --color-accent-glow: rgba(6, 182, 212, 0.1);
+  --color-accent: #0a91ad;
+  --color-accent-hover: #087a92;
+  --color-accent-glow: rgba(10, 145, 173, 0.1);
 }
 
 [data-accent="orange"] {
-  --color-accent: #f97316;
-  --color-accent-hover: #ea580c;
-  --color-accent-glow: rgba(249, 115, 22, 0.1);
+  --color-accent: #e2661a;
+  --color-accent-hover: #c4540f;
+  --color-accent-glow: rgba(226, 102, 26, 0.1);
 }
 
 /* ═══════════════════════════════════════════
    LIGHT THEME
+   Flat three-step stack: canvas → panel → card
    ═══════════════════════════════════════════ */
 
 [data-theme="light"] {
-  --color-bg: #f6f8fc;
-  --color-surface: #f9fafd;
-  --color-elevated: #eff2f8;
-  --color-border: #e8ecf4;
-  --color-border-strong: #d3dce8;
-  --color-text-primary: #0f1726;
-  --color-text-secondary: #3d4a5f;
-  --color-text-muted: #66748b;
-  --color-text-dimmed: #93a0b4;
-  --color-activity-bar: #f3f6fb;
+  --color-bg: #eceef2;
+  --color-surface: #f6f7f9;
+  --color-elevated: #e9ecf1;
+  --color-border: #dfe3ea;
+  --color-border-strong: #c8cfda;
+  --color-text-primary: #151a22;
+  --color-text-secondary: #4a5462;
+  --color-text-muted: #6d7787;
+  --color-text-dimmed: #98a2b1;
+  --color-activity-bar: #e6e9ee;
   --color-card: #ffffff;
-  --color-card-hover: #f8fafd;
-  --color-success: #0f9d76;
-  --color-warning: #d97706;
-  --color-error: #dc4759;
-  --color-overlay: rgba(15, 23, 38, 0.32);
+  --color-card-hover: #f3f5f8;
+  --color-success: #0b8f62;
+  --color-warning: #b8690a;
+  --color-error: #cf3348;
+  --color-overlay: rgba(17, 24, 39, 0.38);
 
-  --shadow-xs: 0 1px 2px rgba(20, 33, 58, 0.05);
-  --shadow-sm: 0 2px 6px -1px rgba(20, 33, 58, 0.08), 0 1px 2px rgba(20, 33, 58, 0.04);
-  --shadow-md: 0 10px 24px -10px rgba(20, 33, 58, 0.18), 0 2px 6px -2px rgba(20, 33, 58, 0.07);
-  --shadow-lg: 0 28px 56px -20px rgba(20, 33, 58, 0.24), 0 10px 20px -12px rgba(20, 33, 58, 0.1);
-  --shadow-pop: 0 18px 44px -16px rgba(20, 33, 58, 0.24), 0 4px 10px -4px rgba(20, 33, 58, 0.1);
+  --shadow-xs: 0 1px 1px rgba(16, 24, 40, 0.04);
+  --shadow-sm: 0 1px 2px rgba(16, 24, 40, 0.06);
+  --shadow-md: 0 4px 12px -2px rgba(16, 24, 40, 0.1);
+  --shadow-lg: 0 12px 32px -8px rgba(16, 24, 40, 0.16);
+  --shadow-pop: 0 10px 28px -10px rgba(16, 24, 40, 0.18), 0 2px 6px -2px rgba(16, 24, 40, 0.08);
   color-scheme: light;
 }
 
@@ -175,78 +179,81 @@
    ═══════════════════════════════════════════ */
 
 [data-theme="dark"] {
-  --color-bg: #070910;
-  --color-surface: #0b0e15;
-  --color-elevated: #1a212c;
-  --color-border: #222a36;
-  --color-border-strong: #303a49;
-  --color-text-primary: #edf1f8;
-  --color-text-secondary: #b6c0d0;
-  --color-text-muted: #8593a7;
-  --color-text-dimmed: #62708a;
-  --color-activity-bar: #080b11;
-  --color-card: #12171f;
-  --color-card-hover: #1e2530;
-  --color-success: #34d399;
-  --color-warning: #fbbf24;
-  --color-error: #f87171;
-  --color-overlay: rgba(4, 6, 10, 0.66);
+  --color-bg: #0a0c10;
+  --color-surface: #101318;
+  --color-elevated: #1c2027;
+  --color-border: #242a33;
+  --color-border-strong: #38404c;
+  --color-text-primary: #edf0f5;
+  --color-text-secondary: #a9b3c1;
+  --color-text-muted: #7d8898;
+  --color-text-dimmed: #5c6675;
+  --color-activity-bar: #0d1014;
+  --color-card: #15181e;
+  --color-card-hover: #1e232b;
+  --color-success: #2fbd8b;
+  --color-warning: #e0a13a;
+  --color-error: #ef5b6b;
+  --color-overlay: rgba(0, 0, 0, 0.62);
 
-  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.4);
-  --shadow-sm: 0 2px 8px -2px rgba(0, 0, 0, 0.55), 0 1px 2px rgba(0, 0, 0, 0.4);
-  --shadow-md: 0 12px 28px -12px rgba(0, 0, 0, 0.7), 0 3px 8px -3px rgba(0, 0, 0, 0.45);
-  --shadow-lg: 0 32px 64px -24px rgba(0, 0, 0, 0.8), 0 12px 24px -14px rgba(0, 0, 0, 0.5);
-  --shadow-pop: 0 20px 48px -16px rgba(0, 0, 0, 0.8), 0 6px 14px -6px rgba(0, 0, 0, 0.5);
+  --shadow-xs: 0 1px 1px rgba(0, 0, 0, 0.4);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.45);
+  --shadow-md: 0 6px 16px -4px rgba(0, 0, 0, 0.55);
+  --shadow-lg: 0 16px 40px -12px rgba(0, 0, 0, 0.65);
+  --shadow-pop: 0 14px 34px -12px rgba(0, 0, 0, 0.7), 0 2px 8px -2px rgba(0, 0, 0, 0.5);
   color-scheme: dark;
 }
 
 /* Dark theme accent adjustments — lighter hover for visibility */
 [data-theme="dark"],
 [data-theme="black"] {
-  --color-accent-hover: #818cf8;
+  --color-accent-hover: color-mix(in srgb, var(--color-accent) 78%, #ffffff);
   --color-accent-glow: rgba(99, 102, 241, 0.15);
+  /* Accent as text needs a lighter step on dark surfaces */
+  --color-accent-text: color-mix(in srgb, var(--color-accent) 62%, #ffffff);
+  --color-accent-soft: color-mix(in srgb, var(--color-accent) 18%, transparent);
 }
 
 [data-theme="dark"][data-accent="blue"],
 [data-theme="black"][data-accent="blue"] {
-  --color-accent-hover: #60a5fa;
-  --color-accent-glow: rgba(59, 130, 246, 0.15);
+  --color-accent: #4b87f5;
+  --color-accent-hover: #77a6fa;
 }
 
 [data-theme="dark"][data-accent="emerald"],
 [data-theme="black"][data-accent="emerald"] {
-  --color-accent-hover: #34d399;
-  --color-accent-glow: rgba(16, 185, 129, 0.15);
+  --color-accent: #1eb184;
+  --color-accent-hover: #4dcfa6;
 }
 
 [data-theme="dark"][data-accent="amber"],
 [data-theme="black"][data-accent="amber"] {
-  --color-accent-hover: #fbbf24;
-  --color-accent-glow: rgba(245, 158, 11, 0.15);
+  --color-accent: #e09a2b;
+  --color-accent-hover: #f0b95c;
 }
 
 [data-theme="dark"][data-accent="rose"],
 [data-theme="black"][data-accent="rose"] {
-  --color-accent-hover: #fb7185;
-  --color-accent-glow: rgba(244, 63, 94, 0.15);
+  --color-accent: #ea4f68;
+  --color-accent-hover: #f58294;
 }
 
 [data-theme="dark"][data-accent="violet"],
 [data-theme="black"][data-accent="violet"] {
-  --color-accent-hover: #a78bfa;
-  --color-accent-glow: rgba(139, 92, 246, 0.15);
+  --color-accent: #8f63e6;
+  --color-accent-hover: #b18ff2;
 }
 
 [data-theme="dark"][data-accent="cyan"],
 [data-theme="black"][data-accent="cyan"] {
-  --color-accent-hover: #22d3ee;
-  --color-accent-glow: rgba(6, 182, 212, 0.15);
+  --color-accent: #16a6c0;
+  --color-accent-hover: #45c6db;
 }
 
 [data-theme="dark"][data-accent="orange"],
 [data-theme="black"][data-accent="orange"] {
-  --color-accent-hover: #fb923c;
-  --color-accent-glow: rgba(249, 115, 22, 0.15);
+  --color-accent: #ea7428;
+  --color-accent-hover: #f59b5d;
 }
 
 /* ═══════════════════════════════════════════
@@ -255,27 +262,27 @@
 
 [data-theme="black"] {
   --color-bg: #000000;
-  --color-surface: #070809;
-  --color-elevated: #131619;
-  --color-border: #1d2229;
-  --color-border-strong: #2a313a;
-  --color-text-primary: #edf1f8;
-  --color-text-secondary: #b6c0d0;
-  --color-text-muted: #8593a7;
-  --color-text-dimmed: #5d6a80;
+  --color-surface: #08090b;
+  --color-elevated: #15181c;
+  --color-border: #1e2127;
+  --color-border-strong: #2e333b;
+  --color-text-primary: #edf0f5;
+  --color-text-secondary: #a9b3c1;
+  --color-text-muted: #7d8898;
+  --color-text-dimmed: #58616f;
   --color-activity-bar: #000000;
-  --color-card: #0b0d10;
-  --color-card-hover: #15191e;
-  --color-success: #34d399;
-  --color-warning: #fbbf24;
-  --color-error: #f87171;
+  --color-card: #0c0e11;
+  --color-card-hover: #16191d;
+  --color-success: #2fbd8b;
+  --color-warning: #e0a13a;
+  --color-error: #ef5b6b;
   --color-overlay: rgba(0, 0, 0, 0.72);
 
-  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.6);
-  --shadow-sm: 0 2px 8px -2px rgba(0, 0, 0, 0.7), 0 1px 2px rgba(0, 0, 0, 0.5);
-  --shadow-md: 0 12px 28px -12px rgba(0, 0, 0, 0.85), 0 3px 8px -3px rgba(0, 0, 0, 0.55);
-  --shadow-lg: 0 32px 64px -24px rgba(0, 0, 0, 0.9), 0 12px 24px -14px rgba(0, 0, 0, 0.6);
-  --shadow-pop: 0 20px 48px -16px rgba(0, 0, 0, 0.9), 0 6px 14px -6px rgba(0, 0, 0, 0.6);
+  --shadow-xs: 0 1px 1px rgba(0, 0, 0, 0.6);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.7);
+  --shadow-md: 0 6px 16px -4px rgba(0, 0, 0, 0.8);
+  --shadow-lg: 0 16px 40px -12px rgba(0, 0, 0, 0.9);
+  --shadow-pop: 0 14px 34px -12px rgba(0, 0, 0, 0.9), 0 2px 8px -2px rgba(0, 0, 0, 0.7);
   color-scheme: dark;
 }
 
@@ -285,19 +292,19 @@
    ═══════════════════════════════════════════ */
 
 :root {
-  --m-get: #0f9d76;
-  --m-post: #b45309;
-  --m-put: #1d4ed8;
-  --m-patch: #7c3aed;
-  --m-delete: #dc2626;
-  --m-head: #0e7490;
+  --m-get: #0b8f62;
+  --m-post: #a8640a;
+  --m-put: #1f4fd0;
+  --m-patch: #6d3bc4;
+  --m-delete: #cf2436;
+  --m-head: #0b7285;
   --m-options: #5b6472;
-  --m-gql: #7c3aed;
-  --m-ws: #0e7490;
-  --m-sse: #c2410c;
-  --m-grpc: #0f9d76;
-  --m-mqtt: #9333ea;
-  --m-sio: #db2777;
+  --m-gql: #6d3bc4;
+  --m-ws: #0b7285;
+  --m-sse: #b34a0a;
+  --m-grpc: #0b8f62;
+  --m-mqtt: #8b31c9;
+  --m-sio: #c0267a;
 }
 
 [data-theme="dark"],
@@ -359,23 +366,23 @@
   letter-spacing: 0.045em;
   line-height: 15px;
   color: var(--pill-c);
-  background: color-mix(in srgb, var(--pill-c) 12%, transparent);
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--pill-c) 24%, transparent);
+  background: color-mix(in srgb, var(--pill-c) 11%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--pill-c) 22%, transparent);
 }
 
 .method-select {
   appearance: none;
   cursor: pointer;
   color: var(--pill-c);
-  background-color: color-mix(in srgb, var(--pill-c) 11%, transparent);
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--pill-c) 22%, transparent);
+  background-color: color-mix(in srgb, var(--pill-c) 9%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--pill-c) 20%, transparent);
   font-weight: 700;
   letter-spacing: 0.04em;
   border-radius: var(--radius-sm);
   transition: background-color 150ms var(--ease-out-soft), box-shadow 150ms var(--ease-out-soft);
 }
 .method-select:hover {
-  background-color: color-mix(in srgb, var(--pill-c) 18%, transparent);
+  background-color: color-mix(in srgb, var(--pill-c) 16%, transparent);
 }
 .method-select option {
   color: var(--color-text-primary);
@@ -463,12 +470,6 @@
   animation: statusPulse 300ms ease-out;
 }
 
-/* Glass effect utility */
-.glass {
-  backdrop-filter: blur(16px) saturate(160%);
-  -webkit-backdrop-filter: blur(16px) saturate(160%);
-}
-
 /* ═══════════════════════════════════════════
    BASE LAYER — typography, canvas, chrome
    ═══════════════════════════════════════════ */
@@ -514,13 +515,13 @@
     background: transparent;
   }
   ::-webkit-scrollbar-thumb {
-    background: color-mix(in srgb, var(--color-text-dimmed) 26%, transparent);
+    background: color-mix(in srgb, var(--color-text-dimmed) 30%, transparent);
     border: 2px solid transparent;
     background-clip: content-box;
     border-radius: 999px;
   }
   ::-webkit-scrollbar-thumb:hover {
-    background: color-mix(in srgb, var(--color-text-dimmed) 55%, transparent);
+    background: color-mix(in srgb, var(--color-text-dimmed) 58%, transparent);
     background-clip: content-box;
   }
   ::-webkit-scrollbar-corner {
@@ -532,22 +533,20 @@
    SURFACES & UTILITIES
    ═══════════════════════════════════════════ */
 
-/* App canvas — very subtle ambient light so large empty areas don't read as flat gray */
+/* App canvas — a solid tinted field; the panels on top carry the design */
 .app-canvas {
   background-color: var(--color-bg);
-  background-image:
-    radial-gradient(120% 80% at 12% 0%, var(--color-accent-soft), transparent 58%),
-    radial-gradient(90% 70% at 100% 100%, color-mix(in srgb, var(--color-accent) 6%, transparent), transparent 62%);
 }
 
-/* Sidebar / tab strip surface with a faint top-to-bottom sheen */
+/* Chrome surface (activity bar, side panel, tab strip, footer) */
 .chrome-surface {
   background-color: var(--color-surface);
-  background-image: linear-gradient(
-    180deg,
-    color-mix(in srgb, var(--color-text-primary) 3%, transparent),
-    transparent 120px
-  );
+}
+
+/* Long-form settings: a hairline between sections instead of just whitespace */
+.divided-sections > section + section {
+  border-top: 1px solid var(--color-border);
+  padding-top: 24px;
 }
 
 /* Hairline separator that survives both themes without looking heavy */
@@ -555,43 +554,29 @@
   border-color: color-mix(in srgb, var(--color-border-strong) 55%, transparent);
 }
 
-/* Plain text fields: a soft accent ring instead of the hard 2px rectangle.
-   Transparent outline is kept so Windows high-contrast still draws its own. */
+/* Plain text fields get a solid accent outline instead of a soft halo */
 input:focus-visible,
 textarea:focus-visible,
 select:focus-visible {
   outline: 2px solid transparent;
   outline-offset: 2px;
-  box-shadow:
-    0 0 0 1px var(--color-accent-line),
-    0 0 0 3px var(--color-accent-ring);
+  border-color: var(--color-accent) !important;
+  box-shadow: inset 0 0 0 1px var(--color-accent);
 }
 
 /* Transparent inputs inside a focused surface don't need their own ring */
-.focus-bare:focus-visible {
-  outline: none;
-  box-shadow: none;
-}
-
-/* Transparent inputs inside a focused surface don't need their own ring */
-.focus-bare:focus-visible {
-  outline: none;
-  box-shadow: none;
-}
-
-/* Composite inputs delegate the focus indicator to their wrapper */
+.focus-bare:focus-visible,
 .ring-focus :is(input, select, textarea):focus-visible,
 .field-soft:focus-visible {
   outline: none;
   box-shadow: none;
+  border-color: transparent !important;
 }
 
-/* Focus glow for composite inputs (command bar, search fields) */
+/* Composite inputs delegate the focus indicator to their wrapper */
 .ring-focus:focus-within {
-  border-color: var(--color-accent-line);
-  box-shadow:
-    0 0 0 3px var(--color-accent-ring),
-    var(--shadow-sm);
+  border-color: var(--color-accent);
+  box-shadow: inset 0 0 0 1px var(--color-accent);
 }
 
 /* Small caps section label */
@@ -609,91 +594,72 @@ select:focus-visible {
 
 /* Elevated panel used for popovers / context menus */
 .surface-pop {
-  background-color: color-mix(in srgb, var(--color-elevated) 94%, var(--color-card));
+  background-color: var(--color-card);
   border: 1px solid var(--color-border-strong);
   box-shadow: var(--shadow-pop);
 }
 
-/* Primary action button — subtle vertical gradient + accent bloom */
+/* Primary action button — one flat accent fill, no gloss */
 .btn-accent {
-  background-image: linear-gradient(180deg, color-mix(in srgb, var(--color-accent) 88%, #ffffff), var(--color-accent));
+  background-color: var(--color-accent);
   color: #fff;
-  border: 1px solid color-mix(in srgb, var(--color-accent) 70%, #000000);
-  box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.18) inset,
-    0 6px 16px -8px color-mix(in srgb, var(--color-accent) 85%, transparent);
-  transition: filter 150ms var(--ease-out-soft), transform 150ms var(--ease-out-soft),
-    box-shadow 150ms var(--ease-out-soft);
+  border: 1px solid transparent;
+  transition: background-color 140ms var(--ease-out-soft);
 }
 .btn-accent:hover {
-  filter: brightness(1.07);
-  box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.2) inset,
-    0 10px 22px -8px color-mix(in srgb, var(--color-accent) 90%, transparent);
+  background-color: var(--color-accent-hover);
 }
 .btn-accent:active {
-  transform: translateY(0.5px) scale(0.995);
-  filter: brightness(0.98);
+  background-color: color-mix(in srgb, var(--color-accent) 88%, #000000);
 }
 
 /* Success action button — same geometry as .btn-accent, semantic green */
 .btn-success {
-  background-image: linear-gradient(180deg, color-mix(in srgb, var(--color-success) 86%, #ffffff), var(--color-success));
+  background-color: var(--color-success);
   color: #fff;
-  border: 1px solid color-mix(in srgb, var(--color-success) 72%, #000000);
-  box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.18) inset,
-    0 6px 16px -8px color-mix(in srgb, var(--color-success) 85%, transparent);
-  transition: filter 150ms var(--ease-out-soft), transform 150ms var(--ease-out-soft);
+  border: 1px solid transparent;
+  transition: background-color 140ms var(--ease-out-soft);
 }
 .btn-success:hover {
-  filter: brightness(1.07);
-}
-.btn-success:active {
-  transform: translateY(0.5px) scale(0.995);
-  filter: brightness(0.98);
+  background-color: color-mix(in srgb, var(--color-success) 88%, #000000);
 }
 
 /* Destructive / stop action — outline style, never a solid red slab */
 .btn-danger {
-  border: 1px solid color-mix(in srgb, var(--color-error) 42%, transparent);
-  background-color: color-mix(in srgb, var(--color-error) 10%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-error) 40%, transparent);
+  background-color: color-mix(in srgb, var(--color-error) 8%, transparent);
   color: var(--color-error);
-  transition: background-color 150ms var(--ease-out-soft), border-color 150ms var(--ease-out-soft);
+  transition: background-color 140ms var(--ease-out-soft), border-color 140ms var(--ease-out-soft);
 }
 .btn-danger:hover {
-  background-color: color-mix(in srgb, var(--color-error) 18%, transparent);
-  border-color: color-mix(in srgb, var(--color-error) 60%, transparent);
+  background-color: color-mix(in srgb, var(--color-error) 15%, transparent);
+  border-color: color-mix(in srgb, var(--color-error) 62%, transparent);
 }
 
 /* Ghost button */
 .btn-ghost {
   border: 1px solid var(--color-border-strong);
-  background-color: color-mix(in srgb, var(--color-elevated) 55%, transparent);
+  background-color: var(--color-card);
   color: var(--color-text-secondary);
-  transition: background-color 150ms var(--ease-out-soft), color 150ms var(--ease-out-soft),
-    border-color 150ms var(--ease-out-soft);
+  transition: background-color 140ms var(--ease-out-soft), color 140ms var(--ease-out-soft),
+    border-color 140ms var(--ease-out-soft);
 }
 .btn-ghost:hover {
   background-color: var(--color-card-hover);
-  border-color: color-mix(in srgb, var(--color-border-strong) 80%, var(--color-text-muted));
+  border-color: color-mix(in srgb, var(--color-border-strong) 70%, var(--color-text-muted));
   color: var(--color-text-primary);
 }
 
 /* Soft inset well — used for code blocks, key/value tables */
 .inset-well {
-  background-color: color-mix(in srgb, var(--color-bg) 55%, var(--color-card));
-  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--color-text-primary) 4%, transparent);
+  background-color: var(--color-elevated);
 }
 
-/* Elevated active tab — a real card that connects to the panel below */
+/* Active tab — a flat card that connects to the panel below */
 .tab-item-active {
   background-color: var(--color-card);
   border-color: var(--color-border);
   border-top-color: var(--color-accent);
-  box-shadow:
-    inset 0 1px 0 color-mix(in srgb, var(--color-text-primary) 4%, transparent),
-    0 -10px 16px -14px rgba(0, 0, 0, 0.5);
 }
 
 /* Fade the clipped edge of an overflowing tab strip */
@@ -732,10 +698,9 @@ select:focus-visible {
   justify-content: center;
   min-width: 18px;
   padding: 1px 5px;
-  border-radius: 5px;
+  border-radius: 4px;
   border: 1px solid var(--color-border-strong);
-  border-bottom-width: 2px;
-  background: color-mix(in srgb, var(--color-elevated) 80%, var(--color-card));
+  background: var(--color-elevated);
   color: var(--color-text-muted);
   font-family: var(--font-mono, ui-monospace, monospace);
   font-size: 10px;
@@ -773,4 +738,3 @@ select:focus-visible {
 @utility elev-pop {
   box-shadow: var(--shadow-pop);
 }
-

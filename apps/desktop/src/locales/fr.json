@@ -52,7 +52,9 @@
     "noEnvironmentsYet": "Aucun environnement pour l'instant",
     "newEnvironment": "Nouvel Environnement",
     "addVariable": "Ajouter une Variable",
-    "importEnvironment": "Importer un Environnement (Postman JSON)"
+    "importEnvironment": "Importer un Environnement (Postman JSON)",
+    "collectionDefaults": "Valeurs par défaut de la collection",
+    "collectionDefaultsDesc": "L’authentification définie ici est héritée par toutes les requêtes qui n’en ont pas."
   },
   "tabs": {
     "untitled": "Requête sans titre",
@@ -69,7 +71,9 @@
     "duplicateTab": "Dupliquer l'Onglet",
     "moveToNewWindow": "Déplacer vers une Nouvelle Fenêtre",
     "httpRequest": "Requête HTTP",
-    "importCurl": "Importer cURL"
+    "importCurl": "Importer cURL",
+    "saveAs": "Enregistrer sous…",
+    "saveOptions": "Options d’enregistrement"
   },
   "request": {
     "send": "Envoyer",
@@ -166,7 +170,8 @@
     "assertionConsumerUrl": "URL du Service Consommateur d'Assertions",
     "certificate": "Certificat de l'IdP (PEM)",
     "nameIdFormat": "Format NameID",
-    "samlToken": "Jeton d'Assertion SAML"
+    "samlToken": "Jeton d'Assertion SAML",
+    "apiKeyHeader": "Nom de l’en-tête"
   },
   "response": {
     "body": "Corps",
@@ -260,7 +265,10 @@
     "upToDate": "Vous êtes à jour",
     "updateAvailable": "Mise à jour disponible : {{version}}",
     "shortcuts": "Raccourcis Clavier",
-    "recording": "Appuyez sur une combinaison de touches..."
+    "recording": "Appuyez sur une combinaison de touches...",
+    "saving": "Enregistrement",
+    "autoSave": "Enregistrer automatiquement les modifications",
+    "autoSaveDesc": "Écrit sur le disque une seconde après la dernière frappe. Désactivez cette option pour garder les modifications dans l’éditeur jusqu’à l’enregistrement manuel."
   },
   "runner": {
     "title": "Exécuteur de Collection",
@@ -359,7 +367,10 @@
     "skipForNow": "Passer pour l'instant",
     "getStarted": "Commencer",
     "name": "Nom",
-    "value": "Valeur"
+    "value": "Valeur",
+    "saved": "Enregistré",
+    "savedTo": "« {{name}} » enregistré",
+    "saveFailed": "Échec de l’enregistrement : {{reason}}"
   },
   "errors": {
     "connectionRefused": "Connexion refusée — le serveur est-il en marche ?",
@@ -464,7 +475,15 @@
     "html": "HTML",
     "markdown": "Markdown",
     "generating": "Génération de la documentation...",
-    "generateDesc": "Générer la documentation à partir des collections"
+    "generateDesc": "Choisissez les collections à inclure, puis générez un document unique.",
+    "pickCollections": "Collections",
+    "selectAll": "Tout",
+    "clearAll": "Aucun",
+    "selectedCount": "{{n}} sélectionnée(s)",
+    "noCollections": "Ouvrez d’abord une collection.",
+    "generateFor": "Générer la doc ({{n}})",
+    "exported": "Exporté vers {{path}}",
+    "exportFailed": "Échec de l’export : {{reason}}"
   },
   "diff": {
     "title": "Diff de Réponse",
@@ -552,5 +571,35 @@
   },
   "audit": {
     "title": "Journal d'Audit"
+  },
+  "proxy": {
+    "title": "Capture proxy",
+    "running": "En cours",
+    "stopped": "Arrêté",
+    "startProxy": "Démarrer le proxy",
+    "stop": "Arrêter",
+    "port": "Port du proxy",
+    "proxyHint": "Configurez votre client HTTP sur 127.0.0.1:{{port}}",
+    "caTitle": "Certificat CA",
+    "copyPem": "Copier le PEM",
+    "copied": "Copié",
+    "generateCa": "Générer une CA",
+    "caHint": "Installez le certificat CA dans votre navigateur pour capturer le trafic HTTPS",
+    "passthrough": "Domaines exclus",
+    "passthroughPlaceholder": "ex. github.com, google.com",
+    "passthroughHint": "Domaines à ne pas capturer, séparés par des virgules",
+    "captured_one": "{{count}} requête capturée",
+    "captured_other": "{{count}} requêtes capturées",
+    "captures": "Captures",
+    "filter": "Filtrer…",
+    "clearCaptures": "Effacer les captures",
+    "waiting": "En attente de requêtes…",
+    "startHint": "Démarrez le proxy pour capturer des requêtes",
+    "selectRequest": "Sélectionnez une requête pour voir les détails",
+    "request": "Requête",
+    "response": "Réponse",
+    "headers": "En-têtes",
+    "body": "Corps",
+    "noHeaders": "Aucun en-tête"
   }
 }

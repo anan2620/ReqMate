@@ -119,7 +119,7 @@ export function MqttView() {
             onChange={(e) => setBrokerUrl(e.target.value)}
             placeholder="Broker host"
             disabled={status === "connected"}
-            className="flex-1 rounded bg-[var(--color-elevated)] px-2.5 py-1.5 text-sm text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none focus:ring-1 focus:ring-[var(--color-accent)] disabled:opacity-50"
+            className="flex-1 rounded border border-[var(--color-border)] bg-[var(--color-card)] px-2.5 py-1.5 text-sm text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none disabled:opacity-50"
           />
           <span className="text-xs text-[var(--color-text-dimmed)]">:</span>
           <input
@@ -128,7 +128,7 @@ export function MqttView() {
             onChange={(e) => setPort(e.target.value)}
             placeholder="1883"
             disabled={status === "connected"}
-            className="w-16 rounded bg-[var(--color-elevated)] px-2.5 py-1.5 text-sm text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none focus:ring-1 focus:ring-[var(--color-accent)] disabled:opacity-50"
+            className="w-16 rounded border border-[var(--color-border)] bg-[var(--color-card)] px-2.5 py-1.5 text-sm text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none disabled:opacity-50"
           />
         </div>
         <div className="flex items-center gap-1.5">
@@ -182,7 +182,7 @@ export function MqttView() {
                 value={clientId}
                 onChange={(e) => setClientId(e.target.value)}
                 disabled={status === "connected"}
-                className="w-full rounded bg-[var(--color-elevated)] px-2 py-1 text-sm text-[var(--color-text-primary)] outline-none focus:ring-1 focus:ring-[var(--color-accent)] disabled:opacity-50"
+                className="w-full rounded border border-[var(--color-border)] bg-[var(--color-card)] px-2 py-1 text-sm text-[var(--color-text-primary)] outline-none disabled:opacity-50"
               />
             </div>
             <div>
@@ -200,7 +200,7 @@ export function MqttView() {
                     onChange={(e) => setUsername(e.target.value)}
                     placeholder="Username"
                     disabled={status === "connected"}
-                    className="h-8 flex-1 rounded-md bg-[var(--color-elevated)] px-2.5 text-[12.5px] text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none focus:ring-1 focus:ring-[var(--color-accent)] disabled:opacity-50"
+                    className="h-8 flex-1 rounded-md border border-[var(--color-border)] bg-[var(--color-card)] px-2.5 text-[12.5px] text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none disabled:opacity-50"
                   />
                   <input
                     type="password"
@@ -208,7 +208,7 @@ export function MqttView() {
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="Password"
                     disabled={status === "connected"}
-                    className="h-8 flex-1 rounded-md bg-[var(--color-elevated)] px-2.5 text-[12.5px] text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none focus:ring-1 focus:ring-[var(--color-accent)] disabled:opacity-50"
+                    className="h-8 flex-1 rounded-md border border-[var(--color-border)] bg-[var(--color-card)] px-2.5 text-[12.5px] text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none disabled:opacity-50"
                   />
                 </div>
               )}
@@ -238,7 +238,7 @@ export function MqttView() {
               onChange={(e) => setSubTopic(e.target.value)}
               placeholder="Topic (e.g. sensor/#)"
               disabled={status !== "connected"}
-              className="h-8 flex-1 rounded-md bg-[var(--color-elevated)] px-2.5 text-[12.5px] text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none focus:ring-1 focus:ring-[var(--color-accent)] disabled:opacity-50"
+              className="h-8 flex-1 rounded-md border border-[var(--color-border)] bg-[var(--color-card)] px-2.5 text-[12.5px] text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none disabled:opacity-50"
               onKeyDown={(e) => {
                 if (e.key === "Enter") handleSubscribe();
               }}
@@ -294,7 +294,7 @@ export function MqttView() {
               onChange={(e) => setPubTopic(e.target.value)}
               placeholder="Topic"
               disabled={status !== "connected"}
-              className="h-8 flex-1 rounded-md bg-[var(--color-elevated)] px-2.5 text-[12.5px] text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none focus:ring-1 focus:ring-[var(--color-accent)] disabled:opacity-50"
+              className="h-8 flex-1 rounded-md border border-[var(--color-border)] bg-[var(--color-card)] px-2.5 text-[12.5px] text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none disabled:opacity-50"
             />
             <Select
               value={String(pubQos)}
@@ -321,7 +321,7 @@ export function MqttView() {
               onChange={(e) => setPubPayload(e.target.value)}
               placeholder="Message payload"
               disabled={status !== "connected"}
-              className="flex-1 resize-none rounded bg-[var(--color-elevated)] p-2 font-mono text-xs text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none focus:ring-1 focus:ring-[var(--color-accent)] disabled:opacity-50"
+              className="flex-1 resize-none rounded border border-[var(--color-border)] bg-[var(--color-card)] p-2 font-mono text-xs text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none disabled:opacity-50"
               rows={2}
               onKeyDown={(e) => {
                 if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
@@ -333,7 +333,7 @@ export function MqttView() {
             <button
               onClick={handlePublish}
               disabled={status !== "connected" || !pubTopic.trim()}
-              className="btn-accent flex items-center gap-1.5 rounded-lg px-3 py-2 text-[13px] font-semibold disabled:opacity-50"
+              className="btn-accent flex items-center gap-1.5 rounded-md px-3 py-2 text-[13px] font-semibold disabled:opacity-50"
             >
               <Send className="h-3.5 w-3.5" />
               Publish
@@ -356,7 +356,7 @@ export function MqttView() {
             value={topicFilter}
             onChange={(e) => setTopicFilter(e.target.value)}
             placeholder="Filter by topic..."
-            className="w-40 rounded bg-[var(--color-elevated)] px-2 py-0.5 text-xs text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none"
+            className="w-40 rounded border border-[var(--color-border)] bg-[var(--color-card)] px-2 py-0.5 text-xs text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none"
           />
           <label className="flex items-center gap-1 cursor-pointer">
             <input

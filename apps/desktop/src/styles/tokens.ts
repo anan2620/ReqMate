@@ -137,14 +137,14 @@ export interface AccentPreset {
 
 /** The 8 accent color presets available in Settings */
 export const accentPresets: readonly AccentPreset[] = [
-  { name: "Indigo", dataValue: "indigo", color: "#6366f1", hoverLight: "#4f46e5", hoverDark: "#818cf8" },
-  { name: "Blue", dataValue: "blue", color: "#3b82f6", hoverLight: "#2563eb", hoverDark: "#60a5fa" },
-  { name: "Emerald", dataValue: "emerald", color: "#10b981", hoverLight: "#059669", hoverDark: "#34d399" },
-  { name: "Amber", dataValue: "amber", color: "#f59e0b", hoverLight: "#d97706", hoverDark: "#fbbf24" },
-  { name: "Rose", dataValue: "rose", color: "#f43f5e", hoverLight: "#e11d48", hoverDark: "#fb7185" },
-  { name: "Violet", dataValue: "violet", color: "#8b5cf6", hoverLight: "#7c3aed", hoverDark: "#a78bfa" },
-  { name: "Cyan", dataValue: "cyan", color: "#06b6d4", hoverLight: "#0891b2", hoverDark: "#22d3ee" },
-  { name: "Orange", dataValue: "orange", color: "#f97316", hoverLight: "#ea580c", hoverDark: "#fb923c" },
+  { name: "Indigo", dataValue: "indigo", color: "#5b5bd6", hoverLight: "#4a4ac0", hoverDark: "#8a8ae4" },
+  { name: "Blue", dataValue: "blue", color: "#2f6fed", hoverLight: "#245cd0", hoverDark: "#77a6fa" },
+  { name: "Emerald", dataValue: "emerald", color: "#0d9d70", hoverLight: "#0a835d", hoverDark: "#4dcfa6" },
+  { name: "Amber", dataValue: "amber", color: "#d98313", hoverLight: "#b96d0a", hoverDark: "#f0b95c" },
+  { name: "Rose", dataValue: "rose", color: "#e23b57", hoverLight: "#c62a45", hoverDark: "#f58294" },
+  { name: "Violet", dataValue: "violet", color: "#7c4ddb", hoverLight: "#6a3cc4", hoverDark: "#b18ff2" },
+  { name: "Cyan", dataValue: "cyan", color: "#0a91ad", hoverLight: "#087a92", hoverDark: "#45c6db" },
+  { name: "Orange", dataValue: "orange", color: "#e2661a", hoverLight: "#c4540f", hoverDark: "#f59b5d" },
 ] as const;
 
 // ---------------------------------------------------------------------------

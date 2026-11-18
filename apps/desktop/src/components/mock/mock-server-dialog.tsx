@@ -89,7 +89,7 @@ export function MockServerDialog() {
   const activeLogs = activeServerId ? (logs[activeServerId] ?? []) : [];
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[var(--color-overlay)]">
       <div className="flex h-[600px] w-[900px] flex-col overflow-hidden rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)]">
         {/* Header */}
         <div className="flex items-center justify-between border-b border-[var(--color-border)] px-4 py-3">
@@ -120,7 +120,7 @@ export function MockServerDialog() {
                     type="number"
                     value={port}
                     onChange={(e) => setPort(Number(e.target.value))}
-                    className="w-full rounded bg-[var(--color-elevated)] px-2 py-1 text-xs text-[var(--color-text-primary)] outline-none"
+                    className="w-full rounded border border-[var(--color-border)] bg-[var(--color-card)] px-2 py-1 text-xs text-[var(--color-text-primary)] outline-none"
                   />
                 </div>
                 <div className="flex-1">
@@ -129,7 +129,7 @@ export function MockServerDialog() {
                     type="number"
                     value={latencyMs}
                     onChange={(e) => setLatencyMs(Number(e.target.value))}
-                    className="w-full rounded bg-[var(--color-elevated)] px-2 py-1 text-xs text-[var(--color-text-primary)] outline-none"
+                    className="w-full rounded border border-[var(--color-border)] bg-[var(--color-card)] px-2 py-1 text-xs text-[var(--color-text-primary)] outline-none"
                   />
                 </div>
                 <div className="flex-1">
@@ -140,7 +140,7 @@ export function MockServerDialog() {
                     max={100}
                     value={errorRate}
                     onChange={(e) => setErrorRate(Number(e.target.value))}
-                    className="w-full rounded bg-[var(--color-elevated)] px-2 py-1 text-xs text-[var(--color-text-primary)] outline-none"
+                    className="w-full rounded border border-[var(--color-border)] bg-[var(--color-card)] px-2 py-1 text-xs text-[var(--color-text-primary)] outline-none"
                   />
                 </div>
               </div>
@@ -148,7 +148,7 @@ export function MockServerDialog() {
               <button
                 onClick={handleStart}
                 disabled={starting || !selectedCollection}
-                className="btn-success flex w-full items-center justify-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold disabled:opacity-50"
+                className="btn-success flex w-full items-center justify-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-semibold disabled:opacity-50"
               >
                 <Play className="h-3 w-3" />
                 {starting ? t("mock.starting") : t("mock.start")}

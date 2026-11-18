@@ -762,7 +762,7 @@ function TreeNodeRow({
                     icon: FileText,
                     onClick: () => {
                       closeContextMenu();
-                      useDocsStore.getState().openDocs(node.path, node.name);
+                      useDocsStore.getState().openDocsForCollection(node.path, node.name);
                     },
                   },
                   {
@@ -893,8 +893,8 @@ function CookieSettingsDialog({
   return (
     <Dialog.Root open onOpenChange={(open) => !open && onClose()}>
       <Dialog.Portal>
-        <Dialog.Overlay className="fixed inset-0 z-50 bg-black/50" />
-        <Dialog.Content className="fixed left-1/2 top-1/2 z-50 w-[380px] -translate-x-1/2 -translate-y-1/2 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] shadow-xl focus:outline-none">
+        <Dialog.Overlay className="fixed inset-0 z-50 bg-[var(--color-overlay)]" />
+        <Dialog.Content className="fixed left-1/2 top-1/2 z-50 w-[380px] -translate-x-1/2 -translate-y-1/2 rounded-lg border border-[var(--color-border)] bg-[var(--color-card)] elev-pop focus:outline-none">
           <div className="flex items-center justify-between border-b border-[var(--color-border)] px-5 py-3">
             <Dialog.Title className="text-sm font-semibold text-[var(--color-text-primary)]">
               {t("sidebar.cookieSettings")}
@@ -1012,8 +1012,8 @@ function InputDialog({
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
       <Dialog.Portal>
-        <Dialog.Overlay className="fixed inset-0 z-40 bg-black/50" />
-        <Dialog.Content className="fixed left-1/2 top-1/2 z-50 w-80 -translate-x-1/2 -translate-y-1/2 rounded-xl border border-[var(--color-border)] bg-[var(--color-elevated)] p-5 shadow-2xl">
+        <Dialog.Overlay className="fixed inset-0 z-40 bg-[var(--color-overlay)]" />
+        <Dialog.Content className="fixed left-1/2 top-1/2 z-50 w-80 -translate-x-1/2 -translate-y-1/2 rounded-xl border border-[var(--color-border)] bg-[var(--color-card)] p-5 elev-pop">
           <Dialog.Title className="mb-4 text-sm font-semibold text-[var(--color-text-primary)]">
             {title}
           </Dialog.Title>
@@ -1095,8 +1095,8 @@ function ConfirmDialog({
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
       <Dialog.Portal>
-        <Dialog.Overlay className="fixed inset-0 z-40 bg-black/50" />
-        <Dialog.Content className="fixed left-1/2 top-1/2 z-50 w-80 -translate-x-1/2 -translate-y-1/2 rounded-xl border border-[var(--color-border)] bg-[var(--color-elevated)] p-5 shadow-2xl">
+        <Dialog.Overlay className="fixed inset-0 z-40 bg-[var(--color-overlay)]" />
+        <Dialog.Content className="fixed left-1/2 top-1/2 z-50 w-80 -translate-x-1/2 -translate-y-1/2 rounded-xl border border-[var(--color-border)] bg-[var(--color-card)] p-5 elev-pop">
           <Dialog.Title className="mb-2 text-sm font-semibold text-[var(--color-text-primary)]">
             {title}
           </Dialog.Title>
@@ -1160,14 +1160,14 @@ function ContextMenu({
       <div className="fixed inset-0 z-40" onMouseDown={onClose} />
       <div
         ref={menuRef}
-        className="fixed z-50 min-w-[160px] max-h-[80vh] overflow-y-auto rounded border border-[var(--color-border)] bg-[var(--color-elevated)] py-1 shadow-lg"
+        className="surface-pop fixed z-50 min-w-[160px] max-h-[80vh] overflow-y-auto rounded-md py-1"
         style={{ left: position.left, top: position.top }}
       >
         {items.map((item) => (
           <button
             key={item.label}
             onClick={item.onClick}
-            className={`flex w-full items-center gap-2 px-3 py-1.5 text-left text-sm hover:bg-[var(--color-border)] ${
+            className={`flex w-full items-center gap-2 px-3 py-1.5 text-left text-sm hover:bg-[var(--color-card-hover)] ${
               item.danger ? "text-red-400" : "text-[var(--color-text-primary)]"
             }`}
           >

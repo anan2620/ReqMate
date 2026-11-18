@@ -73,7 +73,7 @@ export function PanelDivider({ direction, panelRef, containerRef, onResizeEnd, o
     >
       {/* Visible line */}
       <div
-        className={`absolute bg-[color-mix(in_srgb,var(--color-border-strong)_70%,transparent)] transition-all duration-150 group-hover:bg-[var(--color-accent)] group-hover:shadow-[0_0_8px_var(--color-accent-ring)] group-active:bg-[var(--color-accent)] ${
+        className={`absolute bg-[color-mix(in_srgb,var(--color-border-strong)_70%,transparent)] transition-all duration-150 group-hover:bg-[var(--color-accent)] group-hover: group-active:bg-[var(--color-accent)] ${
           isHorizontal
             ? "inset-y-0 left-1/2 w-px -translate-x-1/2 group-hover:w-[2px]"
             : "inset-x-0 top-1/2 h-px -translate-y-1/2 group-hover:h-[2px]"

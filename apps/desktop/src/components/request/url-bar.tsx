@@ -114,7 +114,7 @@ function VariableEditor({
           className={`inline rounded px-0.5 font-mono transition-colors ${
             isUnresolved
               ? "text-[var(--color-warning)] bg-[var(--color-warning)]/10 hover:bg-[var(--color-warning)]/20"
-              : "text-[var(--color-accent)] bg-[var(--color-accent)]/10 hover:bg-[var(--color-accent)]/20"
+              : "text-[var(--color-accent-text)] bg-[var(--color-accent)]/10 hover:bg-[var(--color-accent)]/20"
           }`}
           title={
             isUnresolved
@@ -133,7 +133,7 @@ function VariableEditor({
           onOpenAutoFocus={(e) => e.preventDefault()}
         >
           <p className="mb-1.5 text-xs font-medium text-[var(--color-text-secondary)]">
-            <span className="font-mono text-[var(--color-accent)]">{`{{${varName}}}`}</span>
+            <span className="font-mono text-[var(--color-accent-text)]">{`{{${varName}}}`}</span>
           </p>
           {!activeEnvName ? (
             <div className="flex items-start gap-2 rounded-lg bg-[var(--color-warning)]/10 px-2.5 py-2 text-xs text-[var(--color-text-secondary)]">
@@ -286,7 +286,7 @@ export const UrlBar = forwardRef<HTMLInputElement, UrlBarProps>(function UrlBar(
   return (
     <div data-tour="url-bar" className="flex items-center gap-2.5 bg-[var(--color-card)] px-3 pb-2.5 pt-1">
       {/* Command bar — method + URL in one focused surface */}
-      <div className="ring-focus flex min-w-0 flex-1 items-center gap-2 rounded-xl border border-[var(--color-border-strong)] bg-[color-mix(in_srgb,var(--color-elevated)_55%,var(--color-card))] px-2 py-1.5 elev-xs transition-all duration-200">
+      <div className="ring-focus flex min-w-0 flex-1 items-center gap-2 rounded-lg border border-[var(--color-border-strong)] bg-[var(--color-card)] px-2 py-1.5 transition-colors duration-150">
         {/* Method selector — show static badge for non-HTTP protocols */}
         {tab.protocol === "graphql" ? (
           <span className="pill method-graphql px-2.5 py-1 text-[11px]">GQL</span>
@@ -368,7 +368,7 @@ export const UrlBar = forwardRef<HTMLInputElement, UrlBarProps>(function UrlBar(
             data-tour="send-btn"
             onClick={send}
             disabled={tab.loading || !tab.url.trim()}
-            className="btn-accent flex h-[38px] items-center gap-2 rounded-xl px-4 text-[13px] font-semibold disabled:cursor-not-allowed disabled:opacity-45 disabled:shadow-none disabled:grayscale-[0.25]"
+            className="btn-accent flex h-[38px] items-center gap-2 rounded-md px-4 text-[13px] font-semibold disabled:cursor-not-allowed disabled:opacity-40"
           >
             {tab.loading ? (
               <Loader2 className="h-4 w-4 animate-spin" />

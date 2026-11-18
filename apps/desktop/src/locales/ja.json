@@ -52,7 +52,9 @@
     "noEnvironmentsYet": "環境はまだありません",
     "newEnvironment": "新しい環境",
     "addVariable": "変数を追加",
-    "importEnvironment": "環境をインポート (Postman JSON)"
+    "importEnvironment": "環境をインポート (Postman JSON)",
+    "collectionDefaults": "コレクションの既定値",
+    "collectionDefaultsDesc": "ここで設定した認証は、独自の認証を持たないすべてのリクエストに継承されます。"
   },
   "tabs": {
     "untitled": "無題のリクエスト",
@@ -69,7 +71,9 @@
     "duplicateTab": "タブを複製",
     "moveToNewWindow": "新しいウィンドウに移動",
     "httpRequest": "HTTP リクエスト",
-    "importCurl": "cURL をインポート"
+    "importCurl": "cURL をインポート",
+    "saveAs": "名前を付けて保存…",
+    "saveOptions": "保存オプション"
   },
   "request": {
     "send": "送信",
@@ -166,7 +170,8 @@
     "assertionConsumerUrl": "アサーションコンシューマサービスURL",
     "certificate": "IdP証明書 (PEM)",
     "nameIdFormat": "NameIDフォーマット",
-    "samlToken": "SAMLアサーショントークン"
+    "samlToken": "SAMLアサーショントークン",
+    "apiKeyHeader": "ヘッダー名"
   },
   "response": {
     "body": "ボディ",
@@ -260,7 +265,10 @@
     "upToDate": "最新の状態です",
     "updateAvailable": "アップデートがあります：{{version}}",
     "shortcuts": "キーボードショートカット",
-    "recording": "キーの組み合わせを押してください..."
+    "recording": "キーの組み合わせを押してください...",
+    "saving": "保存",
+    "autoSave": "リクエストの変更を自動保存",
+    "autoSaveDesc": "入力が止まって 1 秒後にディスクへ書き込みます。オフにすると、保存を押すまで変更はエディター内に残ります。"
   },
   "runner": {
     "title": "コレクションランナー",
@@ -359,7 +367,10 @@
     "skipForNow": "今はスキップ",
     "getStarted": "始める",
     "name": "名前",
-    "value": "値"
+    "value": "値",
+    "saved": "保存しました",
+    "savedTo": "「{{name}}」を保存しました",
+    "saveFailed": "保存に失敗しました: {{reason}}"
   },
   "errors": {
     "connectionRefused": "接続が拒否されました — サーバーは稼働中ですか？",
@@ -464,7 +475,15 @@
     "html": "HTML",
     "markdown": "Markdown",
     "generating": "ドキュメントを生成中...",
-    "generateDesc": "コレクションからドキュメントを生成"
+    "generateDesc": "含めるコレクションを選んで、1 つのドキュメントにまとめて生成します。",
+    "pickCollections": "コレクション",
+    "selectAll": "すべて",
+    "clearAll": "クリア",
+    "selectedCount": "{{n}} 件選択中",
+    "noCollections": "先にコレクションを開いてください。",
+    "generateFor": "ドキュメントを生成 ({{n}})",
+    "exported": "{{path}} に書き出しました",
+    "exportFailed": "書き出しに失敗しました: {{reason}}"
   },
   "diff": {
     "title": "レスポンスの差分",
@@ -552,5 +571,35 @@
   },
   "audit": {
     "title": "監査ログ"
+  },
+  "proxy": {
+    "title": "プロキシキャプチャ",
+    "running": "実行中",
+    "stopped": "停止中",
+    "startProxy": "プロキシを開始",
+    "stop": "停止",
+    "port": "プロキシポート",
+    "proxyHint": "HTTP クライアントのプロキシを 127.0.0.1:{{port}} に設定してください",
+    "caTitle": "CA 証明書",
+    "copyPem": "PEM をコピー",
+    "copied": "コピーしました",
+    "generateCa": "CA を生成",
+    "caHint": "HTTPS をキャプチャするには、ブラウザーに CA 証明書をインストールしてください",
+    "passthrough": "パススルードメイン",
+    "passthroughPlaceholder": "例: github.com, google.com",
+    "passthroughHint": "キャプチャしないドメインをカンマ区切りで指定",
+    "captured_one": "{{count}} 件のリクエストをキャプチャしました",
+    "captured_other": "{{count}} 件のリクエストをキャプチャしました",
+    "captures": "キャプチャ",
+    "filter": "フィルター…",
+    "clearCaptures": "キャプチャを消去",
+    "waiting": "リクエストを待機中…",
+    "startHint": "プロキシを開始するとキャプチャが始まります",
+    "selectRequest": "リクエストを選択すると詳細が表示されます",
+    "request": "リクエスト",
+    "response": "レスポンス",
+    "headers": "ヘッダー",
+    "body": "ボディ",
+    "noHeaders": "ヘッダーなし"
   }
 }

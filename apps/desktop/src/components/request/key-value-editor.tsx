@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import type { KeyValuePair } from "@reqmate/types";
 import { Plus, Trash2 } from "lucide-react";
 
@@ -17,6 +18,7 @@ export function KeyValueEditor({
   keyPlaceholder = "Key",
   valuePlaceholder = "Value",
 }: KeyValueEditorProps) {
+  const { t } = useTranslation();
   const update = (index: number, field: keyof KeyValuePair, value: string | boolean) => {
     const updated = pairs.map((p, i) =>
       i === index ? { ...p, [field]: value } : p,
@@ -39,7 +41,7 @@ export function KeyValueEditor({
   return (
     <div className="space-y-1">
       {/* Header row */}
-      <div className="grid grid-cols-[auto_1fr_1fr_auto] items-center gap-2 border-b border-[var(--color-border)] px-1 pb-1.5">
+      <div className="grid grid-cols-[auto_1fr_1fr_auto] items-center gap-2 border-b border-[var(--color-border)] px-1 pb-2">
         <span className="w-3.5" />
         <span className="text-[10.5px] font-semibold uppercase tracking-[0.1em] text-[var(--color-text-dimmed)]">{keyPlaceholder}</span>
         <span className="text-[10.5px] font-semibold uppercase tracking-[0.1em] text-[var(--color-text-dimmed)]">{valuePlaceholder}</span>
@@ -50,7 +52,7 @@ export function KeyValueEditor({
       {pairs.map((pair, index) => (
         <div
           key={pair.id}
-          className="group grid grid-cols-[auto_1fr_1fr_auto] items-center gap-2 rounded-md px-1 py-0.5 transition-colors hover:bg-[color-mix(in_srgb,var(--color-text-primary)_3%,transparent)]"
+          className="group grid grid-cols-[auto_1fr_1fr_auto] items-center gap-2 rounded-md px-1 py-0.5 transition-colors hover:bg-[var(--color-surface)]"
         >
           <input
             type="checkbox"
@@ -63,14 +65,14 @@ export function KeyValueEditor({
             value={pair.key}
             onChange={(e) => update(index, "key", e.target.value)}
             placeholder={keyPlaceholder}
-            className="field-soft min-w-0 rounded-md border border-transparent bg-[color-mix(in_srgb,var(--color-elevated)_70%,transparent)] px-2.5 py-1.5 text-[12.5px] text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none transition-all focus:border-[var(--color-accent-line)] focus:bg-[var(--color-elevated)] focus:ring-2 focus:ring-[var(--color-accent-ring)]"
+            className="field-soft min-w-0 rounded-md border border-transparent bg-[var(--color-surface)] px-2.5 py-1.5 text-[12.5px] text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none transition-colors focus:border-[var(--color-accent)] focus:bg-[var(--color-card)]"
           />
           <input
             type="text"
             value={pair.value}
             onChange={(e) => update(index, "value", e.target.value)}
             placeholder={valuePlaceholder}
-            className="field-soft min-w-0 rounded-md border border-transparent bg-[color-mix(in_srgb,var(--color-elevated)_70%,transparent)] px-2.5 py-1.5 text-[12.5px] text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none transition-all focus:border-[var(--color-accent-line)] focus:bg-[var(--color-elevated)] focus:ring-2 focus:ring-[var(--color-accent-ring)]"
+            className="field-soft min-w-0 rounded-md border border-transparent bg-[var(--color-surface)] px-2.5 py-1.5 text-[12.5px] text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none transition-colors focus:border-[var(--color-accent)] focus:bg-[var(--color-card)]"
           />
           <button
             onClick={() => removeRow(index)}
@@ -85,9 +87,9 @@ export function KeyValueEditor({
       {/* Add row button */}
       <button
         onClick={addRow}
-        className="mt-1.5 flex w-full items-center gap-1.5 rounded-md border border-dashed border-[var(--color-border-strong)] px-2.5 py-1.5 text-[11.5px] text-[var(--color-text-muted)] transition-colors hover:border-[var(--color-accent-line)] hover:bg-[var(--color-accent-soft)] hover:text-[var(--color-accent)]"
+        className="mt-1.5 flex w-full items-center gap-1.5 rounded-md border border-[var(--color-border)] px-2.5 py-1.5 text-[11.5px] text-[var(--color-text-muted)] transition-colors hover:border-[var(--color-accent)] hover:bg-[var(--color-accent-soft)] hover:text-[var(--color-accent-text)]"
       >
-        <Plus className="h-3.5 w-3.5" /> Add
+        <Plus className="h-3.5 w-3.5" /> {t("request.addRow")}
       </button>
     </div>
   );

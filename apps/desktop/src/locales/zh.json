@@ -52,7 +52,9 @@
     "noEnvironmentsYet": "暂无环境",
     "newEnvironment": "新建环境",
     "addVariable": "添加变量",
-    "importEnvironment": "导入环境 (Postman JSON)"
+    "importEnvironment": "导入环境 (Postman JSON)",
+    "collectionDefaults": "集合默认设置",
+    "collectionDefaultsDesc": "这里配置的认证会被所有自身没有认证的请求继承。"
   },
   "tabs": {
     "untitled": "未命名请求",
@@ -69,7 +71,9 @@
     "duplicateTab": "复制标签页",
     "moveToNewWindow": "移至新窗口",
     "httpRequest": "HTTP 请求",
-    "importCurl": "导入 cURL"
+    "importCurl": "导入 cURL",
+    "saveAs": "另存为…",
+    "saveOptions": "保存选项"
   },
   "request": {
     "send": "发送",
@@ -166,7 +170,8 @@
     "assertionConsumerUrl": "断言消费者服务URL",
     "certificate": "IdP证书 (PEM)",
     "nameIdFormat": "NameID格式",
-    "samlToken": "SAML断言令牌"
+    "samlToken": "SAML断言令牌",
+    "apiKeyHeader": "请求头名称"
   },
   "response": {
     "body": "响应体",
@@ -260,7 +265,10 @@
     "upToDate": "已是最新版本",
     "updateAvailable": "有可用更新：{{version}}",
     "shortcuts": "键盘快捷键",
-    "recording": "请按下组合键..."
+    "recording": "请按下组合键...",
+    "saving": "保存",
+    "autoSave": "自动保存请求改动",
+    "autoSaveDesc": "停止输入 1 秒后自动写入磁盘。关闭后，改动会保留在编辑器里，直到你点击“保存”。"
   },
   "runner": {
     "title": "集合运行器",
@@ -359,7 +367,10 @@
     "skipForNow": "暂时跳过",
     "getStarted": "开始使用",
     "name": "名称",
-    "value": "值"
+    "value": "值",
+    "saved": "已保存",
+    "savedTo": "已保存「{{name}}」",
+    "saveFailed": "保存失败：{{reason}}"
   },
   "errors": {
     "connectionRefused": "连接被拒绝 — 服务器是否正在运行？",
@@ -464,7 +475,15 @@
     "html": "HTML",
     "markdown": "Markdown",
     "generating": "正在生成文档...",
-    "generateDesc": "从集合生成文档"
+    "generateDesc": "勾选要包含的集合，生成一份合并的 API 文档。",
+    "pickCollections": "集合",
+    "selectAll": "全选",
+    "clearAll": "清空",
+    "selectedCount": "已选 {{n}} 个",
+    "noCollections": "请先在集合面板中打开一个集合。",
+    "generateFor": "生成文档（{{n}}）",
+    "exported": "已导出到 {{path}}",
+    "exportFailed": "导出失败：{{reason}}"
   },
   "diff": {
     "title": "响应对比",
@@ -552,5 +571,35 @@
   },
   "audit": {
     "title": "审计日志"
+  },
+  "proxy": {
+    "title": "代理抓包",
+    "running": "运行中",
+    "stopped": "已停止",
+    "startProxy": "启动代理",
+    "stop": "停止",
+    "port": "代理端口",
+    "proxyHint": "将 HTTP 客户端的代理设置为 127.0.0.1:{{port}}",
+    "caTitle": "CA 证书",
+    "copyPem": "复制 PEM",
+    "copied": "已复制",
+    "generateCa": "生成 CA 证书",
+    "caHint": "在浏览器中安装 CA 证书后即可抓取 HTTPS 流量",
+    "passthrough": "直连域名",
+    "passthroughPlaceholder": "例如 github.com、google.com",
+    "passthroughHint": "多个域名用英文逗号分隔，这些域名不会被抓包",
+    "captured_one": "已捕获 {{count}} 个请求",
+    "captured_other": "已捕获 {{count}} 个请求",
+    "captures": "抓包记录",
+    "filter": "过滤…",
+    "clearCaptures": "清空抓包记录",
+    "waiting": "正在等待请求…",
+    "startHint": "启动代理后即可开始抓包",
+    "selectRequest": "选择左侧的请求查看详情",
+    "request": "请求",
+    "response": "响应",
+    "headers": "头信息",
+    "body": "内容",
+    "noHeaders": "无头信息"
   }
 }

@@ -22,7 +22,7 @@ const styleMap = {
   info: {
     border: "var(--color-accent)",
     iconBg: "var(--color-accent-soft)",
-    icon: "text-[var(--color-accent)]",
+    icon: "text-[var(--color-accent-text)]",
   },
   success: {
     border: "var(--color-success)",
@@ -55,7 +55,7 @@ export function ToastContainer() {
             >
               <Icon className="h-3.5 w-3.5" />
             </span>
-            <p className="flex-1 pt-0.5 text-[12.5px] leading-relaxed text-[var(--color-text-primary)]">
+            <p className="min-w-0 flex-1 break-words pt-0.5 text-[12.5px] leading-relaxed text-[var(--color-text-primary)]">
               {toast.message}
             </p>
             <button

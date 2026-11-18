@@ -83,7 +83,7 @@ export function RequestPanel() {
                 )}
               </span>
               {isActive && (
-                <span className="absolute inset-x-2 -bottom-px h-[2px] rounded-full bg-[var(--color-accent)] shadow-[0_0_8px_var(--color-accent-ring)]" />
+                <span className="absolute inset-x-2 -bottom-px h-[2px] bg-[var(--color-accent)]" />
               )}
             </button>
           );
@@ -104,7 +104,7 @@ export function RequestPanel() {
             <KeyValueEditor
               pairs={params}
               onChange={setParams}
-              keyPlaceholder="Parameter"
+              keyPlaceholder={t("request.parameter")}
               valuePlaceholder={t("request.value")}
             />
             <HintTooltip hintId="env-vars" message="Tip: Use {{variableName}} for dynamic values from environments" />

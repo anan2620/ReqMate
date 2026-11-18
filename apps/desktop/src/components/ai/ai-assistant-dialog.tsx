@@ -259,7 +259,7 @@ export function AiAssistantDialog({ open, onOpenChange }: AiAssistantDialogProps
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
       <Dialog.Portal>
         <Dialog.Overlay className="fixed inset-0 z-50 bg-black/30" />
-        <Dialog.Content className="fixed right-4 top-16 bottom-16 z-50 flex w-[480px] flex-col rounded-xl border border-[var(--color-border)] bg-[var(--color-card)] shadow-2xl focus:outline-none">
+        <Dialog.Content className="fixed right-4 top-16 bottom-16 z-50 flex w-[480px] flex-col rounded-xl border border-[var(--color-border)] bg-[var(--color-card)] elev-pop focus:outline-none">
           {/* Header */}
           <div className="flex items-center justify-between border-b border-[var(--color-border)] px-4 py-3">
             <Dialog.Title className="flex items-center gap-2 text-sm font-semibold text-[var(--color-text-primary)]">
@@ -415,7 +415,7 @@ export function AiAssistantDialog({ open, onOpenChange }: AiAssistantDialogProps
                     onChange={(e) => setInput(e.target.value)}
                     placeholder="Describe an API request..."
                     disabled={loading}
-                    className="flex-1 resize-none rounded-lg bg-[var(--color-elevated)] px-3 py-2 text-sm text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none focus:ring-1 focus:ring-[var(--color-accent)] disabled:opacity-50"
+                    className="flex-1 resize-none rounded-lg border border-[var(--color-border)] bg-[var(--color-card)] px-3 py-2 text-sm text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none disabled:opacity-50"
                     rows={2}
                     onKeyDown={(e) => {
                       if (e.key === "Enter" && !e.shiftKey) {

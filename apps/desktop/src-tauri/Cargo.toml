@@ -1,6 +1,6 @@
 [package]
 name = "reqmate"
-version = "1.0.0"
+version = "1.1.0"
 description = "Local-first API development platform"
 authors = ["ReqMate Contributors"]
 edition = "2021"
@@ -54,7 +54,7 @@ md-5 = "0.10"
 jsonwebtoken = "9"
 hex = "0.4"
 notify = { version = "7", features = ["macos_fsevent"] }
-notify-debouncer-mini = "0.5"
+notify-debouncer-mini = { version = "0.5", optional = true }
 bytes = "1"
 tonic = { version = "0.12", features = ["transport", "tls"] }
 prost = "0.13"
@@ -64,7 +64,7 @@ protox = "0.7"
 hyper-util = "0.1"
 http-body = "1"
 tower = "0.5"
-fake = { version = "3", features = ["derive"] }
+fake = { version = "3", features = ["derive"], optional = true }
 cron = "0.15"
 zip = { version = "2", default-features = false, features = ["deflate"] }
 md4 = "0.10"

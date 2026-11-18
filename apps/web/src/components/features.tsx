@@ -9,6 +9,9 @@ import {
   FileCode2,
   Sparkles,
   Puzzle,
+  Shield,
+  FileText,
+  Languages,
   ArrowRight,
 } from "lucide-react";
 
@@ -59,6 +62,30 @@ const features = [
     accent: "#f97316",
     description:
       "Extend with JavaScript or WASM plugins. Custom auth, transformers, integrations — your way.",
+    href: "#",
+  },
+  {
+    icon: Shield,
+    title: "Proxy Capture",
+    accent: "#14b8a6",
+    description:
+      "Route any client through a localhost-only proxy, then inspect captured headers, bodies, and statuses side by side.",
+    href: "#",
+  },
+  {
+    icon: FileText,
+    title: "API Docs Generation",
+    accent: "#5b5bd6",
+    description:
+      "Turn one collection — or several at once — into a shareable HTML or Markdown reference. Folder structure preserved.",
+    href: "#",
+  },
+  {
+    icon: Languages,
+    title: "Nine UI Languages",
+    accent: "#f43f5e",
+    description:
+      "English, 中文, 日本語, 한국어, Deutsch, Français, Español, Português, العربية — the whole interface, not just labels.",
     href: "#",
   },
 ];

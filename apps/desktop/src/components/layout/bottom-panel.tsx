@@ -73,7 +73,7 @@ export function BottomPanel({ terminalOpen, onTerminalOpenChange }: BottomPanelP
 
   return (
     <div
-      className="flex flex-col border-t border-[var(--color-border)] bg-[var(--color-card)] shadow-[0_-8px_24px_-18px_rgba(0,0,0,0.5)]"
+      className="flex flex-col border-t border-[var(--color-border)] bg-[var(--color-card)]"
       style={{ height }}
     >
       {/* Resize handle */}
@@ -151,7 +151,7 @@ function PanelTab({
           : "text-[var(--color-text-muted)] hover:text-[var(--color-text-secondary)]"
       }`}
     >
-      <Icon className={`h-3.5 w-3.5 ${active ? "text-[var(--color-accent)]" : ""}`} />
+      <Icon className={`h-3.5 w-3.5 ${active ? "text-[var(--color-accent-text)]" : ""}`} />
       {label}
       {active && (
         <span className="absolute inset-x-2 -bottom-px h-[2px] rounded-full bg-[var(--color-accent)]" />

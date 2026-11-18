@@ -52,7 +52,9 @@
     "noEnvironmentsYet": "Aún no hay entornos",
     "newEnvironment": "Nuevo Entorno",
     "addVariable": "Agregar Variable",
-    "importEnvironment": "Importar Entorno (Postman JSON)"
+    "importEnvironment": "Importar Entorno (Postman JSON)",
+    "collectionDefaults": "Valores predeterminados de la colección",
+    "collectionDefaultsDesc": "La autenticación configurada aquí la heredan todas las solicitudes sin autenticación propia."
   },
   "tabs": {
     "untitled": "Solicitud sin título",
@@ -69,7 +71,9 @@
     "duplicateTab": "Duplicar Pestaña",
     "moveToNewWindow": "Mover a Nueva Ventana",
     "httpRequest": "Solicitud HTTP",
-    "importCurl": "Importar cURL"
+    "importCurl": "Importar cURL",
+    "saveAs": "Guardar como…",
+    "saveOptions": "Opciones de guardado"
   },
   "request": {
     "send": "Enviar",
@@ -166,7 +170,8 @@
     "assertionConsumerUrl": "URL del Servicio de Consumo de Aserciones",
     "certificate": "Certificado del IdP (PEM)",
     "nameIdFormat": "Formato NameID",
-    "samlToken": "Token de Aserción SAML"
+    "samlToken": "Token de Aserción SAML",
+    "apiKeyHeader": "Nombre de la cabecera"
   },
   "response": {
     "body": "Cuerpo",
@@ -260,7 +265,10 @@
     "upToDate": "Estás al día",
     "updateAvailable": "Actualización disponible: {{version}}",
     "shortcuts": "Atajos de Teclado",
-    "recording": "Presiona la combinación de teclas..."
+    "recording": "Presiona la combinación de teclas...",
+    "saving": "Guardado",
+    "autoSave": "Guardar los cambios automáticamente",
+    "autoSaveDesc": "Guarda en disco un segundo después de dejar de escribir. Desactívalo para mantener los cambios en el editor hasta que pulses Guardar."
   },
   "runner": {
     "title": "Ejecutor de Colección",
@@ -359,7 +367,10 @@
     "skipForNow": "Omitir por ahora",
     "getStarted": "Comenzar",
     "name": "Nombre",
-    "value": "Valor"
+    "value": "Valor",
+    "saved": "Guardado",
+    "savedTo": "«{{name}}» guardado",
+    "saveFailed": "Error al guardar: {{reason}}"
   },
   "errors": {
     "connectionRefused": "Conexión rechazada — ¿el servidor está en ejecución?",
@@ -464,7 +475,15 @@
     "html": "HTML",
     "markdown": "Markdown",
     "generating": "Generando documentación...",
-    "generateDesc": "Genera documentación desde colecciones"
+    "generateDesc": "Elige las colecciones que quieres incluir y genera un único documento.",
+    "pickCollections": "Colecciones",
+    "selectAll": "Todas",
+    "clearAll": "Ninguna",
+    "selectedCount": "{{n}} seleccionadas",
+    "noCollections": "Abre primero una colección.",
+    "generateFor": "Generar docs ({{n}})",
+    "exported": "Exportado a {{path}}",
+    "exportFailed": "Error al exportar: {{reason}}"
   },
   "diff": {
     "title": "Diferencia de Respuesta",
@@ -552,5 +571,35 @@
   },
   "audit": {
     "title": "Registros de Auditoría"
+  },
+  "proxy": {
+    "title": "Captura de proxy",
+    "running": "En ejecución",
+    "stopped": "Detenido",
+    "startProxy": "Iniciar proxy",
+    "stop": "Detener",
+    "port": "Puerto del proxy",
+    "proxyHint": "Configura tu cliente HTTP en 127.0.0.1:{{port}}",
+    "caTitle": "Certificado CA",
+    "copyPem": "Copiar PEM",
+    "copied": "Copiado",
+    "generateCa": "Generar CA",
+    "caHint": "Instala el certificado CA en tu navegador para capturar tráfico HTTPS",
+    "passthrough": "Dominios excluidos",
+    "passthroughPlaceholder": "p. ej. github.com, google.com",
+    "passthroughHint": "Dominios a omitir, separados por comas",
+    "captured_one": "{{count}} solicitud capturada",
+    "captured_other": "{{count}} solicitudes capturadas",
+    "captures": "Capturas",
+    "filter": "Filtrar…",
+    "clearCaptures": "Borrar capturas",
+    "waiting": "Esperando solicitudes…",
+    "startHint": "Inicia el proxy para capturar solicitudes",
+    "selectRequest": "Selecciona una solicitud para ver los detalles",
+    "request": "Solicitud",
+    "response": "Respuesta",
+    "headers": "Cabeceras",
+    "body": "Cuerpo",
+    "noHeaders": "Sin cabeceras"
   }
 }

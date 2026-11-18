@@ -52,7 +52,9 @@
     "noEnvironmentsYet": "Noch keine Umgebungen",
     "newEnvironment": "Neue Umgebung",
     "addVariable": "Variable Hinzufügen",
-    "importEnvironment": "Umgebung Importieren (Postman JSON)"
+    "importEnvironment": "Umgebung Importieren (Postman JSON)",
+    "collectionDefaults": "Sammlungs-Standardwerte",
+    "collectionDefaultsDesc": "Die hier konfigurierte Authentifizierung wird von allen Anfragen ohne eigene Authentifizierung übernommen."
   },
   "tabs": {
     "untitled": "Unbenannte Anfrage",
@@ -69,7 +71,9 @@
     "duplicateTab": "Tab Duplizieren",
     "moveToNewWindow": "In Neues Fenster Verschieben",
     "httpRequest": "HTTP-Anfrage",
-    "importCurl": "cURL Importieren"
+    "importCurl": "cURL Importieren",
+    "saveAs": "Speichern unter…",
+    "saveOptions": "Speicheroptionen"
   },
   "request": {
     "send": "Senden",
@@ -166,7 +170,8 @@
     "assertionConsumerUrl": "Assertion Consumer Service URL",
     "certificate": "IdP-Zertifikat (PEM)",
     "nameIdFormat": "NameID-Format",
-    "samlToken": "SAML-Assertion-Token"
+    "samlToken": "SAML-Assertion-Token",
+    "apiKeyHeader": "Header-Name"
   },
   "response": {
     "body": "Body",
@@ -260,7 +265,10 @@
     "upToDate": "Du bist auf dem neuesten Stand",
     "updateAvailable": "Update verfügbar: {{version}}",
     "shortcuts": "Tastenkürzel",
-    "recording": "Drücke eine Tastenkombination..."
+    "recording": "Drücke eine Tastenkombination...",
+    "saving": "Speichern",
+    "autoSave": "Änderungen automatisch speichern",
+    "autoSaveDesc": "Schreibt eine Sekunde nach der letzten Eingabe auf die Festplatte. Deaktiviert bleiben Änderungen im Editor, bis du auf Speichern klickst."
   },
   "runner": {
     "title": "Sammlungsausführer",
@@ -359,7 +367,10 @@
     "skipForNow": "Vorerst überspringen",
     "getStarted": "Loslegen",
     "name": "Name",
-    "value": "Wert"
+    "value": "Wert",
+    "saved": "Gespeichert",
+    "savedTo": "„{{name}}“ gespeichert",
+    "saveFailed": "Speichern fehlgeschlagen: {{reason}}"
   },
   "errors": {
     "connectionRefused": "Verbindung abgelehnt — läuft der Server?",
@@ -464,7 +475,15 @@
     "html": "HTML",
     "markdown": "Markdown",
     "generating": "Dokumentation wird generiert...",
-    "generateDesc": "Dokumentation aus Sammlungen generieren"
+    "generateDesc": "Wähle die Sammlungen aus und erzeuge ein gemeinsames Dokument.",
+    "pickCollections": "Sammlungen",
+    "selectAll": "Alle",
+    "clearAll": "Keine",
+    "selectedCount": "{{n}} ausgewählt",
+    "noCollections": "Öffne zuerst eine Sammlung.",
+    "generateFor": "Docs erzeugen ({{n}})",
+    "exported": "Exportiert nach {{path}}",
+    "exportFailed": "Export fehlgeschlagen: {{reason}}"
   },
   "diff": {
     "title": "Antwort-Diff",
@@ -552,5 +571,35 @@
   },
   "audit": {
     "title": "Audit-Protokolle"
+  },
+  "proxy": {
+    "title": "Proxy-Aufzeichnung",
+    "running": "Läuft",
+    "stopped": "Gestoppt",
+    "startProxy": "Proxy starten",
+    "stop": "Stoppen",
+    "port": "Proxy-Port",
+    "proxyHint": "Stelle deinen HTTP-Client auf 127.0.0.1:{{port}} ein",
+    "caTitle": "CA-Zertifikat",
+    "copyPem": "PEM kopieren",
+    "copied": "Kopiert",
+    "generateCa": "CA erzeugen",
+    "caHint": "Installiere das CA-Zertifikat im Browser, um HTTPS-Verkehr aufzuzeichnen",
+    "passthrough": "Passthrough-Domains",
+    "passthroughPlaceholder": "z. B. github.com, google.com",
+    "passthroughHint": "Kommagetrennte Domains, die nicht aufgezeichnet werden",
+    "captured_one": "{{count}} Anfrage aufgezeichnet",
+    "captured_other": "{{count}} Anfragen aufgezeichnet",
+    "captures": "Aufzeichnungen",
+    "filter": "Filtern…",
+    "clearCaptures": "Aufzeichnungen löschen",
+    "waiting": "Warte auf Anfragen…",
+    "startHint": "Starte den Proxy, um Anfragen aufzuzeichnen",
+    "selectRequest": "Wähle eine Anfrage, um Details zu sehen",
+    "request": "Anfrage",
+    "response": "Antwort",
+    "headers": "Header",
+    "body": "Body",
+    "noHeaders": "Keine Header"
   }
 }

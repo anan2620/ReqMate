@@ -64,8 +64,8 @@ export function CollectionRunnerDialog({
   return (
     <Dialog.Root open={open} onOpenChange={handleClose}>
       <Dialog.Portal>
-        <Dialog.Overlay className="fixed inset-0 z-50 bg-black/50" />
-        <Dialog.Content className="fixed left-1/2 top-1/2 z-50 w-[700px] max-h-[80vh] -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] shadow-xl focus:outline-none flex flex-col">
+        <Dialog.Overlay className="fixed inset-0 z-50 bg-[var(--color-overlay)]" />
+        <Dialog.Content className="fixed left-1/2 top-1/2 z-50 w-[700px] max-h-[80vh] -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-lg border border-[var(--color-border)] bg-[var(--color-card)] elev-pop focus:outline-none flex flex-col">
           {/* Header */}
           <div className="flex items-center justify-between border-b border-[var(--color-border)] px-4 py-3">
             <Dialog.Title className="text-sm font-semibold text-[var(--color-text-primary)]">
@@ -116,7 +116,7 @@ export function CollectionRunnerDialog({
                     min={0}
                     value={delayMs}
                     onChange={(e) => setDelayMs(Number(e.target.value))}
-                    className="w-full rounded bg-[var(--color-elevated)] px-2.5 py-1.5 text-sm text-[var(--color-text-primary)] outline-none"
+                    className="w-full rounded border border-[var(--color-border)] bg-[var(--color-card)] px-2.5 py-1.5 text-sm text-[var(--color-text-primary)] outline-none"
                   />
                 </div>
                 <div>
@@ -126,7 +126,7 @@ export function CollectionRunnerDialog({
                     min={1}
                     value={iterations}
                     onChange={(e) => setIterations(Math.max(1, Number(e.target.value)))}
-                    className="w-full rounded bg-[var(--color-elevated)] px-2.5 py-1.5 text-sm text-[var(--color-text-primary)] outline-none"
+                    className="w-full rounded border border-[var(--color-border)] bg-[var(--color-card)] px-2.5 py-1.5 text-sm text-[var(--color-text-primary)] outline-none"
                   />
                 </div>
                 <div className="flex items-end">
@@ -145,7 +145,7 @@ export function CollectionRunnerDialog({
               <button
                 onClick={handleRun}
                 disabled={!collectionPath}
-                className="btn-success flex items-center gap-1.5 rounded-lg px-4 py-2 text-[13px] font-semibold disabled:opacity-50"
+                className="btn-success flex items-center gap-1.5 rounded-md px-4 py-2 text-[13px] font-semibold disabled:opacity-50"
               >
                 <Play className="h-3.5 w-3.5" />
                 Run Collection

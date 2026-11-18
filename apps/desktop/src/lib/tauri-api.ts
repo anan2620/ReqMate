@@ -475,6 +475,23 @@ export async function previewDocs(collectionPath: string): Promise<string> {
   return await invoke<string>("preview_docs", { collectionPath });
 }
 
+/** Combined documentation for several collections at once. */
+export async function generateDocsMulti(
+  collectionPaths: string[],
+  format: import("@reqmate/types").DocsFormat,
+  outputPath?: string,
+): Promise<string> {
+  return await invoke<string>("generate_docs_multi", {
+    collectionPaths,
+    format,
+    outputPath: outputPath ?? null,
+  });
+}
+
+export async function previewDocsMulti(collectionPaths: string[]): Promise<string> {
+  return await invoke<string>("preview_docs_multi", { collectionPaths });
+}
+
 // ── Monitors / Scheduler ──
 
 export async function createMonitor(config: import("@reqmate/types").MonitorConfig): Promise<import("@reqmate/types").MonitorStatus> {

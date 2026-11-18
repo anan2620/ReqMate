@@ -9,8 +9,8 @@
   --color-text: #f4f4f5;
   --color-text-secondary: #d4d4d8;
   --color-text-muted: #a1a1aa;
-  --color-accent: #6366f1;
-  --color-accent-light: #818cf8;
+  --color-accent: #5b5bd6;
+  --color-accent-light: #8a8ae4;
   --color-success: #22c55e;
   --color-warning: #eab308;
   --color-error: #ef4444;
@@ -40,12 +40,12 @@ body {
 }
 
 ::selection {
-  background: rgba(99, 102, 241, 0.3);
+  background: rgba(91, 91, 214, 0.32);
 }
 
 /* Accent text */
 .accent-text {
-  color: #818cf8;
+  color: #8a8ae4;
 }
 
 /* Warm accent for performance section */

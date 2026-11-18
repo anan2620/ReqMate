@@ -83,7 +83,7 @@ export function StatusBar({ onToggleTerminal, terminalOpen }: StatusBarProps) {
           onClick={toggleConsole}
           className={`flex items-center gap-1 rounded-md px-1.5 py-1 transition-colors ${
             consoleOpen
-              ? "bg-[var(--color-accent-soft)] text-[var(--color-accent)]"
+              ? "bg-[var(--color-accent-soft)] text-[var(--color-accent-text)]"
               : "text-[var(--color-text-dimmed)] hover:bg-[color-mix(in_srgb,var(--color-text-primary)_6%,transparent)] hover:text-[var(--color-text-secondary)]"
           }`}
           title={t("commandPalette.toggleConsole")}
@@ -102,7 +102,7 @@ export function StatusBar({ onToggleTerminal, terminalOpen }: StatusBarProps) {
             onClick={onToggleTerminal}
             className={`flex items-center gap-1 rounded-md px-1.5 py-1 transition-colors ${
               terminalOpen
-                ? "bg-[var(--color-accent-soft)] text-[var(--color-accent)]"
+                ? "bg-[var(--color-accent-soft)] text-[var(--color-accent-text)]"
                 : "text-[var(--color-text-dimmed)] hover:bg-[color-mix(in_srgb,var(--color-text-primary)_6%,transparent)] hover:text-[var(--color-text-secondary)]"
             }`}
             title="Toggle Terminal (Ctrl+`)"

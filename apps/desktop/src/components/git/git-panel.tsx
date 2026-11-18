@@ -68,7 +68,7 @@ export function GitPanel() {
         <button
           onClick={() => init()}
           disabled={loading}
-          className="btn-accent flex items-center gap-1.5 rounded-lg px-4 py-2 text-[13px] font-semibold disabled:opacity-50"
+          className="btn-accent flex items-center gap-1.5 rounded-md px-4 py-2 text-[13px] font-semibold disabled:opacity-50"
         >
           <GitBranch className="h-3.5 w-3.5" />
           Initialize Git Repo
@@ -267,7 +267,7 @@ export function GitPanel() {
           <button
             onClick={handleCommit}
             disabled={loading || !commitMessage.trim()}
-            className="btn-accent mt-1.5 flex w-full items-center justify-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold disabled:opacity-50"
+            className="btn-accent mt-1.5 flex w-full items-center justify-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-semibold disabled:opacity-50"
           >
             {loading ? (
               <Loader2 className="h-3.5 w-3.5 animate-spin" />

@@ -91,7 +91,7 @@ export function ResponsePanel() {
 
       {/* Status bar — below tabs, always visible when response exists */}
       {response && (
-        <div className="flex items-center gap-2 border-b border-[var(--color-border)] bg-[color-mix(in_srgb,var(--color-surface)_65%,var(--color-card))] px-3 py-1.5" role="status" aria-live="polite">
+        <div className="flex items-center gap-2 border-b border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-1.5" role="status" aria-live="polite">
           <span
             className={`pill animate-status-pulse px-2 py-0.5 !text-[11px] ${
               response.status < 300 ? "method-get" : response.status < 400 ? "method-post" : "method-delete"
@@ -144,9 +144,11 @@ export function ResponsePanel() {
           const formattedBody = tryFormatBody(response.body, language);
           return (
             <>
-              <ResponseBodyActions body={formattedBody} />
-              {response.truncated && <TruncationBanner response={response} />}
-              <div className="min-h-0 flex-1">
+              <div className="px-3 pt-1.5">
+                <ResponseBodyActions body={formattedBody} />
+                {response.truncated && <TruncationBanner response={response} />}
+              </div>
+              <div className="min-h-0 flex-1 border-t border-[var(--color-border)] pt-1">
                 <CodeEditor
                   value={formattedBody}
                   onChange={() => {}}
@@ -155,6 +157,7 @@ export function ResponsePanel() {
                   readOnly
                   lineNumbers={false}
                   minimap={false}
+                  bordered={false}
                 />
               </div>
             </>
@@ -361,7 +364,7 @@ function ResponseTabs({
               {meta}
             </span>
             {isActive && (
-              <span className="absolute inset-x-2 -bottom-px h-[2px] rounded-full bg-[var(--color-accent)] shadow-[0_0_8px_var(--color-accent-ring)]" />
+              <span className="absolute inset-x-2 -bottom-px h-[2px] bg-[var(--color-accent)]" />
             )}
           </button>
         );

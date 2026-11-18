@@ -134,7 +134,7 @@ export function SSEView() {
             value={filter}
             onChange={(e) => setFilter(e.target.value)}
             placeholder="Filter by event type..."
-            className="w-36 rounded bg-[var(--color-elevated)] px-2 py-0.5 text-xs text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none"
+            className="w-36 rounded border border-[var(--color-border)] bg-[var(--color-card)] px-2 py-0.5 text-xs text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none"
           />
           <label className="flex items-center gap-1 cursor-pointer">
             <input

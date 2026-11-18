@@ -59,6 +59,9 @@ pub struct AppSettings {
     /// Layout mode: "horizontal" (side-by-side) or "vertical" (stacked)
     #[serde(default = "default_layout")]
     pub layout: String,
+    /// Persist request edits automatically instead of waiting for an explicit save
+    #[serde(default = "default_true")]
+    pub auto_save: bool,
 }
 
 fn default_theme() -> String {
@@ -117,6 +120,7 @@ impl Default for AppSettings {
             ai_model: None,
             panel_ratio: default_panel_ratio(),
             layout: default_layout(),
+            auto_save: true,
         }
     }
 }

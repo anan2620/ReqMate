@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { useProxyStore } from "@/stores/proxy-store";
 import {
   proxyStart,
@@ -27,6 +28,7 @@ import {
 } from "lucide-react";
 
 export function ProxySidePanel() {
+  const { t } = useTranslation();
   const { status, setStatus } = useProxyStore();
   const [port, setPort] = useState("8888");
   const [loading, setLoading] = useState(false);
@@ -37,7 +39,9 @@ export function ProxySidePanel() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    proxyGetStatus().then(setStatus).catch(() => {});
+    proxyGetStatus()
+      .then((s) => s && setStatus(s))
+      .catch(() => {});
     proxyCaExists().then(setCaExists).catch(() => {});
   }, [setStatus]);
 
@@ -102,7 +106,7 @@ export function ProxySidePanel() {
               }`}
             />
             <span className="text-sm font-medium text-[var(--color-text-primary)]">
-              {status.running ? "Running" : "Stopped"}
+              {status.running ? t("proxy.running") : t("proxy.stopped")}
             </span>
           </div>
           {status.running && (
@@ -119,7 +123,7 @@ export function ProxySidePanel() {
               value={port}
               onChange={(e) => setPort(e.target.value)}
               placeholder="8888"
-              aria-label="Proxy port"
+              aria-label={t("proxy.port")}
               className="h-7 w-[64px] rounded-md bg-[var(--color-surface)] px-2 text-xs text-[var(--color-text-primary)] outline-none transition-colors focus:ring-1 focus:ring-[var(--color-accent)]"
             />
           )}
@@ -133,12 +137,12 @@ export function ProxySidePanel() {
             {status.running ? (
               <>
                 <Square className="h-3 w-3 shrink-0" />
-                Stop
+                {t("proxy.stop")}
               </>
             ) : (
               <>
                 <Play className="h-3 w-3 shrink-0" />
-                Start Proxy
+                {t("proxy.startProxy")}
               </>
             )}
           </button>
@@ -146,7 +150,7 @@ export function ProxySidePanel() {
 
         {status.running && (
           <p className="mt-2 text-[10px] text-[var(--color-text-dimmed)]">
-            Configure your HTTP client to use <code>127.0.0.1:{status.port}</code> as proxy
+            {t("proxy.proxyHint", { port: status.port })}
           </p>
         )}
       </div>
@@ -167,7 +171,7 @@ export function ProxySidePanel() {
             <Shield className="h-4 w-4 text-[var(--color-text-muted)]" />
           )}
           <span className="text-sm font-medium text-[var(--color-text-primary)]">
-            CA Certificate
+            {t("proxy.caTitle")}
           </span>
         </div>
         {caExists ? (
@@ -177,7 +181,7 @@ export function ProxySidePanel() {
               className="flex flex-1 items-center justify-center gap-1.5 rounded bg-[var(--color-surface)] px-2 py-1.5 text-xs text-[var(--color-text-secondary)] hover:bg-[var(--color-border)]"
             >
               {caCopied ? <Check className="h-3 w-3 text-green-500" /> : <Copy className="h-3 w-3" />}
-              {caCopied ? "Copied" : "Copy PEM"}
+              {caCopied ? t("proxy.copied") : t("proxy.copyPem")}
             </button>
           </div>
         ) : (
@@ -186,11 +190,11 @@ export function ProxySidePanel() {
             className="flex w-full items-center justify-center gap-1.5 rounded bg-[var(--color-surface)] px-2 py-1.5 text-xs text-[var(--color-text-secondary)] hover:bg-[var(--color-border)]"
           >
             <Download className="h-3 w-3" />
-            Generate CA
+            {t("proxy.generateCa")}
           </button>
         )}
         <p className="mt-1.5 text-[10px] text-[var(--color-text-dimmed)]">
-          Install the CA certificate in your browser to capture HTTPS traffic
+          {t("proxy.caHint")}
         </p>
       </div>
 
@@ -201,7 +205,7 @@ export function ProxySidePanel() {
           className="flex w-full items-center gap-1.5 px-3 py-2 text-xs text-[var(--color-text-muted)] hover:text-[var(--color-text-secondary)]"
         >
           {showSettings ? <ChevronDown className="h-3 w-3" /> : <ChevronRight className="h-3 w-3" />}
-          Passthrough Domains
+          {t("proxy.passthrough")}
         </button>
         {showSettings && (
           <div className="px-3 pb-3">
@@ -209,7 +213,7 @@ export function ProxySidePanel() {
               type="text"
               value={passthrough}
               onChange={(e) => setPassthrough(e.target.value)}
-              placeholder="e.g. github.com, google.com"
+              placeholder={t("proxy.passthroughPlaceholder")}
               className="w-full rounded bg-[var(--color-surface)] px-2 py-1.5 text-xs text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none focus:ring-1 focus:ring-indigo-500"
               onBlur={handleUpdatePassthrough}
               onKeyDown={(e) => {
@@ -217,7 +221,7 @@ export function ProxySidePanel() {
               }}
             />
             <p className="mt-1 text-[10px] text-[var(--color-text-dimmed)]">
-              Comma-separated domains to skip capture
+              {t("proxy.passthroughHint")}
             </p>
           </div>
         )}
@@ -225,13 +229,14 @@ export function ProxySidePanel() {
 
       {/* Captures count */}
       <div className="text-center text-xs text-[var(--color-text-dimmed)]">
-        {status.captureCount} request{status.captureCount !== 1 ? "s" : ""} captured
+        {t("proxy.captured", { count: status.captureCount })}
       </div>
     </div>
   );
 }
 
 export function ProxyCaptureViewer() {
+  const { t } = useTranslation();
   const { captures, selectedId, filter, setCaptures, clearCaptures, selectCapture, setFilter, addCapture, status } = useProxyStore();
 
   // Listen for live captures
@@ -287,7 +292,7 @@ export function ProxyCaptureViewer() {
       {/* Toolbar */}
       <div className="flex items-center gap-2 border-b border-[var(--color-border)] px-3 py-1.5">
         <span className="text-xs font-semibold text-[var(--color-text-muted)]">
-          CAPTURES
+          {t("proxy.captures")}
         </span>
         <span className="rounded-full bg-[var(--color-elevated)] px-1.5 py-0.5 text-[10px] text-[var(--color-text-dimmed)]">
           {filtered.length}
@@ -299,14 +304,14 @@ export function ProxyCaptureViewer() {
             type="text"
             value={filter}
             onChange={(e) => setFilter(e.target.value)}
-            placeholder="Filter..."
+            placeholder={t("proxy.filter")}
             className="w-28 bg-transparent py-1 text-xs text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none"
           />
         </div>
         <button
           onClick={handleClear}
           className="rounded p-1 text-[var(--color-text-muted)] hover:bg-[var(--color-elevated)] hover:text-[var(--color-text-secondary)]"
-          title="Clear captures"
+          title={t("proxy.clearCaptures")}
         >
           <Trash2 className="h-3.5 w-3.5" />
         </button>
@@ -317,9 +322,7 @@ export function ProxyCaptureViewer() {
         <div className="w-1/2 overflow-auto border-r border-[var(--color-border)]">
           {filtered.length === 0 ? (
             <div className="flex items-center justify-center py-8 text-xs text-[var(--color-text-dimmed)]">
-              {status.running
-                ? "Waiting for requests..."
-                : "Start the proxy to capture requests"}
+              {status.running ? t("proxy.waiting") : t("proxy.startHint")}
             </div>
           ) : (
             filtered.map((cap) => (
@@ -351,7 +354,7 @@ export function ProxyCaptureViewer() {
             <CaptureDetail capture={selected} />
           ) : (
             <div className="flex items-center justify-center py-8 text-xs text-[var(--color-text-dimmed)]">
-              Select a request to view details
+              {t("proxy.selectRequest")}
             </div>
           )}
         </div>
@@ -361,11 +364,12 @@ export function ProxyCaptureViewer() {
 }
 
 function CaptureDetail({ capture }: { capture: CapturedRequest }) {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState<"request" | "response">("response");
 
   const tabs = [
-    { id: "request" as const, label: "Request" },
-    { id: "response" as const, label: "Response" },
+    { id: "request" as const, label: t("proxy.request") },
+    { id: "response" as const, label: t("proxy.response") },
   ];
 
   return (
@@ -408,11 +412,11 @@ function CaptureDetail({ capture }: { capture: CapturedRequest }) {
       <div className="overflow-auto p-3">
         {activeTab === "request" ? (
           <>
-            <SectionTitle>Headers</SectionTitle>
+            <SectionTitle>{t("proxy.headers")}</SectionTitle>
             <HeadersTable headers={capture.requestHeaders} />
             {capture.requestBody && (
               <>
-                <SectionTitle>Body</SectionTitle>
+                <SectionTitle>{t("proxy.body")}</SectionTitle>
                 <pre className="mt-1 whitespace-pre-wrap break-all rounded bg-[var(--color-surface)] p-2 font-mono text-xs text-[var(--color-text-primary)]">
                   {tryFormatJson(capture.requestBody)}
                 </pre>
@@ -421,11 +425,11 @@ function CaptureDetail({ capture }: { capture: CapturedRequest }) {
           </>
         ) : (
           <>
-            <SectionTitle>Headers</SectionTitle>
+            <SectionTitle>{t("proxy.headers")}</SectionTitle>
             <HeadersTable headers={capture.responseHeaders} />
             {capture.responseBody && (
               <>
-                <SectionTitle>Body</SectionTitle>
+                <SectionTitle>{t("proxy.body")}</SectionTitle>
                 <pre className="mt-1 max-h-96 overflow-auto whitespace-pre-wrap break-all rounded bg-[var(--color-surface)] p-2 font-mono text-xs text-[var(--color-text-primary)]">
                   {tryFormatJson(capture.responseBody)}
                 </pre>
@@ -447,9 +451,10 @@ function SectionTitle({ children }: { children: React.ReactNode }) {
 }
 
 function HeadersTable({ headers }: { headers: Record<string, string> }) {
+  const { t } = useTranslation();
   const entries = Object.entries(headers);
   if (entries.length === 0) {
-    return <p className="text-xs text-[var(--color-text-dimmed)]">No headers</p>;
+    return <p className="text-xs text-[var(--color-text-dimmed)]">{t("proxy.noHeaders")}</p>;
   }
   return (
     <div className="rounded border border-[var(--color-border)]">

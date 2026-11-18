@@ -64,7 +64,7 @@ export function PathVariablesEditor({
             value={values[param] ?? ""}
             onChange={(e) => handleChange(param, e.target.value)}
             placeholder={t("request.value")}
-            className="rounded bg-[var(--color-elevated)] px-2 py-1 text-sm text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none focus:ring-1 focus:ring-[var(--color-accent)]"
+            className="rounded border border-[var(--color-border)] bg-[var(--color-card)] px-2 py-1 text-sm text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none"
           />
           <button
             onClick={() => handleRemove(param)}
@@ -84,7 +84,7 @@ export function PathVariablesEditor({
             onChange={(e) => setNewVarName(e.target.value)}
             onKeyDown={(e) => { if (e.key === "Enter") handleAdd(); }}
             placeholder={t("request.variableName")}
-            className="rounded bg-[var(--color-elevated)] px-2 py-1 text-sm text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none focus:ring-1 focus:ring-[var(--color-accent)]"
+            className="rounded border border-[var(--color-border)] bg-[var(--color-card)] px-2 py-1 text-sm text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none"
           />
           <div />
           <button

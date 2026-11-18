@@ -3,6 +3,7 @@ import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
 import type { HttpMethod, Tab } from "@reqmate/types";
 import { useTabStore } from "@/stores/tab-store";
+import { useShortcutsStore, formatBindingParts } from "@/stores/shortcuts-store";
 import {
   Plus,
   X,
@@ -14,6 +15,8 @@ import {
   ChevronRight,
   Pin,
   Save,
+  Check,
+  FilePlus2,
   Terminal,
 } from "lucide-react";
 import {
@@ -166,7 +169,7 @@ function SortableTab({
           }
         }}
         onContextMenu={handleContextMenu}
-        className={`group relative flex h-full shrink-0 select-none items-center gap-2 rounded-t-[9px] border-x border-b-0 border-t-2 border-transparent pl-2.5 text-[12.5px] transition-[background-color,color,box-shadow] duration-150 ${
+        className={`group relative flex h-full shrink-0 select-none items-center gap-2 rounded-t-[4px] border-x border-b-0 border-t-2 border-transparent pl-2.5 text-[12.5px] transition-[background-color,color,box-shadow] duration-150 ${
           tab.pinned ? "pr-2.5" : "pr-7"
         } ${
           isActive
@@ -175,7 +178,7 @@ function SortableTab({
         }`}
       >
         {tab.pinned && (
-          <Pin className="h-3 w-3 shrink-0 rotate-45 text-[var(--color-accent)]" />
+          <Pin className="h-3 w-3 shrink-0 rotate-45 text-[var(--color-accent-text)]" />
         )}
         <TabBadge tab={tab} />
         <span className="max-w-[168px] truncate leading-none">{tab.name}</span>
@@ -209,7 +212,7 @@ function SortableTab({
             ref={menuRef}
             role="menu"
             onContextMenu={(e) => e.preventDefault()}
-            className="surface-pop animate-panel-in fixed z-[90] min-w-[194px] overflow-hidden rounded-xl py-1"
+            className="surface-pop animate-panel-in fixed z-[90] min-w-[194px] overflow-hidden rounded-lg py-1"
             style={{ left: contextMenu.x, top: contextMenu.y }}
           >
             {menuItems.map((item, i) =>
@@ -233,6 +236,121 @@ function SortableTab({
           document.body,
         )}
     </>
+  );
+}
+
+/**
+ * Save split-button: the main half saves in place (or opens Save As for a
+ * request that has no file yet), the chevron exposes "Save as…".
+ */
+function SaveControl({ tab }: { tab: Tab | undefined }) {
+  const { t } = useTranslation();
+  const [open, setOpen] = useState(false);
+  const wrapRef = useRef<HTMLDivElement>(null);
+
+  // Flash a "saved" confirmation for a moment after a successful write, so a
+  // save that changes nothing visible still gives clear feedback.
+  const savePulse = useTabStore((s) => s.savePulse);
+  const tabId = tab?.id;
+  const [justSaved, setJustSaved] = useState(false);
+  useEffect(() => {
+    if (!savePulse || savePulse.tabId !== tabId) return;
+    setJustSaved(true);
+    const timer = setTimeout(() => setJustSaved(false), 1800);
+    return () => clearTimeout(timer);
+  }, [savePulse, tabId]);
+
+  useEffect(() => {
+    if (!open) return;
+    const onDown = (e: MouseEvent) => {
+      if (wrapRef.current && !wrapRef.current.contains(e.target as Node)) setOpen(false);
+    };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setOpen(false);
+    };
+    document.addEventListener("mousedown", onDown);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("mousedown", onDown);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [open]);
+
+  if (!tab) return null;
+
+  const openSaveAs = () => {
+    setOpen(false);
+    window.dispatchEvent(new CustomEvent("reqmate:open-save-as"));
+  };
+
+  const handleSave = () => {
+    setOpen(false);
+    if (tab.filePath) {
+      useTabStore.getState().save();
+    } else {
+      window.dispatchEvent(new CustomEvent("reqmate:open-save-as"));
+    }
+  };
+
+  const saveHint = formatBindingParts(useShortcutsStore.getState().getBinding("save")).join("");
+  const saveAsHint = formatBindingParts(useShortcutsStore.getState().getBinding("saveAs")).join("");
+
+  return (
+    <div ref={wrapRef} className="relative flex items-center">
+      <button
+        onClick={handleSave}
+        title={`${t("common.save")} (${saveHint})`}
+        aria-live="polite"
+        className={`flex h-7 shrink-0 items-center gap-1.5 rounded-l-md border border-r-0 border-[var(--color-border-strong)] bg-[var(--color-card)] pl-2.5 pr-2 text-xs font-medium transition-colors hover:bg-[var(--color-card-hover)] ${
+          justSaved
+            ? "text-[var(--color-success)]"
+            : tab.isDirty
+              ? "text-[var(--color-text-primary)]"
+              : "text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)]"
+        }`}
+      >
+        {justSaved ? <Check className="h-3.5 w-3.5" /> : <Save className="h-3.5 w-3.5" />}
+        {justSaved ? t("common.saved") : t("common.save")}
+        {tab.isDirty && !justSaved && (
+          <span className="h-1.5 w-1.5 rounded-full bg-[var(--color-accent)]" />
+        )}
+      </button>
+      <button
+        onClick={() => setOpen((o) => !o)}
+        aria-label={t("tabs.saveOptions")}
+        aria-haspopup="menu"
+        aria-expanded={open}
+        className="flex h-7 w-6 shrink-0 items-center justify-center rounded-r-md border border-[var(--color-border-strong)] bg-[var(--color-card)] text-[var(--color-text-muted)] transition-colors hover:bg-[var(--color-card-hover)] hover:text-[var(--color-text-primary)]"
+      >
+        <ChevronDown className="h-3 w-3" />
+      </button>
+
+      {open && (
+        <div
+          role="menu"
+          className="surface-pop animate-panel-in absolute right-0 top-full z-50 mt-1.5 min-w-[200px] overflow-hidden rounded-md py-1"
+        >
+          <button
+            role="menuitem"
+            onClick={handleSave}
+            className="flex w-full items-center gap-2 px-3 py-1.5 text-left text-[12.5px] text-[var(--color-text-secondary)] transition-colors hover:bg-[var(--color-accent-soft)] hover:text-[var(--color-text-primary)]"
+          >
+            <Save className="h-3.5 w-3.5 shrink-0" />
+            <span className="flex-1">{t("common.save")}</span>
+            <span className="tabular text-[10.5px] text-[var(--color-text-dimmed)]">{saveHint}</span>
+          </button>
+          <button
+            role="menuitem"
+            onClick={openSaveAs}
+            className="flex w-full items-center gap-2 px-3 py-1.5 text-left text-[12.5px] text-[var(--color-text-secondary)] transition-colors hover:bg-[var(--color-accent-soft)] hover:text-[var(--color-text-primary)]"
+          >
+            <FilePlus2 className="h-3.5 w-3.5 shrink-0" />
+            <span className="flex-1">{t("tabs.saveAs")}</span>
+            <span className="tabular text-[10.5px] text-[var(--color-text-dimmed)]">{saveAsHint}</span>
+          </button>
+        </div>
+      )}
+    </div>
   );
 }
 
@@ -267,7 +385,7 @@ function NewTabDropdown() {
     <div ref={ref} className="relative flex items-center">
       <button
         onClick={() => setOpen(!open)}
-        className="btn-accent ml-1 flex shrink-0 items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-semibold"
+        className="ml-1 flex shrink-0 items-center gap-1.5 rounded-md px-2.5 py-1.5 text-xs font-medium text-[var(--color-accent-text)] transition-colors hover:bg-[var(--color-accent-soft)]"
         title="New Tab"
       >
         <Plus className="h-3.5 w-3.5" strokeWidth={2.6} />
@@ -275,7 +393,7 @@ function NewTabDropdown() {
         <ChevronDown className="h-3 w-3 opacity-70" />
       </button>
       {open && (
-        <div className="surface-pop animate-panel-in absolute right-0 top-full z-50 mt-2 min-w-[186px] overflow-hidden rounded-xl py-1.5">
+        <div className="surface-pop animate-panel-in absolute right-0 top-full z-50 mt-2 min-w-[186px] overflow-hidden rounded-lg py-1.5">
           {items.map((item) => (
             <button
               key={item.label}
@@ -283,7 +401,7 @@ function NewTabDropdown() {
                 item.action();
                 setOpen(false);
               }}
-              className="flex w-full items-center gap-2.5 px-3 py-2 text-left text-sm text-[var(--color-text-primary)] transition-colors hover:bg-[var(--color-accent-glow)]"
+              className="flex w-full items-center gap-2.5 px-3 py-2 text-left text-sm text-[var(--color-text-primary)] transition-colors hover:bg-[var(--color-accent-soft)]"
             >
               <item.icon className={`h-4 w-4 ${item.color ?? "text-[var(--color-text-muted)]"}`} />
               {item.label}
@@ -295,7 +413,7 @@ function NewTabDropdown() {
               window.dispatchEvent(new CustomEvent("reqmate:open-curl-import"));
               setOpen(false);
             }}
-            className="flex w-full items-center gap-2.5 px-3 py-2 text-left text-sm text-[var(--color-text-primary)] transition-colors hover:bg-[var(--color-accent-glow)]"
+            className="flex w-full items-center gap-2.5 px-3 py-2 text-left text-sm text-[var(--color-text-primary)] transition-colors hover:bg-[var(--color-accent-soft)]"
           >
             <Terminal className="h-4 w-4 text-[var(--color-text-muted)]" />
             {t("tabs.importCurl")}
@@ -307,8 +425,7 @@ function NewTabDropdown() {
 }
 
 export function TabBar() {
-  const { t } = useTranslation();
-  const { tabs, activeTabId, setActiveTab, closeTab, closeOtherTabs, closeAllTabs, reorderTabs, detachTab, togglePin, duplicateTab, save } = useTabStore();
+  const { tabs, activeTabId, setActiveTab, closeTab, closeOtherTabs, closeAllTabs, reorderTabs, detachTab, togglePin, duplicateTab } = useTabStore();
   const activeTab = tabs.find((t) => t.id === activeTabId);
 
   const scrollerRef = useRef<HTMLDivElement>(null);
@@ -386,7 +503,7 @@ export function TabBar() {
   return (
     <div
       data-tour="tabs"
-      className="flex h-9 shrink-0 items-stretch gap-2 bg-[var(--color-surface)] pl-2 pr-2"
+      className="flex h-9 shrink-0 items-stretch gap-2 border-b border-[var(--color-border)] bg-[var(--color-surface)] pl-2 pr-2"
     >
       <DndContext
         sensors={sensors}
@@ -465,22 +582,7 @@ export function TabBar() {
       </DndContext>
 
       <div className="flex items-center gap-1.5">
-        {activeTab?.isDirty && (
-          <button
-            onClick={() => {
-              if (activeTab && !activeTab.filePath) {
-                window.dispatchEvent(new CustomEvent("reqmate:open-save-as"));
-              } else {
-                save();
-              }
-            }}
-            className="flex h-7 shrink-0 items-center gap-1.5 rounded-lg border border-[var(--color-border-strong)] bg-[color-mix(in_srgb,var(--color-elevated)_60%,transparent)] px-2.5 text-xs font-medium text-[var(--color-text-secondary)] transition-colors hover:bg-[var(--color-card-hover)] hover:text-[var(--color-text-primary)]"
-            title="Save (Ctrl+S)"
-          >
-            <Save className="h-3.5 w-3.5" />
-            {t("common.save")}
-          </button>
-        )}
+        <SaveControl tab={activeTab} />
         <NewTabDropdown />
       </div>
     </div>

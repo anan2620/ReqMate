@@ -16,13 +16,13 @@ import { ProxySidePanel as ProxySidePanelView } from "@/components/proxy/proxy-p
 import { GitPanel as GitPanelView } from "@/components/git/git-panel";
 import { AuditPanel } from "@/components/audit/audit-panel";
 import { Select } from "@/components/ui/select";
+import { DocsPanel } from "@/components/docs/docs-panel";
 
 interface SidePanelProps {
   activeView: ActivityView;
   envSelectorRef?: React.RefObject<HTMLButtonElement | null>;
   onOpenMock?: () => void;
   onOpenMonitor?: () => void;
-  onOpenDocs?: () => void;
   onOpenImport?: () => void;
 }
 
@@ -31,7 +31,6 @@ export function SidePanel({
   envSelectorRef,
   onOpenMock,
   onOpenMonitor,
-  onOpenDocs,
   onOpenImport,
 }: SidePanelProps) {
   const { t } = useTranslation();
@@ -42,7 +41,7 @@ export function SidePanel({
     mock: t("mock.title"),
     monitor: t("monitor.title"),
     docs: t("docs.title"),
-    proxy: "Proxy Capture",
+    proxy: t("proxy.title"),
     git: "Git",
     audit: t("audit.title"),
   };
@@ -55,15 +54,15 @@ export function SidePanel({
       style={{ width: `${sidebarWidth}px` }}
     >
       {/* Panel header */}
-      <div className="flex h-12 shrink-0 items-center gap-2 px-4">
-        <span className="h-1.5 w-1.5 rounded-full bg-[var(--color-accent)] shadow-[0_0_6px_var(--color-accent)]" />
+      <div className="flex h-9 shrink-0 items-center gap-2 px-3">
+        <span className="h-3 w-[3px] rounded-full bg-[var(--color-accent)]" aria-hidden />
         <span className="label-caps">{titles[activeView]}</span>
       </div>
 
       {/* Panel content */}
       <div
         className={
-          activeView === "collections"
+          activeView === "collections" || activeView === "docs"
             ? "flex min-h-0 flex-1 flex-col overflow-hidden"
             : "flex-1 overflow-y-auto"
         }
@@ -73,7 +72,7 @@ export function SidePanel({
         {activeView === "history" && <HistoryPanel />}
         {activeView === "mock" && <ToolPanel description={t("mock.createDesc")} actionLabel={t("mock.newMockServer")} onAction={onOpenMock} />}
         {activeView === "monitor" && <ToolPanel description={t("monitor.createDesc")} actionLabel={t("monitor.newMonitor")} onAction={onOpenMonitor} />}
-        {activeView === "docs" && <ToolPanel description={t("docs.generateDesc")} actionLabel={t("docs.generateDocs")} onAction={onOpenDocs} />}
+        {activeView === "docs" && <DocsPanel />}
         {activeView === "proxy" && <ProxySidePanelView />}
         {activeView === "git" && <GitPanelView />}
         {activeView === "audit" && <AuditPanel />}
@@ -100,10 +99,10 @@ function PanelAction({
       onClick={onClick}
       title={title}
       aria-label={title}
-      className={`flex min-w-0 flex-1 items-center justify-center gap-1 rounded-[6px] px-1.5 py-[6px] text-[11.5px] font-medium transition-colors ${
+      className={`flex min-w-0 flex-1 items-center justify-center gap-1 rounded-[4px] px-1.5 py-[5px] text-[11.5px] font-medium transition-colors ${
         primary
-          ? "text-[var(--color-accent)] hover:bg-[var(--color-accent-soft)]"
-          : "text-[var(--color-text-muted)] hover:bg-[var(--color-card-hover)] hover:text-[var(--color-text-primary)]"
+          ? "text-[var(--color-accent-text)] hover:bg-[var(--color-accent-soft)]"
+          : "text-[var(--color-text-muted)] hover:bg-[var(--color-card)] hover:text-[var(--color-text-primary)]"
       }`}
     >
       <Icon className="h-3.5 w-3.5 shrink-0" />
@@ -138,7 +137,7 @@ function CollectionsPanel({ onOpenImport }: { onOpenImport?: () => void }) {
     <div className="flex min-h-0 flex-1 flex-col">
       {/* Pinned actions — stay put while the collection list scrolls */}
       <div className="shrink-0 space-y-2 border-b border-[var(--color-border)] px-2.5 pb-2">
-        <div className="flex items-center gap-0.5 rounded-lg border border-[var(--color-border)] bg-[color-mix(in_srgb,var(--color-card)_65%,transparent)] p-0.5">
+        <div className="flex items-center gap-0.5 rounded-md border border-[var(--color-border)] bg-[var(--color-elevated)] p-0.5">
           <PanelAction
             icon={FolderPlus}
             label={t("sidebar.new")}
@@ -164,7 +163,7 @@ function CollectionsPanel({ onOpenImport }: { onOpenImport?: () => void }) {
 
         {/* Search */}
         {collections.length > 0 && (
-          <div className="ring-focus relative flex items-center rounded-lg border border-transparent bg-[color-mix(in_srgb,var(--color-text-primary)_5%,transparent)] transition-all">
+          <div className="ring-focus relative flex items-center rounded-md border border-[var(--color-border)] bg-[var(--color-card)] transition-colors">
             <Search className="absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-[var(--color-text-dimmed)]" />
             <input
               type="text"
@@ -189,8 +188,8 @@ function CollectionsPanel({ onOpenImport }: { onOpenImport?: () => void }) {
       <div className="min-h-0 flex-1 overflow-y-auto px-2.5 pb-3 pt-2">
         {collections.length === 0 ? (
           <div className="flex h-full flex-col items-center justify-center gap-3 px-2 text-center">
-            <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] elev-sm">
-              <FolderOpen className="h-5 w-5 text-[var(--color-accent)]" />
+            <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-[var(--color-border)] bg-[var(--color-card)]">
+              <FolderOpen className="h-5 w-5 text-[var(--color-accent-text)]" />
             </div>
             <div>
               <p className="text-sm font-medium text-[var(--color-text-secondary)]">{t("sidebar.noCollections")}</p>
@@ -223,7 +222,7 @@ function CollectionsPanel({ onOpenImport }: { onOpenImport?: () => void }) {
         <>
           <div className="fixed inset-0 z-40" onClick={() => setCollectionMenu(null)} />
           <div
-            className="fixed z-50 min-w-[160px] rounded-lg border border-[var(--color-border-strong)] bg-[var(--color-elevated)] py-1 shadow-xl"
+            className="surface-pop fixed z-50 min-w-[160px] rounded-md py-1"
             style={{ left: collectionMenu.x, top: collectionMenu.y }}
           >
             <button
@@ -234,7 +233,7 @@ function CollectionsPanel({ onOpenImport }: { onOpenImport?: () => void }) {
               className="flex w-full items-center gap-2 px-3 py-1.5 text-left text-[12.5px] text-[var(--color-text-primary)] hover:bg-[var(--color-accent-soft)]"
             >
               <Settings className="h-3.5 w-3.5" />
-              Collection Defaults
+              {t("sidebar.collectionDefaults")}
             </button>
             <button
               onClick={() => {
@@ -269,20 +268,20 @@ function CollectionsPanel({ onOpenImport }: { onOpenImport?: () => void }) {
       {/* Delete collection confirmation */}
       <Dialog.Root open={!!deleteCollectionTarget} onOpenChange={(v) => { if (!v) setDeleteCollectionTarget(null); }}>
         <Dialog.Portal>
-          <Dialog.Overlay className="fixed inset-0 z-40 bg-black/50" />
-          <Dialog.Content className="fixed left-1/2 top-1/2 z-50 w-80 -translate-x-1/2 -translate-y-1/2 rounded-xl border border-[var(--color-border)] bg-[var(--color-elevated)] p-5 shadow-2xl">
+          <Dialog.Overlay className="fixed inset-0 z-40 bg-[var(--color-overlay)]" />
+          <Dialog.Content className="fixed left-1/2 top-1/2 z-50 w-80 -translate-x-1/2 -translate-y-1/2 rounded-xl border border-[var(--color-border)] bg-[var(--color-card)] p-5 elev-pop">
             <Dialog.Title className="mb-2 text-sm font-semibold text-[var(--color-text-primary)]">
               {t("confirmDelete.title")}
             </Dialog.Title>
             <p className="mb-5 text-sm text-[var(--color-text-secondary)]">
-              Delete collection &ldquo;{deleteCollectionTarget?.name}&rdquo;? This will move the entire collection to trash.
+              {t("confirmDelete.collection", { name: deleteCollectionTarget?.name ?? "" })}
             </p>
             <div className="flex justify-end gap-2">
               <button
                 onClick={() => setDeleteCollectionTarget(null)}
-                className="rounded-lg px-4 py-1.5 text-sm text-[var(--color-text-muted)] hover:bg-[var(--color-surface)]"
+                className="rounded-md border border-[var(--color-border)] bg-[var(--color-card)] px-4 py-1.5 text-sm text-[var(--color-text-secondary)] transition-colors hover:bg-[var(--color-card-hover)] hover:text-[var(--color-text-primary)]"
               >
-                Cancel
+                {t("common.cancel")}
               </button>
               <button
                 onClick={async () => {
@@ -297,9 +296,9 @@ function CollectionsPanel({ onOpenImport }: { onOpenImport?: () => void }) {
                     );
                   }
                 }}
-                className="rounded-lg bg-red-600 px-4 py-1.5 text-sm font-medium text-white hover:bg-red-700"
+                className="btn-danger rounded-md px-4 py-1.5 text-sm font-medium"
               >
-                Delete
+                {t("common.delete")}
               </button>
             </div>
           </Dialog.Content>
@@ -371,16 +370,16 @@ function CollectionDefaultsDialog({
     <Dialog.Root open onOpenChange={(v) => { if (!v) onClose(); }}>
       <Dialog.Portal>
         <Dialog.Overlay className="fixed inset-0 z-50 bg-black/30" />
-        <Dialog.Content className="fixed left-1/2 top-1/2 z-50 w-[400px] -translate-x-1/2 -translate-y-1/2 rounded-xl border border-[var(--color-border)] bg-[var(--color-card)] p-6 shadow-2xl focus:outline-none">
+        <Dialog.Content className="fixed left-1/2 top-1/2 z-50 w-[400px] -translate-x-1/2 -translate-y-1/2 rounded-xl border border-[var(--color-border)] bg-[var(--color-card)] p-6 elev-pop focus:outline-none">
           <Dialog.Title className="text-base font-semibold text-[var(--color-text-primary)]">
-            Collection Defaults
+            {t("sidebar.collectionDefaults")}
           </Dialog.Title>
           <p className="mt-1 text-xs text-[var(--color-text-muted)]">
-            Auth configured here is inherited by all requests without their own auth.
+            {t("sidebar.collectionDefaultsDesc")}
           </p>
 
           {loading ? (
-            <div className="py-8 text-center text-sm text-[var(--color-text-dimmed)]">Loading...</div>
+            <div className="py-8 text-center text-sm text-[var(--color-text-dimmed)]">{t("common.loading")}</div>
           ) : (
             <div className="mt-4 space-y-3">
               <div>
@@ -403,31 +402,31 @@ function CollectionDefaultsDialog({
 
               {authType === "bearer" && (
                 <input type="text" value={token} onChange={(e) => setToken(e.target.value)} placeholder={t("auth.token")}
-                  className="w-full rounded bg-[var(--color-elevated)] px-3 py-1.5 text-sm text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none" />
+                  className="w-full rounded border border-[var(--color-border)] bg-[var(--color-card)] px-3 py-1.5 text-sm text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none" />
               )}
               {authType === "basic" && (
                 <div className="space-y-2">
                   <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} placeholder={t("auth.username")}
-                    className="w-full rounded bg-[var(--color-elevated)] px-3 py-1.5 text-sm text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none" />
+                    className="w-full rounded border border-[var(--color-border)] bg-[var(--color-card)] px-3 py-1.5 text-sm text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none" />
                   <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder={t("auth.password")}
-                    className="w-full rounded bg-[var(--color-elevated)] px-3 py-1.5 text-sm text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none" />
+                    className="w-full rounded border border-[var(--color-border)] bg-[var(--color-card)] px-3 py-1.5 text-sm text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none" />
                 </div>
               )}
               {authType === "api-key" && (
                 <div className="space-y-2">
-                  <input type="text" value={apiKeyKey} onChange={(e) => setApiKeyKey(e.target.value)} placeholder="Header name"
-                    className="w-full rounded bg-[var(--color-elevated)] px-3 py-1.5 text-sm text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none" />
-                  <input type="text" value={apiKeyValue} onChange={(e) => setApiKeyValue(e.target.value)} placeholder="Value"
-                    className="w-full rounded bg-[var(--color-elevated)] px-3 py-1.5 text-sm text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none" />
+                  <input type="text" value={apiKeyKey} onChange={(e) => setApiKeyKey(e.target.value)} placeholder={t("auth.apiKeyHeader")}
+                    className="w-full rounded border border-[var(--color-border)] bg-[var(--color-card)] px-3 py-1.5 text-sm text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none" />
+                  <input type="text" value={apiKeyValue} onChange={(e) => setApiKeyValue(e.target.value)} placeholder={t("common.value")}
+                    className="w-full rounded border border-[var(--color-border)] bg-[var(--color-card)] px-3 py-1.5 text-sm text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none" />
                 </div>
               )}
 
               <div className="flex justify-end gap-2 pt-2">
-                <button onClick={onClose} className="rounded-lg px-4 py-1.5 text-sm text-[var(--color-text-muted)] hover:bg-[var(--color-elevated)]">
-                  Cancel
+                <button onClick={onClose} className="rounded-md border border-[var(--color-border)] bg-[var(--color-card)] px-4 py-1.5 text-sm text-[var(--color-text-secondary)] transition-colors hover:bg-[var(--color-card-hover)] hover:text-[var(--color-text-primary)]">
+                  {t("common.cancel")}
                 </button>
-                <button onClick={handleSave} className="rounded-lg bg-[var(--color-accent)] px-4 py-1.5 text-sm font-medium text-white hover:bg-[var(--color-accent-hover)]">
-                  Save
+                <button onClick={handleSave} className="btn-accent rounded-md px-4 py-1.5 text-sm font-medium">
+                  {t("common.save")}
                 </button>
               </div>
             </div>
@@ -599,8 +598,8 @@ function NewCollectionDialog({
   return (
     <Dialog.Root open={isOpen} onOpenChange={handleOpenChange}>
       <Dialog.Portal>
-        <Dialog.Overlay className="fixed inset-0 z-50 bg-black/50" />
-        <Dialog.Content className="fixed left-1/2 top-1/2 z-50 w-[440px] -translate-x-1/2 -translate-y-1/2 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] shadow-xl">
+        <Dialog.Overlay className="fixed inset-0 z-50 bg-[var(--color-overlay)]" />
+        <Dialog.Content className="fixed left-1/2 top-1/2 z-50 w-[440px] -translate-x-1/2 -translate-y-1/2 rounded-lg border border-[var(--color-border)] bg-[var(--color-card)] elev-pop">
           <div className="flex items-center justify-between border-b border-[var(--color-border)] px-4 py-3">
             <Dialog.Title className="text-sm font-medium text-[var(--color-text-primary)]">
               {t("sidebar.newCollection")}
@@ -621,7 +620,7 @@ function NewCollectionDialog({
                 onChange={(e) => setName(e.target.value)}
                 placeholder={t("sidebar.collectionNamePlaceholder")}
                 autoFocus
-                className="w-full rounded bg-[var(--color-elevated)] px-3 py-2 text-sm text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none focus:ring-1 focus:ring-[var(--color-accent)]"
+                className="w-full rounded border border-[var(--color-border)] bg-[var(--color-card)] px-3 py-2 text-sm text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none"
                 onKeyDown={(e) => {
                   if (e.key === "Enter" && canCreate) handleCreate();
                 }}
@@ -638,7 +637,7 @@ function NewCollectionDialog({
                   value={parentDir}
                   readOnly
                   placeholder={t("common.browse")}
-                  className="flex-1 truncate rounded bg-[var(--color-elevated)] px-3 py-2 text-sm text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none"
+                  className="flex-1 truncate rounded border border-[var(--color-border)] bg-[var(--color-card)] px-3 py-2 text-sm text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none"
                 />
                 <button
                   onClick={handlePickFolder}
@@ -861,7 +860,7 @@ function EnvironmentsPanel({
               onClick={() => setEditingEnv(env)}
               className={`flex w-full items-center justify-between rounded-md px-2 py-1.5 text-left text-xs transition-colors ${
                 activeEnvironmentName === env.name
-                  ? "bg-[var(--color-accent)]/10 text-[var(--color-accent)]"
+                  ? "bg-[var(--color-accent)]/10 text-[var(--color-accent-text)]"
                   : "text-[var(--color-text-primary)] hover:bg-[var(--color-elevated)]"
               }`}
             >
@@ -949,7 +948,7 @@ function EnvironmentEditor({
           type="text"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          className="min-w-0 flex-1 truncate rounded bg-transparent px-1 text-sm font-medium text-[var(--color-text-primary)] outline-none focus:bg-[var(--color-elevated)] focus:ring-1 focus:ring-[var(--color-accent)]"
+          className="min-w-0 flex-1 truncate rounded bg-transparent px-1 text-sm font-medium text-[var(--color-text-primary)] outline-none focus:border border-[var(--color-border)] bg-[var(--color-card)] "
         />
         <button
           onClick={handleSave}
@@ -999,14 +998,14 @@ function EnvironmentEditor({
               value={v.key}
               onChange={(e) => updateVar(i, "key", e.target.value)}
               placeholder={t("request.key")}
-              className="min-w-0 flex-1 basis-0 rounded bg-[var(--color-elevated)] px-2 py-1 text-xs text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none focus:ring-1 focus:ring-[var(--color-accent)]"
+              className="min-w-0 flex-1 basis-0 rounded border border-[var(--color-border)] bg-[var(--color-card)] px-2 py-1 text-xs text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none"
             />
             <input
               type="text"
               value={v.value}
               onChange={(e) => updateVar(i, "value", e.target.value)}
               placeholder={t("request.value")}
-              className="min-w-0 flex-1 basis-0 rounded bg-[var(--color-elevated)] px-2 py-1 text-xs text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none focus:ring-1 focus:ring-[var(--color-accent)]"
+              className="min-w-0 flex-1 basis-0 rounded border border-[var(--color-border)] bg-[var(--color-card)] px-2 py-1 text-xs text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none"
             />
             <button
               onClick={() => removeVar(i)}
@@ -1048,8 +1047,8 @@ function NewEnvironmentDialog({
   return (
     <Dialog.Root open={isOpen} onOpenChange={handleOpenChange}>
       <Dialog.Portal>
-        <Dialog.Overlay className="fixed inset-0 z-50 bg-black/50" />
-        <Dialog.Content className="fixed left-1/2 top-1/2 z-50 w-[360px] -translate-x-1/2 -translate-y-1/2 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] shadow-xl">
+        <Dialog.Overlay className="fixed inset-0 z-50 bg-[var(--color-overlay)]" />
+        <Dialog.Content className="fixed left-1/2 top-1/2 z-50 w-[360px] -translate-x-1/2 -translate-y-1/2 rounded-lg border border-[var(--color-border)] bg-[var(--color-card)] elev-pop">
           <div className="flex items-center justify-between border-b border-[var(--color-border)] px-4 py-3">
             <Dialog.Title className="text-sm font-medium text-[var(--color-text-primary)]">
               {t("sidebar.newEnvironment")}
@@ -1065,7 +1064,7 @@ function NewEnvironmentDialog({
               onChange={(e) => setName(e.target.value)}
               placeholder="e.g. Development, Staging, Production"
               autoFocus
-              className="w-full rounded bg-[var(--color-elevated)] px-3 py-2 text-sm text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none focus:ring-1 focus:ring-[var(--color-accent)]"
+              className="w-full rounded border border-[var(--color-border)] bg-[var(--color-card)] px-3 py-2 text-sm text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none"
               onKeyDown={(e) => {
                 if (e.key === "Enter" && name.trim()) onCreate(name.trim());
               }}

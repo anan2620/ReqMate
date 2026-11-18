@@ -66,8 +66,8 @@ export function SaveAsDialog({
   return (
     <Dialog.Root open={open} onOpenChange={handleOpenChange}>
       <Dialog.Portal>
-        <Dialog.Overlay className="fixed inset-0 z-50 bg-black/50" />
-        <Dialog.Content className="fixed left-1/2 top-1/2 z-50 w-[480px] -translate-x-1/2 -translate-y-1/2 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] shadow-xl">
+        <Dialog.Overlay className="fixed inset-0 z-50 bg-[var(--color-overlay)]" />
+        <Dialog.Content className="fixed left-1/2 top-1/2 z-50 w-[480px] -translate-x-1/2 -translate-y-1/2 rounded-lg border border-[var(--color-border)] bg-[var(--color-card)] elev-pop">
           <div className="flex items-center justify-between border-b border-[var(--color-border)] px-4 py-3">
             <Dialog.Title className="text-sm font-medium text-[var(--color-text-primary)]">
               {t("request.saveRequest")}
@@ -89,7 +89,7 @@ export function SaveAsDialog({
                 onChange={(e) => setName(e.target.value)}
                 placeholder={t("request.requestNamePlaceholder")}
                 autoFocus
-                className="w-full rounded bg-[var(--color-elevated)] px-3 py-2 text-sm text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none focus:ring-1 focus:ring-[var(--color-accent)]"
+                className="w-full rounded border border-[var(--color-border)] bg-[var(--color-card)] px-3 py-2 text-sm text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none"
                 onKeyDown={(e) => {
                   if (e.key === "Enter" && canSave) handleSave();
                 }}
@@ -104,7 +104,7 @@ export function SaveAsDialog({
             {/* Location picker */}
             <div className="space-y-1.5">
               <label className="text-xs font-medium text-[var(--color-text-secondary)]">
-                Save Location
+                {t("request.saveTo")}
               </label>
               {collections.length === 0 ? (
                 <div className="rounded border border-dashed border-[var(--color-border)] p-4 text-center">
@@ -188,7 +188,7 @@ function FolderTreeNode({
         }}
         className={`flex w-full items-center gap-1.5 px-2 py-1.5 text-left text-sm transition-colors ${
           isSelected
-            ? "bg-[var(--color-accent)]/10 text-[var(--color-accent)]"
+            ? "bg-[var(--color-accent)]/10 text-[var(--color-accent-text)]"
             : "text-[var(--color-text-primary)] hover:bg-[var(--color-elevated)]"
         }`}
         style={{ paddingLeft: `${depth * 16 + 8}px` }}

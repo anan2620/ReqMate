@@ -41,6 +41,8 @@ interface TabState {
   tabs: Tab[];
   activeTabId: string | null;
   autoSaveError: string | null;
+  /** Bumped after a manual save so the UI can flash a "saved" confirmation */
+  savePulse: { tabId: string; at: number } | null;
 
   // Tab management
   newTab: () => void;
@@ -149,6 +151,7 @@ export const useTabStore = create<TabState>((set, get) => ({
   tabs: [],
   activeTabId: null,
   autoSaveError: null,
+  savePulse: null,
 
   newTab: () => {
     const tab = createEmptyTab();
@@ -528,21 +531,33 @@ export const useTabStore = create<TabState>((set, get) => ({
   save: async () => {
     const { tabs, activeTabId } = get();
     const tab = tabs.find((t) => t.id === activeTabId);
-    if (!tab || !tab.filePath) return;
+    if (!tab) return;
+
+    // A request that has never been written to disk needs a location first
+    if (!tab.filePath) {
+      window.dispatchEvent(new CustomEvent("reqmate:open-save-as"));
+      return;
+    }
+
+    const { useToastStore } = await import("@/stores/toast-store");
+    const { default: i18n } = await import("@/lib/i18n");
+    const label = tab.name?.trim() || tab.url || i18n.t("tabs.untitled");
 
     try {
       const requestFile = tabToRequestFile(tab);
       markRecentlySaved(tab.filePath);
       await saveRequestFile(tab.filePath, requestFile);
       set({
+        savePulse: { tabId: tab.id, at: Date.now() },
         tabs: get().tabs.map((t) =>
-          t.id === activeTabId ? { ...t, isDirty: false } : t,
+          t.id === tab.id ? { ...t, isDirty: false } : t,
         ),
       });
+      useToastStore.getState().showSuccess(i18n.t("common.savedTo", { name: label }));
     } catch (err) {
-      import("@/stores/toast-store").then(({ useToastStore }) =>
-        useToastStore.getState().showError(`Failed to save request: ${String(err)}`)
-      );
+      useToastStore
+        .getState()
+        .showError(i18n.t("common.saveFailed", { reason: String(err) }));
     }
   },
 
@@ -571,7 +586,12 @@ export const useTabStore = create<TabState>((set, get) => ({
   },
 
   hasUnsavedNewTabs: () => {
-    return get().tabs.some((t) => !t.filePath && (t.url.trim() || t.body.content.trim()));
+    const { autoSave } = useSettingsStore.getState().settings;
+    return get().tabs.some(
+      (t) =>
+        // Never-saved requests, plus any dirty tab while auto-save is off
+        (!t.filePath && (t.url.trim() || t.body.content.trim())) || (!autoSave && t.isDirty),
+    );
   },
 
   clearResponse: () => {

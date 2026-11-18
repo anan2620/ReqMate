@@ -30,7 +30,12 @@ export const useToastStore = create<ToastState>((set, get) => ({
   addToast: (toast) => {
     const id = `toast-${++nextId}`;
     const duration = toast.duration ?? 5000;
-    set({ toasts: [...get().toasts, { ...toast, id }] });
+    // Same message twice in a row (e.g. hammering Ctrl+S) should refresh the
+    // existing toast instead of stacking copies
+    const others = get().toasts.filter(
+      (t) => !(t.message === toast.message && t.type === toast.type),
+    );
+    set({ toasts: [...others, { ...toast, id }] });
     if (duration > 0) {
       setTimeout(() => get().removeToast(id), duration);
     }

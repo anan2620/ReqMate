@@ -52,7 +52,9 @@
     "noEnvironmentsYet": "لا توجد بيئات بعد",
     "newEnvironment": "بيئة جديدة",
     "addVariable": "إضافة متغير",
-    "importEnvironment": "استيراد بيئة (Postman JSON)"
+    "importEnvironment": "استيراد بيئة (Postman JSON)",
+    "collectionDefaults": "الإعدادات الافتراضية للمجموعة",
+    "collectionDefaultsDesc": "المصادقة المُعدّة هنا ترثها كل الطلبات التي لا تملك مصادقة خاصة بها."
   },
   "tabs": {
     "untitled": "طلب بدون عنوان",
@@ -69,7 +71,9 @@
     "duplicateTab": "تكرار علامة التبويب",
     "moveToNewWindow": "نقل إلى نافذة جديدة",
     "httpRequest": "طلب HTTP",
-    "importCurl": "استيراد cURL"
+    "importCurl": "استيراد cURL",
+    "saveAs": "حفظ باسم…",
+    "saveOptions": "خيارات الحفظ"
   },
   "request": {
     "send": "إرسال",
@@ -166,7 +170,8 @@
     "assertionConsumerUrl": "عنوان خدمة مستهلك التأكيد",
     "certificate": "شهادة موفر الهوية (PEM)",
     "nameIdFormat": "تنسيق NameID",
-    "samlToken": "رمز تأكيد SAML"
+    "samlToken": "رمز تأكيد SAML",
+    "apiKeyHeader": "اسم الترويسة"
   },
   "response": {
     "body": "المحتوى",
@@ -260,7 +265,10 @@
     "upToDate": "أنت على أحدث إصدار",
     "updateAvailable": "تحديث متاح: {{version}}",
     "shortcuts": "اختصارات لوحة المفاتيح",
-    "recording": "اضغط مجموعة المفاتيح..."
+    "recording": "اضغط مجموعة المفاتيح...",
+    "saving": "الحفظ",
+    "autoSave": "حفظ تغييرات الطلب تلقائيًا",
+    "autoSaveDesc": "يُحفظ على القرص بعد ثانية من التوقف عن الكتابة. أوقف هذا الخيار لتبقى التغييرات في المحرر حتى تضغط حفظ."
   },
   "runner": {
     "title": "مشغّل المجموعة",
@@ -359,7 +367,10 @@
     "skipForNow": "تخطي الآن",
     "getStarted": "ابدأ",
     "name": "الاسم",
-    "value": "القيمة"
+    "value": "القيمة",
+    "saved": "تم الحفظ",
+    "savedTo": "تم حفظ «{{name}}»",
+    "saveFailed": "فشل الحفظ: {{reason}}"
   },
   "errors": {
     "connectionRefused": "تم رفض الاتصال — هل الخادم قيد التشغيل؟",
@@ -464,7 +475,15 @@
     "html": "HTML",
     "markdown": "Markdown",
     "generating": "جارٍ توليد الوثائق...",
-    "generateDesc": "توليد الوثائق من المجموعات"
+    "generateDesc": "اختر المجموعات المطلوبة ثم أنشئ مستندًا واحدًا يجمعها.",
+    "pickCollections": "المجموعات",
+    "selectAll": "الكل",
+    "clearAll": "مسح",
+    "selectedCount": "تم اختيار {{n}}",
+    "noCollections": "افتح مجموعة أولًا.",
+    "generateFor": "إنشاء المستند ({{n}})",
+    "exported": "تم التصدير إلى {{path}}",
+    "exportFailed": "فشل التصدير: {{reason}}"
   },
   "diff": {
     "title": "مقارنة الاستجابة",
@@ -552,5 +571,35 @@
   },
   "audit": {
     "title": "سجلات التدقيق"
+  },
+  "proxy": {
+    "title": "التقاط الوكيل",
+    "running": "يعمل",
+    "stopped": "متوقف",
+    "startProxy": "تشغيل الوكيل",
+    "stop": "إيقاف",
+    "port": "منفذ الوكيل",
+    "proxyHint": "اضبط عميل HTTP على 127.0.0.1:{{port}}",
+    "caTitle": "شهادة CA",
+    "copyPem": "نسخ PEM",
+    "copied": "تم النسخ",
+    "generateCa": "إنشاء CA",
+    "caHint": "ثبّت شهادة CA في المتصفح لالتقاط حركة HTTPS",
+    "passthrough": "النطاقات المستثناة",
+    "passthroughPlaceholder": "مثال: github.com, google.com",
+    "passthroughHint": "نطاقات لا يتم التقاطها، مفصولة بفواصل",
+    "captured_one": "تم التقاط طلب واحد",
+    "captured_other": "تم التقاط {{count}} طلبًا",
+    "captures": "عمليات الالتقاط",
+    "filter": "تصفية…",
+    "clearCaptures": "مسح عمليات الالتقاط",
+    "waiting": "في انتظار الطلبات…",
+    "startHint": "شغّل الوكيل لالتقاط الطلبات",
+    "selectRequest": "اختر طلبًا لعرض التفاصيل",
+    "request": "الطلب",
+    "response": "الاستجابة",
+    "headers": "الترويسات",
+    "body": "النص",
+    "noHeaders": "لا توجد ترويسات"
   }
 }

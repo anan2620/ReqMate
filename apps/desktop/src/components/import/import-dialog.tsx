@@ -174,8 +174,8 @@ export function ImportDialog({ open, onOpenChange }: ImportDialogProps) {
   return (
     <Dialog.Root open={open} onOpenChange={handleOpenChange}>
       <Dialog.Portal>
-        <Dialog.Overlay className="fixed inset-0 z-50 bg-black/50" />
-        <Dialog.Content className="fixed left-1/2 top-1/2 z-50 w-[520px] -translate-x-1/2 -translate-y-1/2 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] shadow-xl focus:outline-none">
+        <Dialog.Overlay className="fixed inset-0 z-50 bg-[var(--color-overlay)]" />
+        <Dialog.Content className="fixed left-1/2 top-1/2 z-50 w-[520px] -translate-x-1/2 -translate-y-1/2 rounded-lg border border-[var(--color-border)] bg-[var(--color-card)] elev-pop focus:outline-none">
           {/* Header */}
           <div className="flex items-center justify-between border-b border-[var(--color-border)] px-5 py-4">
             <Dialog.Title className="flex items-center gap-2 text-sm font-medium text-[var(--color-text-primary)]">
@@ -304,7 +304,7 @@ function SelectStep({
         <button
           onClick={onNext}
           disabled={!filePath || !format}
-          className="btn-accent rounded-lg px-4 py-1.5 text-[13px] font-semibold disabled:opacity-40 disabled:cursor-not-allowed"
+          className="btn-accent rounded-md px-4 py-1.5 text-[13px] font-semibold disabled:opacity-40 disabled:cursor-not-allowed"
         >
           {t("import.next")}
         </button>
@@ -386,7 +386,7 @@ function PreviewStep({
         <button
           onClick={onImport}
           disabled={!targetDir}
-          className="btn-accent rounded-lg px-4 py-1.5 text-[13px] font-semibold disabled:opacity-40 disabled:cursor-not-allowed"
+          className="btn-accent rounded-md px-4 py-1.5 text-[13px] font-semibold disabled:opacity-40 disabled:cursor-not-allowed"
         >
           {t("sidebar.import")}
         </button>
@@ -424,7 +424,7 @@ function ImportingStep({
           <p className="truncate text-xs text-[var(--color-text-dimmed)]">{result}</p>
           <button
             onClick={onClose}
-            className="btn-accent mt-2 rounded-lg px-4 py-1.5 text-[13px] font-semibold"
+            className="btn-accent mt-2 rounded-md px-4 py-1.5 text-[13px] font-semibold"
           >
             {t("import.done")}
           </button>

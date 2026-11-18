@@ -33,10 +33,10 @@ export function BodyEditor({
           <button
             key={btId}
             onClick={() => onChange({ ...body, type: btId })}
-            className={`rounded px-3 py-1 text-xs transition-colors ${
+            className={`rounded-md border px-3 py-1 text-xs transition-colors ${
               body.type === btId
-                ? "bg-[var(--color-accent)] text-white shadow-[var(--shadow-xs)]"
-                : "bg-[var(--color-elevated)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]"
+                ? "border-transparent bg-[var(--color-accent)] text-white"
+                : "border-[var(--color-border)] bg-[var(--color-card)] text-[var(--color-text-secondary)] hover:bg-[var(--color-card-hover)] hover:text-[var(--color-text-primary)]"
             }`}
           >
             {t(BODY_TYPE_LABEL_KEYS[btId])}

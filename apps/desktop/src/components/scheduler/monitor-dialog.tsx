@@ -136,7 +136,7 @@ export function MonitorDialog() {
   const selectedMonitor = monitors.find((m) => m.id === selectedMonitorId);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[var(--color-overlay)]">
       <div className="flex h-[600px] w-[900px] flex-col overflow-hidden rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)]">
         {/* Header */}
         <div className="flex items-center justify-between border-b border-[var(--color-border)] px-4 py-3">
@@ -157,7 +157,7 @@ export function MonitorDialog() {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder={t("monitor.create")}
-                className="w-full rounded bg-[var(--color-elevated)] px-2 py-1.5 text-xs text-[var(--color-text-primary)] outline-none"
+                className="w-full rounded border border-[var(--color-border)] bg-[var(--color-card)] px-2 py-1.5 text-xs text-[var(--color-text-primary)] outline-none"
               />
               <Select
                 value={collectionPath}
@@ -179,13 +179,13 @@ export function MonitorDialog() {
                 value={environmentName}
                 onChange={(e) => setEnvironmentName(e.target.value)}
                 placeholder="Environment (optional)"
-                className="w-full rounded bg-[var(--color-elevated)] px-2 py-1.5 text-xs text-[var(--color-text-primary)] outline-none"
+                className="w-full rounded border border-[var(--color-border)] bg-[var(--color-card)] px-2 py-1.5 text-xs text-[var(--color-text-primary)] outline-none"
               />
               <input
                 value={webhookUrl}
                 onChange={(e) => setWebhookUrl(e.target.value)}
                 placeholder="Webhook URL (optional)"
-                className="w-full rounded bg-[var(--color-elevated)] px-2 py-1.5 text-xs text-[var(--color-text-primary)] outline-none"
+                className="w-full rounded border border-[var(--color-border)] bg-[var(--color-card)] px-2 py-1.5 text-xs text-[var(--color-text-primary)] outline-none"
               />
               <label className="flex items-center gap-2 text-xs text-[var(--color-text-secondary)]">
                 <input
@@ -198,7 +198,7 @@ export function MonitorDialog() {
               <button
                 onClick={handleCreate}
                 disabled={creating || !name || !collectionPath}
-                className="btn-accent flex w-full items-center justify-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold disabled:opacity-50"
+                className="btn-accent flex w-full items-center justify-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-semibold disabled:opacity-50"
               >
                 <Plus className="h-3 w-3" />
                 {creating ? "Creating..." : t("monitor.newMonitor")}

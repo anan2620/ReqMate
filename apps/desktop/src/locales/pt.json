@@ -52,7 +52,9 @@
     "noEnvironmentsYet": "Nenhum ambiente ainda",
     "newEnvironment": "Novo Ambiente",
     "addVariable": "Adicionar Variável",
-    "importEnvironment": "Importar Ambiente (Postman JSON)"
+    "importEnvironment": "Importar Ambiente (Postman JSON)",
+    "collectionDefaults": "Padrões da coleção",
+    "collectionDefaultsDesc": "A autenticação definida aqui é herdada por todas as requisições sem autenticação própria."
   },
   "tabs": {
     "untitled": "Requisição sem título",
@@ -69,7 +71,9 @@
     "duplicateTab": "Duplicar Aba",
     "moveToNewWindow": "Mover para Nova Janela",
     "httpRequest": "Requisição HTTP",
-    "importCurl": "Importar cURL"
+    "importCurl": "Importar cURL",
+    "saveAs": "Salvar como…",
+    "saveOptions": "Opções de salvamento"
   },
   "request": {
     "send": "Enviar",
@@ -166,7 +170,8 @@
     "assertionConsumerUrl": "URL do Serviço Consumidor de Asserções",
     "certificate": "Certificado do IdP (PEM)",
     "nameIdFormat": "Formato NameID",
-    "samlToken": "Token de Asserção SAML"
+    "samlToken": "Token de Asserção SAML",
+    "apiKeyHeader": "Nome do cabeçalho"
   },
   "response": {
     "body": "Corpo",
@@ -260,7 +265,10 @@
     "upToDate": "Você está atualizado",
     "updateAvailable": "Atualização disponível: {{version}}",
     "shortcuts": "Atalhos de Teclado",
-    "recording": "Pressione a combinação de teclas..."
+    "recording": "Pressione a combinação de teclas...",
+    "saving": "Salvamento",
+    "autoSave": "Salvar alterações automaticamente",
+    "autoSaveDesc": "Salva no disco um segundo após parar de digitar. Desative para manter as alterações no editor até clicar em Salvar."
   },
   "runner": {
     "title": "Executor de Coleção",
@@ -359,7 +367,10 @@
     "skipForNow": "Pular por enquanto",
     "getStarted": "Começar",
     "name": "Nome",
-    "value": "Valor"
+    "value": "Valor",
+    "saved": "Salvo",
+    "savedTo": "«{{name}}» salvo",
+    "saveFailed": "Falha ao salvar: {{reason}}"
   },
   "errors": {
     "connectionRefused": "Conexão recusada — o servidor está em execução?",
@@ -464,7 +475,15 @@
     "html": "HTML",
     "markdown": "Markdown",
     "generating": "Gerando documentação...",
-    "generateDesc": "Gere documentação a partir de coleções"
+    "generateDesc": "Selecione as coleções a incluir e gere um único documento.",
+    "pickCollections": "Coleções",
+    "selectAll": "Todas",
+    "clearAll": "Nenhuma",
+    "selectedCount": "{{n}} selecionadas",
+    "noCollections": "Abra uma coleção primeiro.",
+    "generateFor": "Gerar docs ({{n}})",
+    "exported": "Exportado para {{path}}",
+    "exportFailed": "Falha ao exportar: {{reason}}"
   },
   "diff": {
     "title": "Diff de Resposta",
@@ -552,5 +571,35 @@
   },
   "audit": {
     "title": "Logs de Auditoria"
+  },
+  "proxy": {
+    "title": "Captura de proxy",
+    "running": "Em execução",
+    "stopped": "Parado",
+    "startProxy": "Iniciar proxy",
+    "stop": "Parar",
+    "port": "Porta do proxy",
+    "proxyHint": "Configure seu cliente HTTP para 127.0.0.1:{{port}}",
+    "caTitle": "Certificado CA",
+    "copyPem": "Copiar PEM",
+    "copied": "Copiado",
+    "generateCa": "Gerar CA",
+    "caHint": "Instale o certificado CA no navegador para capturar tráfego HTTPS",
+    "passthrough": "Domínios ignorados",
+    "passthroughPlaceholder": "ex. github.com, google.com",
+    "passthroughHint": "Domínios a ignorar, separados por vírgula",
+    "captured_one": "{{count}} requisição capturada",
+    "captured_other": "{{count}} requisições capturadas",
+    "captures": "Capturas",
+    "filter": "Filtrar…",
+    "clearCaptures": "Limpar capturas",
+    "waiting": "Aguardando requisições…",
+    "startHint": "Inicie o proxy para capturar requisições",
+    "selectRequest": "Selecione uma requisição para ver os detalhes",
+    "request": "Requisição",
+    "response": "Resposta",
+    "headers": "Cabeçalhos",
+    "body": "Corpo",
+    "noHeaders": "Sem cabeçalhos"
   }
 }

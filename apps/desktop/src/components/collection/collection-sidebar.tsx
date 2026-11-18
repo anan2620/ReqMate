@@ -65,7 +65,7 @@ export function CollectionSidebar({ onOpenSettings, collapsed, envSelectorRef, o
     >
       {/* Header */}
       <div className="flex h-12 items-center justify-between border-b border-[var(--color-border)] px-4">
-        <span className="text-lg font-semibold text-[var(--color-accent)]">ReqMate</span>
+        <span className="text-lg font-semibold text-[var(--color-accent-text)]">ReqMate</span>
         {onOpenSettings && (
           <button
             onClick={onOpenSettings}
@@ -104,7 +104,7 @@ export function CollectionSidebar({ onOpenSettings, collapsed, envSelectorRef, o
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder={t("sidebar.search")}
-                    className="w-full rounded bg-[var(--color-elevated)] py-1 pl-7 pr-6 text-xs text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none focus:ring-1 focus:ring-[var(--color-accent)]"
+                    className="w-full rounded border border-[var(--color-border)] bg-[var(--color-card)] py-1 pl-7 pr-6 text-xs text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none"
                   />
                   {searchQuery && (
                     <button
@@ -297,8 +297,8 @@ function NewCollectionDialog({
   return (
     <Dialog.Root open={isOpen} onOpenChange={handleOpenChange}>
       <Dialog.Portal>
-        <Dialog.Overlay className="fixed inset-0 z-50 bg-black/50" />
-        <Dialog.Content className="fixed left-1/2 top-1/2 z-50 w-[440px] -translate-x-1/2 -translate-y-1/2 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] shadow-xl">
+        <Dialog.Overlay className="fixed inset-0 z-50 bg-[var(--color-overlay)]" />
+        <Dialog.Content className="fixed left-1/2 top-1/2 z-50 w-[440px] -translate-x-1/2 -translate-y-1/2 rounded-lg border border-[var(--color-border)] bg-[var(--color-card)] elev-pop">
           <div className="flex items-center justify-between border-b border-[var(--color-border)] px-4 py-3">
             <Dialog.Title className="text-sm font-medium text-[var(--color-text-primary)]">
               {t("sidebar.newCollection")}
@@ -319,7 +319,7 @@ function NewCollectionDialog({
                 onChange={(e) => setName(e.target.value)}
                 placeholder={t("sidebar.collectionNamePlaceholder")}
                 autoFocus
-                className="w-full rounded bg-[var(--color-elevated)] px-3 py-2 text-sm text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none focus:ring-1 focus:ring-[var(--color-accent)]"
+                className="w-full rounded border border-[var(--color-border)] bg-[var(--color-card)] px-3 py-2 text-sm text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none"
                 onKeyDown={(e) => {
                   if (e.key === "Enter" && canCreate) handleCreate();
                 }}
@@ -336,7 +336,7 @@ function NewCollectionDialog({
                   value={parentDir}
                   readOnly
                   placeholder={t("common.browse")}
-                  className="flex-1 rounded bg-[var(--color-elevated)] px-3 py-2 text-sm text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none"
+                  className="flex-1 rounded border border-[var(--color-border)] bg-[var(--color-card)] px-3 py-2 text-sm text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none"
                 />
                 <button
                   onClick={handlePickFolder}

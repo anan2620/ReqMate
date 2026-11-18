@@ -172,7 +172,7 @@ export function CommandPalette({
         icon: Globe,
         action: () => {
           const col = collections[0];
-          useDocsStore.getState().openDocs(col.path, col.name);
+          useDocsStore.getState().openDocsForCollection(col.path, col.name);
           onOpenChange(false);
         },
       });
@@ -360,14 +360,14 @@ export function CommandPalette({
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
       <Dialog.Portal>
-        <Dialog.Overlay className="fixed inset-0 z-50 bg-[var(--color-overlay)] backdrop-blur-[3px]" />
+        <Dialog.Overlay className="fixed inset-0 z-50 bg-[var(--color-overlay)]" />
         <Dialog.Content
-          className="animate-panel-in fixed left-1/2 top-[18%] z-50 w-[520px] -translate-x-1/2 overflow-hidden rounded-2xl border border-[var(--color-border-strong)] bg-[var(--color-elevated)] elev-lg focus:outline-none"
+          className="animate-panel-in fixed left-1/2 top-[18%] z-50 w-[520px] -translate-x-1/2 overflow-hidden rounded-xl border border-[var(--color-border-strong)] bg-[var(--color-card)] elev-pop focus:outline-none"
           onKeyDown={handleKeyDown}
         >
           {/* Search input */}
           <div className="flex items-center gap-2.5 border-b border-[var(--color-border)] px-4 py-3.5">
-            <Search className="h-4 w-4 shrink-0 text-[var(--color-accent)]" />
+            <Search className="h-4 w-4 shrink-0 text-[var(--color-accent-text)]" />
             <Dialog.Title className="sr-only">Command Palette</Dialog.Title>
             <input
               ref={inputRef}
@@ -402,7 +402,7 @@ export function CommandPalette({
                     {Icon && (
                       <Icon
                         className={`h-4 w-4 shrink-0 ${
-                          i === selectedIndex ? "text-[var(--color-accent)]" : "text-[var(--color-text-muted)]"
+                          i === selectedIndex ? "text-[var(--color-accent-text)]" : "text-[var(--color-text-muted)]"
                         }`}
                       />
                     )}

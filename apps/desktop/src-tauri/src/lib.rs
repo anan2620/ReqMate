@@ -30,7 +30,7 @@ use commands::collection::{
 };
 use commands::cookies::{clear_cookie_jar, delete_cookie, get_cookie_jar};
 use commands::curl::{export_curl_command, parse_curl_command};
-use commands::docs::{generate_docs, preview_docs};
+use commands::docs::{generate_docs, generate_docs_multi, preview_docs, preview_docs_multi};
 use commands::environment::{
     get_resolved_variables, load_environments, load_root_dotenv, save_environment,
 };
@@ -338,7 +338,9 @@ pub fn run() {
             list_mock_servers,
             // Docs commands
             generate_docs,
+            generate_docs_multi,
             preview_docs,
+            preview_docs_multi,
             // Monitor/Scheduler commands
             create_monitor,
             delete_monitor,

@@ -22,18 +22,18 @@ const REQMATE_LIGHT: Monaco.editor.IStandaloneThemeData = {
   ],
   colors: {
     "editor.background": "#ffffff",
-    "editor.foreground": "#111827",
-    "editor.lineHighlightBackground": "#f5f6fa",
-    "editor.selectionBackground": "#6366f130",
-    "editorCursor.foreground": "#6366f1",
+    "editor.foreground": "#151a22",
+    "editor.lineHighlightBackground": "#f5f7fa",
+    "editor.selectionBackground": "#5b5bd630",
+    "editorCursor.foreground": "#5b5bd6",
     "editorLineNumber.foreground": "#9ca3af",
     "editorLineNumber.activeForeground": "#374151",
-    "editor.inactiveSelectionBackground": "#6366f115",
-    "editorIndentGuide.background": "#e4e6ed",
-    "editorWidget.background": "#f8f9fc",
-    "editorWidget.border": "#d1d5e0",
+    "editor.inactiveSelectionBackground": "#5b5bd615",
+    "editorIndentGuide.background": "#e8ebf0",
+    "editorWidget.background": "#f6f7f9",
+    "editorWidget.border": "#c8cfda",
     "input.background": "#ffffff",
-    "input.border": "#d1d5e0",
+    "input.border": "#c8cfda",
   },
 };
 
@@ -50,19 +50,19 @@ const REQMATE_DARK: Monaco.editor.IStandaloneThemeData = {
     { token: "variable", foreground: "60a5fa" },
   ],
   colors: {
-    "editor.background": "#141416",
-    "editor.foreground": "#e4e4e7",
-    "editor.lineHighlightBackground": "#1c1c1f",
-    "editor.selectionBackground": "#6366f140",
-    "editorCursor.foreground": "#6366f1",
+    "editor.background": "#15181e",
+    "editor.foreground": "#edf0f5",
+    "editor.lineHighlightBackground": "#1b1f26",
+    "editor.selectionBackground": "#5b5bd640",
+    "editorCursor.foreground": "#5b5bd6",
     "editorLineNumber.foreground": "#52525b",
     "editorLineNumber.activeForeground": "#a1a1aa",
-    "editor.inactiveSelectionBackground": "#6366f120",
-    "editorIndentGuide.background": "#2a2a2e",
-    "editorWidget.background": "#141416",
-    "editorWidget.border": "#2a2a2e",
-    "input.background": "#1c1c1f",
-    "input.border": "#2a2a2e",
+    "editor.inactiveSelectionBackground": "#5b5bd620",
+    "editorIndentGuide.background": "#262b33",
+    "editorWidget.background": "#1a1e25",
+    "editorWidget.border": "#38404c",
+    "input.background": "#1c2027",
+    "input.border": "#38404c",
   },
 };
 
@@ -73,13 +73,13 @@ const REQMATE_BLACK: Monaco.editor.IStandaloneThemeData = {
   rules: REQMATE_DARK.rules,
   colors: {
     ...REQMATE_DARK.colors,
-    "editor.background": "#0a0a0a",
-    "editor.lineHighlightBackground": "#141414",
-    "editorIndentGuide.background": "#1f1f1f",
-    "editorWidget.background": "#0a0a0a",
-    "editorWidget.border": "#1f1f1f",
-    "input.background": "#141414",
-    "input.border": "#1f1f1f",
+    "editor.background": "#0c0e11",
+    "editor.lineHighlightBackground": "#14171b",
+    "editorIndentGuide.background": "#1e2127",
+    "editorWidget.background": "#0c0e11",
+    "editorWidget.border": "#2e333b",
+    "input.background": "#14171b",
+    "input.border": "#2e333b",
   },
 };
 
@@ -165,6 +165,8 @@ interface CodeEditorProps {
   minimap?: boolean;
   lineNumbers?: boolean;
   placeholder?: string;
+  /** Draw the hairline frame around the editor (default true). */
+  bordered?: boolean;
 }
 
 export function CodeEditor({
@@ -176,6 +178,7 @@ export function CodeEditor({
   minimap = false,
   lineNumbers = true,
   placeholder,
+  bordered = true,
 }: CodeEditorProps) {
   const editorRef = useRef<Monaco.editor.IStandaloneCodeEditor | null>(null);
   const monacoRef = useRef<typeof Monaco | null>(null);
@@ -204,7 +207,9 @@ export function CodeEditor({
   const showPlaceholder = placeholder && !value;
 
   return (
-    <div className="relative h-full overflow-hidden rounded border border-[var(--color-border)]">
+    <div
+      className={`relative h-full overflow-hidden ${bordered ? "rounded border border-[var(--color-border)]" : ""}`}
+    >
       {showPlaceholder && (
         <div className="pointer-events-none absolute top-2 z-10 text-sm text-[var(--color-text-dimmed)]" style={{ left: contentLeft }}>
           {placeholder}
@@ -237,7 +242,7 @@ export function CodeEditor({
             horizontalScrollbarSize: 8,
           },
           padding: { top: 8, bottom: 8 },
-          renderLineHighlight: "line",
+          renderLineHighlight: readOnly ? "none" : "line",
           folding: true,
           bracketPairColorization: { enabled: true },
           suggest: { showWords: false },

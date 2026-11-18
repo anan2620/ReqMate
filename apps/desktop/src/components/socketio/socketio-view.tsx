@@ -85,7 +85,7 @@ export function SocketIoView() {
           onChange={(e) => setUrl(e.target.value)}
           placeholder="http://localhost:3000"
           disabled={status === "connected"}
-          className="flex-1 rounded bg-[var(--color-elevated)] px-2.5 py-1.5 text-sm text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none focus:ring-1 focus:ring-pink-500 disabled:opacity-50"
+          className="flex-1 rounded border border-[var(--color-border)] bg-[var(--color-card)] px-2.5 py-1.5 text-sm text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none focus:ring-1 focus:ring-pink-500 disabled:opacity-50"
         />
         <div className="flex items-center gap-1">
           <span className="text-xs text-[var(--color-text-dimmed)]">ns:</span>
@@ -95,7 +95,7 @@ export function SocketIoView() {
             onChange={(e) => setNamespace(e.target.value)}
             placeholder="/"
             disabled={status === "connected"}
-            className="w-24 rounded bg-[var(--color-elevated)] px-2 py-1.5 text-sm text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none focus:ring-1 focus:ring-pink-500 disabled:opacity-50"
+            className="w-24 rounded border border-[var(--color-border)] bg-[var(--color-card)] px-2 py-1.5 text-sm text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none focus:ring-1 focus:ring-pink-500 disabled:opacity-50"
           />
         </div>
         <div className="flex items-center gap-1.5">
@@ -194,7 +194,7 @@ export function SocketIoView() {
             onChange={(e) => setEventName(e.target.value)}
             placeholder="Event name (e.g. message, chat)"
             disabled={status !== "connected"}
-            className="flex-1 rounded bg-[var(--color-elevated)] px-2.5 py-1.5 text-sm text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none focus:ring-1 focus:ring-pink-500 disabled:opacity-50"
+            className="flex-1 rounded border border-[var(--color-border)] bg-[var(--color-card)] px-2.5 py-1.5 text-sm text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none focus:ring-1 focus:ring-pink-500 disabled:opacity-50"
           />
         </div>
         <div className="flex items-end gap-1.5">
@@ -203,7 +203,7 @@ export function SocketIoView() {
             onChange={(e) => setEventArgs(e.target.value)}
             placeholder='Arguments (JSON) e.g. "hello" or {"msg": "hi"} or ["a", 1]'
             disabled={status !== "connected"}
-            className="flex-1 resize-none rounded bg-[var(--color-elevated)] p-2 font-mono text-xs text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none focus:ring-1 focus:ring-pink-500 disabled:opacity-50"
+            className="flex-1 resize-none rounded border border-[var(--color-border)] bg-[var(--color-card)] p-2 font-mono text-xs text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none focus:ring-1 focus:ring-pink-500 disabled:opacity-50"
             rows={2}
             onKeyDown={(e) => {
               if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
@@ -239,7 +239,7 @@ export function SocketIoView() {
             value={listenFilter}
             onChange={(e) => setListenFilter(e.target.value)}
             placeholder="Filter events..."
-            className="w-36 rounded bg-[var(--color-elevated)] px-2 py-0.5 text-xs text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none"
+            className="w-36 rounded border border-[var(--color-border)] bg-[var(--color-card)] px-2 py-0.5 text-xs text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none"
           />
           <label className="flex items-center gap-1 cursor-pointer">
             <input

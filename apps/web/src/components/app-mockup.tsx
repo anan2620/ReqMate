@@ -200,7 +200,7 @@ function highlightJSON(code: string) {
       .replace(/: "([^"]+)"/g, ': <span style="color:#34d399">"$1"</span>')
       .replace(/: (\d+\.?\d*)/g, ': <span style="color:#fbbf24">$1</span>')
       .replace(/: (true|false|null)/g, ': <span style="color:#f472b6">$1</span>')
-      .replace(/(▶|◀)/g, '<span style="color:#6366f1">$1</span>')
+      .replace(/(▶|◀)/g, '<span style="color:#5b5bd6">$1</span>')
       .replace(/(\d{2}:\d{2}:\d{2})/g, '<span style="color:#71717a">$1</span>');
     return (
       <div key={i} className="leading-relaxed">
@@ -333,7 +333,7 @@ export function AppMockup({ autoPlay = true, className = "" }: { autoPlay?: bool
                           className={item.active ? "text-white" : "text-zinc-500"}
                           style={
                             item.active
-                              ? { background: "#6366f115", borderRadius: 4, padding: "1px 4px", margin: "-1px -4px" }
+                              ? { background: "#5b5bd615", borderRadius: 4, padding: "1px 4px", margin: "-1px -4px" }
                               : {}
                           }
                         >
@@ -371,11 +371,24 @@ export function AppMockup({ autoPlay = true, className = "" }: { autoPlay?: bool
                         {tab.method}
                       </span>
                       <span className="truncate max-w-20">{tab.name}</span>
-                      {tab.active && <div className="absolute bottom-0 left-0 right-0 h-px bg-[#6366f1]" />}
+                      {tab.active && <div className="absolute bottom-0 left-0 right-0 h-px bg-[#5b5bd6]" />}
                     </div>
                   ))}
                 </motion.div>
               </AnimatePresence>
+
+              {/* Save split control + new tab, mirroring the desktop chrome */}
+              <div className="ml-auto flex shrink-0 items-center gap-1 pr-2">
+                <div className="flex overflow-hidden rounded-md border border-[var(--color-border)]">
+                  <span className="bg-[var(--color-surface)] px-2 py-[3px] text-[10px] font-medium text-zinc-300">
+                    Save
+                  </span>
+                  <span className="border-l border-[var(--color-border)] px-1.5 py-[3px] text-[9px] text-zinc-500">
+                    ⌘S
+                  </span>
+                </div>
+                <span className="px-1.5 py-[3px] text-[10px] font-medium text-zinc-400">+ New</span>
+              </div>
             </div>
 
             {/* URL Bar */}
@@ -398,7 +411,7 @@ export function AppMockup({ autoPlay = true, className = "" }: { autoPlay?: bool
                   <span className="text-[11px] text-zinc-400 truncate flex-1 font-mono">{scene.url}</span>
                 </motion.div>
               </AnimatePresence>
-              <button className="px-3 py-1 rounded-md bg-[#6366f1] text-white text-[10px] font-semibold shrink-0">
+              <button className="px-3 py-1 rounded-md bg-[#5b5bd6] text-white text-[10px] font-semibold shrink-0">
                 Send
               </button>
             </div>

@@ -61,7 +61,7 @@ export function ConsoleBottomBar() {
 
       {/* Header */}
       <div className="flex items-center gap-2 border-b border-[var(--color-border)] px-3 py-1.5">
-        <Terminal className="h-3.5 w-3.5 text-[var(--color-accent)]" />
+        <Terminal className="h-3.5 w-3.5 text-[var(--color-accent-text)]" />
         <span className="text-xs font-semibold text-[var(--color-text-secondary)]">
           {t("console.title")}
         </span>

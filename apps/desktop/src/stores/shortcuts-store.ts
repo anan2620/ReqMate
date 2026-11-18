@@ -28,6 +28,7 @@ export const SHORTCUT_ACTIONS: ShortcutAction[] = [
   { id: "newWindow", description: "New window", defaultBinding: binding("n", { shift: true }) },
   { id: "closeTab", description: "Close tab", defaultBinding: binding("w") },
   { id: "save", description: "Save request", defaultBinding: binding("s") },
+  { id: "saveAs", description: "Save request as…", defaultBinding: binding("s", { shift: true }) },
   { id: "send", description: "Send request", defaultBinding: binding("enter") },
   { id: "settings", description: "Settings", defaultBinding: binding(",") },
   { id: "curlImport", description: "Import cURL", defaultBinding: binding("i") },

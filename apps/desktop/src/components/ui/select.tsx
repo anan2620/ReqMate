@@ -66,7 +66,7 @@ export const Select = forwardRef<HTMLButtonElement, SelectProps>(function Select
         className={
           variant === "plain"
             ? `group flex min-w-0 items-center justify-between gap-1.5 whitespace-nowrap rounded-md font-bold outline-none transition-colors duration-150 disabled:cursor-not-allowed disabled:opacity-50 ${SIZE_CLASS[size]} ${className}`
-            : `group flex w-full min-w-0 items-center justify-between gap-2 whitespace-nowrap rounded-md border border-transparent bg-[color-mix(in_srgb,var(--color-elevated)_80%,transparent)] text-left font-medium text-[var(--color-text-primary)] outline-none transition-all duration-150 hover:bg-[var(--color-card-hover)] focus-visible:border-[var(--color-accent-line)] focus-visible:ring-2 focus-visible:ring-[var(--color-accent-ring)] data-[state=open]:border-[var(--color-accent-line)] data-[state=open]:bg-[var(--color-card-hover)] data-[state=open]:ring-2 data-[state=open]:ring-[var(--color-accent-ring)] disabled:cursor-not-allowed disabled:opacity-50 ${SIZE_CLASS[size]} ${className}`
+            : `group flex w-full min-w-0 items-center justify-between gap-2 whitespace-nowrap rounded-md border border-[var(--color-border)] bg-[var(--color-card)] text-left font-medium text-[var(--color-text-primary)] outline-none transition-colors duration-150 hover:border-[var(--color-border-strong)] focus-visible:border-[var(--color-accent)] focus-visible:ring-1 focus-visible:ring-[var(--color-accent)] data-[state=open]:border-[var(--color-accent)] disabled:cursor-not-allowed disabled:opacity-50 ${SIZE_CLASS[size]} ${className}`
         }
       >
         <RSelect.Value placeholder={<span className="text-[var(--color-text-dimmed)]">{placeholder ?? ""}</span>} />
@@ -84,7 +84,7 @@ export const Select = forwardRef<HTMLButtonElement, SelectProps>(function Select
           position="popper"
           sideOffset={6}
           align="start"
-          className="surface-pop animate-panel-in z-[90] max-h-[280px] min-w-[var(--radix-select-trigger-width)] overflow-hidden rounded-xl p-1"
+          className="surface-pop animate-panel-in z-[90] max-h-[280px] min-w-[var(--radix-select-trigger-width)] overflow-hidden rounded-lg p-1"
         >
           <RSelect.ScrollUpButton className="flex h-5 items-center justify-center text-[var(--color-text-dimmed)]">
             <ChevronDown className="h-3 w-3 rotate-180" />
@@ -99,7 +99,7 @@ export const Select = forwardRef<HTMLButtonElement, SelectProps>(function Select
               >
                 <RSelect.ItemText>{opt.label}</RSelect.ItemText>
                 <RSelect.ItemIndicator className="absolute right-2 flex items-center">
-                  <Check className="h-3.5 w-3.5 text-[var(--color-accent)]" strokeWidth={2.5} />
+                  <Check className="h-3.5 w-3.5 text-[var(--color-accent-text)]" strokeWidth={2.5} />
                 </RSelect.ItemIndicator>
               </RSelect.Item>
             ))}

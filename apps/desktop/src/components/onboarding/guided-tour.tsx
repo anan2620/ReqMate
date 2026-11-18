@@ -266,7 +266,7 @@ export function GuidedTour({ onComplete }: { onComplete: () => void }) {
       {/* Tooltip */}
       <div
         ref={tooltipRef}
-        className="absolute z-10 w-80 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] p-4 shadow-2xl transition-all duration-300"
+        className="absolute z-10 w-80 rounded-lg border border-[var(--color-border)] bg-[var(--color-card)] p-4 elev-pop transition-all duration-300"
         style={{ top: tooltipPos.top, left: tooltipPos.left }}
       >
         {/* Close button */}
