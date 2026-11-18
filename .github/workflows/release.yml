@@ -31,7 +31,6 @@ jobs:
           # 说明：这里故意不再写死 Intel 专用镜像。macos-13/macos-13-large 已于 2025-12-04 下线、
           # 2026-11-02 又下线 macos-14，v1.0.0/v1.1.0 就是因为 macos-13 分不到 runner 而静默漏了 Intel 包。
           # 现在两个 macOS 条目都跑 macos-latest（arm64），Intel 包靠 rustup target 交叉编译产出
-          # （上游 apiark 也是这么做的），从此不受 Intel 镜像存亡影响。
           # ubuntu-22.04 自 2026-09-17 进入弃用、2027-04-17 彻底不可用；这里也不再钉死版本号，
           # 统一跟 ubuntu-latest（当前 24.04）。Linux runner 架构稳定是 x86_64，不存在 macOS 那种漂移。
           - platform: ubuntu-latest
@@ -175,7 +174,6 @@ jobs:
             });
             console.log('✅ latest.json 已上传，包含平台：' + Object.keys(platforms).join(', '));
 
-
   # 兜底校验：v1.0.0 / v1.1.0 都因为 macos-13 runner 已下线、Intel job 被 cancel，
   # 却仍然发布了一个没有 Intel 安装包的 release。这里在发布后逐个核对产物，
   # 缺任何一个就让整次运行变红，避免再次“静默半残发布”。
@@ -213,4 +211,3 @@ jobs:
             } else {
               console.log('✅ 所有平台安装包齐全');
             }
-
