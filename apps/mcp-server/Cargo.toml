@@ -1,6 +1,6 @@
 [package]
 name = "reqmate-mcp"
-version = "1.1.1"
+version = "1.1.2"
 description = "ReqMate MCP server — AI editor integration for API collections"
 authors = ["ReqMate Contributors"]
 edition = "2021"
