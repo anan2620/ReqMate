@@ -120,18 +120,10 @@ function App() {
   const openSettings = useCallback(() => setSettingsOpen(true), []);
   const openCurlImport = useCallback(() => setCurlImportOpen(true), []);
 
-  // Listen for settings open event from AI dialog and other components
+  // Listen for settings open event from AI dialog and other components.
+  // The settings dialog itself consumes `detail.section` and switches menus.
   useEffect(() => {
-    const handler = (e: Event) => {
-      const section = (e as CustomEvent).detail?.section;
-      setSettingsOpen(true);
-      if (section) {
-        // Wait for dialog to render, then scroll to section
-        setTimeout(() => {
-          document.getElementById(`settings-${section}`)?.scrollIntoView({ behavior: "smooth", block: "start" });
-        }, 100);
-      }
-    };
+    const handler = () => setSettingsOpen(true);
     window.addEventListener("reqmate:open-settings", handler);
     return () => window.removeEventListener("reqmate:open-settings", handler);
   }, []);

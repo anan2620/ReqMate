@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import * as Dialog from "@radix-ui/react-dialog";
 import {
   X,
@@ -76,6 +76,25 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
   const { t, i18n } = useTranslation();
   const [section, setSection] = useState<SettingsSectionId>("appearance");
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  // Components can open the dialog straight into a specific section by
+  // dispatching "reqmate:open-settings" with `{ detail: { section } }`.
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const requested = (e as CustomEvent).detail?.section;
+      if (
+        requested &&
+        SETTINGS_SECTIONS.some((item) => item.id === requested)
+      ) {
+        setSection(requested as SettingsSectionId);
+        requestAnimationFrame(() => {
+          if (scrollRef.current) scrollRef.current.scrollTop = 0;
+        });
+      }
+    };
+    window.addEventListener("reqmate:open-settings", handler);
+    return () => window.removeEventListener("reqmate:open-settings", handler);
+  }, []);
 
   const update = (patch: Partial<AppSettings>) => {
     updateSettings(patch);

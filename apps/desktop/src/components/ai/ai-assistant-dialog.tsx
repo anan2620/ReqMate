@@ -52,7 +52,6 @@ export function AiAssistantDialog({ open, onOpenChange }: AiAssistantDialogProps
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
-  const [showConfig, setShowConfig] = useState(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const logRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
@@ -271,10 +270,8 @@ export function AiAssistantDialog({ open, onOpenChange }: AiAssistantDialogProps
             </Dialog.Title>
             <div className="flex items-center gap-1">
               <button
-                onClick={() => setShowConfig(!showConfig)}
-                className={`rounded-lg p-1.5 transition-colors hover:bg-[var(--color-elevated)] ${
-                  showConfig ? "text-purple-400" : "text-[var(--color-text-muted)]"
-                }`}
+                onClick={handleOpenSettings}
+                className="rounded-lg p-1.5 text-[var(--color-text-muted)] transition-colors hover:bg-[var(--color-elevated)] hover:text-[var(--color-text-primary)]"
                 title="Settings"
               >
                 <Settings className="h-3.5 w-3.5" />
@@ -291,33 +288,6 @@ export function AiAssistantDialog({ open, onOpenChange }: AiAssistantDialogProps
               </Dialog.Close>
             </div>
           </div>
-
-          {/* Config panel */}
-          {showConfig && (
-            <div className="border-b border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-3 text-xs">
-              <div className="flex items-center gap-2 mb-2">
-                <span className={`h-2 w-2 rounded-full ${isConfigured ? "bg-yellow-500" : "bg-red-500"}`} />
-                <span className="text-[var(--color-text-muted)]">
-                  {isConfigured ? "Configured — using your own API key" : "Not configured — bring your own API key to use this optional feature"}
-                </span>
-              </div>
-              <p className="text-[var(--color-text-dimmed)]">
-                Configure your AI provider in{" "}
-                <button
-                  onClick={handleOpenSettings}
-                  className="text-purple-400 hover:underline"
-                >
-                  Settings → AI
-                </button>
-              </p>
-              {isConfigured && (
-                <div className="mt-2 flex gap-3 text-[var(--color-text-dimmed)]">
-                  <span>Model: <code className="text-[var(--color-text-secondary)]">{aiModel}</code></span>
-                  <span>Endpoint: <code className="text-[var(--color-text-secondary)]">{aiEndpoint?.replace("https://", "")}</code></span>
-                </div>
-              )}
-            </div>
-          )}
 
           {/* Not configured — full setup screen */}
           {!isConfigured && (
