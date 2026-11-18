@@ -3,7 +3,10 @@ import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
 import type { HttpMethod, Tab } from "@reqmate/types";
 import { useTabStore } from "@/stores/tab-store";
-import { useShortcutsStore, formatBindingParts } from "@/stores/shortcuts-store";
+import {
+  useShortcutsStore,
+  formatBindingParts,
+} from "@/stores/shortcuts-store";
 import {
   Plus,
   X,
@@ -57,14 +60,18 @@ function TabBadge({ tab }: { tab: Tab }) {
   if (tab.protocol !== "http") {
     const badge = badges[tab.protocol];
     return (
-      <span className={`pill !px-1.5 !py-0 !text-[9.5px] !leading-[14px] ${badge?.cls ?? ""}`}>
+      <span
+        className={`pill !px-1.5 !py-0 !text-[9.5px] !leading-[14px] ${badge?.cls ?? ""}`}
+      >
         {badge?.label ?? tab.protocol}
       </span>
     );
   }
 
   return (
-    <span className={`pill !px-1.5 !py-0 !text-[9.5px] !leading-[14px] ${METHOD_COLORS[tab.method]}`}>
+    <span
+      className={`pill !px-1.5 !py-0 !text-[9.5px] !leading-[14px] ${METHOD_COLORS[tab.method]}`}
+    >
       {tab.method}
     </span>
   );
@@ -95,7 +102,10 @@ function SortableTab({
   onDuplicate: () => void;
 }) {
   const { t } = useTranslation();
-  const [contextMenu, setContextMenu] = useState<{ x: number; y: number } | null>(null);
+  const [contextMenu, setContextMenu] = useState<{
+    x: number;
+    y: number;
+  } | null>(null);
   const menuRef = useRef<HTMLDivElement>(null);
   const {
     attributes,
@@ -116,7 +126,11 @@ function SortableTab({
   useEffect(() => {
     if (!contextMenu) return;
     const dismiss = (e: Event) => {
-      if (e instanceof MouseEvent && menuRef.current?.contains(e.target as Node)) return;
+      if (
+        e instanceof MouseEvent &&
+        menuRef.current?.contains(e.target as Node)
+      )
+        return;
       setContextMenu(null);
     };
     const onKey = (e: KeyboardEvent) => {
@@ -143,7 +157,10 @@ function SortableTab({
   };
 
   const menuItems: Array<{ label: string; action: () => void } | null> = [
-    { label: tab.pinned ? t("tabs.unpinTab") : t("tabs.pinTab"), action: onTogglePin },
+    {
+      label: tab.pinned ? t("tabs.unpinTab") : t("tabs.pinTab"),
+      action: onTogglePin,
+    },
     { label: t("tabs.duplicateTab"), action: onDuplicate },
     null,
     { label: t("tabs.close"), action: onClose },
@@ -196,7 +213,9 @@ function SortableTab({
               }}
               aria-label={t("tabs.close")}
               className={`absolute inset-0 flex items-center justify-center rounded-[5px] text-[var(--color-text-muted)] transition-all duration-150 hover:bg-[color-mix(in_srgb,var(--color-text-primary)_10%,transparent)] hover:text-[var(--color-text-primary)] ${
-                isActive && !tab.isDirty ? "opacity-50 group-hover:opacity-100" : "opacity-0 group-hover:opacity-100"
+                isActive && !tab.isDirty
+                  ? "opacity-50 group-hover:opacity-100"
+                  : "opacity-0 group-hover:opacity-100"
               }`}
             >
               <X className="h-3 w-3" />
@@ -217,7 +236,10 @@ function SortableTab({
           >
             {menuItems.map((item, i) =>
               item === null ? (
-                <div key={i} className="my-1 border-t border-[var(--color-border-strong)]/60" />
+                <div
+                  key={i}
+                  className="my-1 border-t border-[var(--color-border-strong)]/60"
+                />
               ) : (
                 <button
                   key={item.label}
@@ -263,7 +285,8 @@ function SaveControl({ tab }: { tab: Tab | undefined }) {
   useEffect(() => {
     if (!open) return;
     const onDown = (e: MouseEvent) => {
-      if (wrapRef.current && !wrapRef.current.contains(e.target as Node)) setOpen(false);
+      if (wrapRef.current && !wrapRef.current.contains(e.target as Node))
+        setOpen(false);
     };
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") setOpen(false);
@@ -292,8 +315,12 @@ function SaveControl({ tab }: { tab: Tab | undefined }) {
     }
   };
 
-  const saveHint = formatBindingParts(useShortcutsStore.getState().getBinding("save")).join("");
-  const saveAsHint = formatBindingParts(useShortcutsStore.getState().getBinding("saveAs")).join("");
+  const saveHint = formatBindingParts(
+    useShortcutsStore.getState().getBinding("save"),
+  ).join("");
+  const saveAsHint = formatBindingParts(
+    useShortcutsStore.getState().getBinding("saveAs"),
+  ).join("");
 
   return (
     <div ref={wrapRef} className="relative flex items-center">
@@ -309,7 +336,11 @@ function SaveControl({ tab }: { tab: Tab | undefined }) {
               : "text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)]"
         }`}
       >
-        {justSaved ? <Check className="h-3.5 w-3.5" /> : <Save className="h-3.5 w-3.5" />}
+        {justSaved ? (
+          <Check className="h-3.5 w-3.5" />
+        ) : (
+          <Save className="h-3.5 w-3.5" />
+        )}
         {justSaved ? t("common.saved") : t("common.save")}
         {tab.isDirty && !justSaved && (
           <span className="h-1.5 w-1.5 rounded-full bg-[var(--color-accent)]" />
@@ -328,25 +359,18 @@ function SaveControl({ tab }: { tab: Tab | undefined }) {
       {open && (
         <div
           role="menu"
-          className="surface-pop animate-panel-in absolute right-0 top-full z-50 mt-1.5 min-w-[200px] overflow-hidden rounded-md py-1"
+          className="surface-pop animate-panel-in absolute right-0 top-full z-50 mt-1.5 min-w-[132px] overflow-hidden rounded-md py-1"
         >
-          <button
-            role="menuitem"
-            onClick={handleSave}
-            className="flex w-full items-center gap-2 px-3 py-1.5 text-left text-[12.5px] text-[var(--color-text-secondary)] transition-colors hover:bg-[var(--color-accent-soft)] hover:text-[var(--color-text-primary)]"
-          >
-            <Save className="h-3.5 w-3.5 shrink-0" />
-            <span className="flex-1">{t("common.save")}</span>
-            <span className="tabular text-[10.5px] text-[var(--color-text-dimmed)]">{saveHint}</span>
-          </button>
           <button
             role="menuitem"
             onClick={openSaveAs}
             className="flex w-full items-center gap-2 px-3 py-1.5 text-left text-[12.5px] text-[var(--color-text-secondary)] transition-colors hover:bg-[var(--color-accent-soft)] hover:text-[var(--color-text-primary)]"
           >
             <FilePlus2 className="h-3.5 w-3.5 shrink-0" />
-            <span className="flex-1">{t("tabs.saveAs")}</span>
-            <span className="tabular text-[10.5px] text-[var(--color-text-dimmed)]">{saveAsHint}</span>
+            <span className="min-w-0 flex-1 truncate">{t("tabs.saveAs")}</span>
+            <span className="tabular shrink-0 text-[10.5px] text-[var(--color-text-dimmed)]">
+              {saveAsHint}
+            </span>
           </button>
         </div>
       )}
@@ -358,7 +382,15 @@ function NewTabDropdown() {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
-  const { newTab, newGraphQLTab, newWebSocketTab, newSSETab, newGrpcTab, newMqttTab, newSocketIoTab } = useTabStore();
+  const {
+    newTab,
+    newGraphQLTab,
+    newWebSocketTab,
+    newSSETab,
+    newGrpcTab,
+    newMqttTab,
+    newSocketIoTab,
+  } = useTabStore();
 
   useEffect(() => {
     if (!open) return;
@@ -373,12 +405,37 @@ function NewTabDropdown() {
 
   const items = [
     { label: t("tabs.httpRequest"), icon: Globe, action: newTab },
-    { label: "GraphQL", icon: Globe, action: newGraphQLTab, color: "text-violet-400" },
-    { label: "WebSocket", icon: Zap, action: newWebSocketTab, color: "text-cyan-400" },
+    {
+      label: "GraphQL",
+      icon: Globe,
+      action: newGraphQLTab,
+      color: "text-violet-400",
+    },
+    {
+      label: "WebSocket",
+      icon: Zap,
+      action: newWebSocketTab,
+      color: "text-cyan-400",
+    },
     { label: "SSE", icon: Radio, action: newSSETab, color: "text-orange-400" },
-    { label: "gRPC", icon: Globe, action: newGrpcTab, color: "text-emerald-400" },
-    { label: "MQTT", icon: Radio, action: newMqttTab, color: "text-purple-400" },
-    { label: "Socket.IO", icon: Zap, action: newSocketIoTab, color: "text-pink-400" },
+    {
+      label: "gRPC",
+      icon: Globe,
+      action: newGrpcTab,
+      color: "text-emerald-400",
+    },
+    {
+      label: "MQTT",
+      icon: Radio,
+      action: newMqttTab,
+      color: "text-purple-400",
+    },
+    {
+      label: "Socket.IO",
+      icon: Zap,
+      action: newSocketIoTab,
+      color: "text-pink-400",
+    },
   ];
 
   return (
@@ -403,7 +460,9 @@ function NewTabDropdown() {
               }}
               className="flex w-full items-center gap-2.5 px-3 py-2 text-left text-sm text-[var(--color-text-primary)] transition-colors hover:bg-[var(--color-accent-soft)]"
             >
-              <item.icon className={`h-4 w-4 ${item.color ?? "text-[var(--color-text-muted)]"}`} />
+              <item.icon
+                className={`h-4 w-4 ${item.color ?? "text-[var(--color-text-muted)]"}`}
+              />
               {item.label}
             </button>
           ))}
@@ -425,7 +484,18 @@ function NewTabDropdown() {
 }
 
 export function TabBar() {
-  const { tabs, activeTabId, setActiveTab, closeTab, closeOtherTabs, closeAllTabs, reorderTabs, detachTab, togglePin, duplicateTab } = useTabStore();
+  const {
+    tabs,
+    activeTabId,
+    setActiveTab,
+    closeTab,
+    closeOtherTabs,
+    closeAllTabs,
+    reorderTabs,
+    detachTab,
+    togglePin,
+    duplicateTab,
+  } = useTabStore();
   const activeTab = tabs.find((t) => t.id === activeTabId);
 
   const scrollerRef = useRef<HTMLDivElement>(null);
@@ -464,12 +534,15 @@ export function TabBar() {
   useEffect(() => {
     const id = requestAnimationFrame(() => {
       const c = scrollerRef.current;
-      const el = c?.querySelector<HTMLElement>(`[data-tab-id="${activeTabId}"]`);
+      const el = c?.querySelector<HTMLElement>(
+        `[data-tab-id="${activeTabId}"]`,
+      );
       if (c && el) {
         const left = el.offsetLeft;
         const right = left + el.offsetWidth;
         if (left < c.scrollLeft + 8) c.scrollLeft = Math.max(0, left - 8);
-        else if (right > c.scrollLeft + c.clientWidth - 8) c.scrollLeft = right - c.clientWidth + 8;
+        else if (right > c.scrollLeft + c.clientWidth - 8)
+          c.scrollLeft = right - c.clientWidth + 8;
       }
       updateScrollState();
     });
@@ -479,7 +552,10 @@ export function TabBar() {
   const scrollTabs = (direction: -1 | 1) => {
     const el = scrollerRef.current;
     if (!el) return;
-    el.scrollBy({ left: direction * Math.max(160, el.clientWidth * 0.7), behavior: "smooth" });
+    el.scrollBy({
+      left: direction * Math.max(160, el.clientWidth * 0.7),
+      behavior: "smooth",
+    });
   };
 
   const sensors = useSensors(
@@ -530,7 +606,8 @@ export function TabBar() {
               onWheel={(e) => {
                 const el = e.currentTarget;
                 if (el.scrollWidth <= el.clientWidth) return;
-                if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) el.scrollLeft += e.deltaY;
+                if (Math.abs(e.deltaY) > Math.abs(e.deltaX))
+                  el.scrollLeft += e.deltaY;
               }}
               className={`no-scrollbar flex min-w-0 shrink items-stretch gap-[3px] overflow-x-auto ${
                 canScrollLeft && canScrollRight
