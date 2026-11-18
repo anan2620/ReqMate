@@ -2,6 +2,8 @@ import { useState, useRef, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { Select } from "@/components/ui/select";
 import { useTabStore, useActiveTab } from "@/stores/tab-store";
+import { useSettingsStore } from "@/stores/settings-store";
+import { PanelTabSwitch } from "@/components/ui/panel-tab-switch";
 import { KeyValueEditor } from "@/components/request/key-value-editor";
 import { ResponsePanel } from "@/components/response/response-panel";
 import { CodeEditor } from "@/components/ui/code-editor";
@@ -52,6 +54,10 @@ function isSubscriptionQuery(query: string): boolean {
 export function GraphQLView() {
   const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState<GqlTab>("query");
+  // Panel layout is a global setting — honour it here too (this view used to
+  // hard-code a 50/50 side-by-side split).
+  const panelLayout = useSettingsStore((s) => s.settings.layout);
+  const [pane, setPane] = useState<"request" | "response">("request");
   const [schemaTypes, setSchemaTypes] = useState<
     { name: string; kind: string }[]
   >([]);
@@ -199,24 +205,47 @@ export function GraphQLView() {
         }
       />
 
-      <div className="flex flex-1 overflow-hidden">
+      <div
+        className={
+          panelLayout === "tabbed"
+            ? "flex flex-1 flex-col overflow-hidden"
+            : `flex flex-1 overflow-hidden ${panelLayout === "vertical" ? "flex-col" : "flex-row"}`
+        }
+      >
+        {panelLayout === "tabbed" && <PanelTabSwitch value={pane} onChange={setPane} />}
         {/* Left: Query editor */}
-        <div className="flex min-h-0 w-1/2 flex-col border-r border-[var(--color-border)]">
-          <div className="flex shrink-0 gap-0 border-b border-[var(--color-border)] bg-[var(--color-surface)]">
+        <div
+          hidden={panelLayout === "tabbed" && pane !== "request"}
+          className={`flex min-h-0 min-w-0 flex-1 flex-col ${
+            panelLayout === "tabbed"
+              ? ""
+              : panelLayout === "vertical"
+                ? "border-b"
+                : "border-r"
+          } border-[var(--color-border)]`}
+        >
+          {/* Same metrics as the response panel tabs so both columns' rules line up */}
+          <div className="flex shrink-0 items-center gap-0.5 overflow-x-auto overflow-y-hidden border-b border-[var(--color-border)] bg-[var(--color-surface)] px-2">
             {(["query", "variables", "headers", "auth"] as const).map(
-              (t) => (
-                <button
-                  key={t}
-                  onClick={() => setActiveTab(t)}
-                  className={`px-4 py-2 text-sm capitalize transition-colors ${
-                    activeTab === t
-                      ? "border-b-2 border-purple-500 text-[var(--color-text-primary)]"
-                      : "text-[var(--color-text-muted)] hover:text-[var(--color-text-secondary)]"
-                  }`}
-                >
-                  {t}
-                </button>
-              ),
+              (t) => {
+                const isActive = activeTab === t;
+                return (
+                  <button
+                    key={t}
+                    onClick={() => setActiveTab(t)}
+                    className={`relative shrink-0 whitespace-nowrap px-3 py-[9px] text-[12.5px] capitalize transition-colors duration-150 ${
+                      isActive
+                        ? "font-medium text-[var(--color-text-primary)]"
+                        : "text-[var(--color-text-muted)] hover:text-[var(--color-text-secondary)]"
+                    }`}
+                  >
+                    {t}
+                    {isActive && (
+                      <span className="absolute inset-x-2 -bottom-px h-[2px] bg-[var(--color-accent)]" />
+                    )}
+                  </button>
+                );
+              },
             )}
           </div>
 
@@ -320,7 +349,10 @@ export function GraphQLView() {
         </div>
 
         {/* Right: Response / Subscription messages */}
-        <div className="flex w-1/2 flex-col">
+        <div
+          hidden={panelLayout === "tabbed" && pane !== "response"}
+          className="flex min-h-0 min-w-0 flex-1 flex-col"
+        >
           {isSubscription ? (
             <SubscriptionPanel
               status={subStatus}

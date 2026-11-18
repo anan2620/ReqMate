@@ -3,7 +3,7 @@ import { useConsoleStore } from "@/stores/console-store";
 
 describe("Console Store", () => {
   beforeEach(() => {
-    useConsoleStore.getState().clear();
+    useConsoleStore.setState({ entries: [], open: false, panel: "console" });
   });
 
   it("adds log entries", () => {
@@ -50,6 +50,32 @@ describe("Console Store", () => {
     expect(useConsoleStore.getState().open).toBe(true);
     useConsoleStore.getState().toggle();
     expect(useConsoleStore.getState().open).toBe(false);
+  });
+
+  it("opens the panel on the console when closed", () => {
+    useConsoleStore.getState().toggleTerminal();
+    expect(useConsoleStore.getState().open).toBe(true);
+    expect(useConsoleStore.getState().panel).toBe("terminal");
+  });
+
+  it("switches from console to terminal in a single click", () => {
+    useConsoleStore.getState().toggle(); // console open
+    expect(useConsoleStore.getState().panel).toBe("console");
+
+    useConsoleStore.getState().toggleTerminal();
+    expect(useConsoleStore.getState().open).toBe(true);
+    expect(useConsoleStore.getState().panel).toBe("terminal");
+
+    // A second click on the same tab closes the panel
+    useConsoleStore.getState().toggleTerminal();
+    expect(useConsoleStore.getState().open).toBe(false);
+  });
+
+  it("switch back to the console from the terminal in one click", () => {
+    useConsoleStore.getState().toggleTerminal();
+    useConsoleStore.getState().toggle();
+    expect(useConsoleStore.getState().open).toBe(true);
+    expect(useConsoleStore.getState().panel).toBe("console");
   });
 
   it("sets filter", () => {

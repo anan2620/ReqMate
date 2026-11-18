@@ -9,43 +9,27 @@ const TerminalPanel = lazy(() =>
   })),
 );
 
-type BottomTab = "console" | "terminal";
-
-interface BottomPanelProps {
-  terminalOpen: boolean;
-  onTerminalOpenChange: (open: boolean) => void;
-}
-
-export function BottomPanel({ terminalOpen, onTerminalOpenChange }: BottomPanelProps) {
+export function BottomPanel() {
   const { t } = useTranslation();
-  const consoleOpen = useConsoleStore((s) => s.open);
-  const [activeTab, setActiveTab] = useState<BottomTab>("console");
+  // Visibility and the active tab live in one store so every entry point
+  // (status bar, activity bar, shortcut, in-panel tabs) agrees on the state.
+  const isOpen = useConsoleStore((s) => s.open);
+  const activeTab = useConsoleStore((s) => s.panel);
+  const setOpen = useConsoleStore((s) => s.setOpen);
+  const toggleConsole = useConsoleStore((s) => s.toggle);
+  const toggleTerminal = useConsoleStore((s) => s.toggleTerminal);
   const [height, setHeight] = useState(250);
   const [resizing, setResizing] = useState(false);
 
-  const isOpen = (activeTab === "console" && consoleOpen) || (activeTab === "terminal" && terminalOpen);
+  const toggleTab = useCallback(
+    (tab: "console" | "terminal") => {
+      if (tab === "console") toggleConsole();
+      else toggleTerminal();
+    },
+    [toggleConsole, toggleTerminal],
+  );
 
-  // If one panel opens, show it
-  useEffect(() => {
-    if (consoleOpen && !terminalOpen) setActiveTab("console");
-    if (terminalOpen && !consoleOpen) setActiveTab("terminal");
-  }, [consoleOpen, terminalOpen]);
-
-  const toggleTab = useCallback((tab: BottomTab) => {
-    if (activeTab === tab && isOpen) {
-      if (tab === "console") useConsoleStore.getState().setOpen(false);
-      else onTerminalOpenChange(false);
-    } else {
-      setActiveTab(tab);
-      if (tab === "console") useConsoleStore.getState().setOpen(true);
-      else onTerminalOpenChange(true);
-    }
-  }, [activeTab, isOpen, onTerminalOpenChange]);
-
-  const closePanel = useCallback(() => {
-    if (activeTab === "console") useConsoleStore.getState().setOpen(false);
-    else onTerminalOpenChange(false);
-  }, [activeTab, onTerminalOpenChange]);
+  const closePanel = useCallback(() => setOpen(false), [setOpen]);
 
   const handleMouseDown = useCallback(
     (e: React.MouseEvent) => {

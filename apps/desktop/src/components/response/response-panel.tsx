@@ -332,7 +332,7 @@ function ResponseTabs({
   };
 
   return (
-    <div className="flex shrink-0 items-center gap-0.5 overflow-x-auto border-b border-[var(--color-border)] bg-[var(--color-surface)] px-2">
+    <div className="flex shrink-0 items-center gap-0.5 overflow-x-auto overflow-y-hidden border-b border-[var(--color-border)] bg-[var(--color-surface)] px-2">
       {TAB_IDS.map((tabId) => {
         const isActive = activeTab === tabId;
         let meta: ReactNode = null;

@@ -7,15 +7,22 @@ import { useMockStore } from "@/stores/mock-store";
 import { useMonitorStore } from "@/stores/monitor-store";
 import { useSettingsStore } from "@/stores/settings-store";
 import { useConsoleStore } from "@/stores/console-store";
-import { Globe, FolderOpen, Server, Activity, Columns2, Rows2, LayoutList, Terminal, ScrollText } from "lucide-react";
+import {
+  Globe,
+  FolderOpen,
+  Server,
+  Activity,
+  Columns2,
+  Rows2,
+  LayoutList,
+  Terminal,
+  ScrollText,
+  Sun,
+  Moon,
+} from "lucide-react";
 import type { AppSettings } from "@reqmate/types";
 
-interface StatusBarProps {
-  onToggleTerminal?: () => void;
-  terminalOpen?: boolean;
-}
-
-export function StatusBar({ onToggleTerminal, terminalOpen }: StatusBarProps) {
+export function StatusBar() {
   const { t } = useTranslation();
   // Injected at build time, so the shell still shows a version without Tauri
   const [appVersion, setAppVersion] = useState(__APP_VERSION__);
@@ -30,18 +37,36 @@ export function StatusBar({ onToggleTerminal, terminalOpen }: StatusBarProps) {
   const monitors = useMonitorStore((s) => s.monitors);
   const layout = useSettingsStore((s) => s.settings.layout);
   const updateSettings = useSettingsStore((s) => s.updateSettings);
+  const theme = useSettingsStore((s) => s.settings.theme);
   const consoleEntries = useConsoleStore((s) => s.entries);
-  const consoleOpen = useConsoleStore((s) => s.open);
+  const panelOpen = useConsoleStore((s) => s.open);
+  const panelTab = useConsoleStore((s) => s.panel);
   const toggleConsole = useConsoleStore((s) => s.toggle);
+  const toggleTerminal = useConsoleStore((s) => s.toggleTerminal);
   const hasErrors = consoleEntries.some((e) => e.level === "error");
+  const consoleOpen = panelOpen && panelTab === "console";
+  const terminalOpen = panelOpen && panelTab === "terminal";
 
   const runningMocks = mockServers.filter((s) => s.running).length;
   const activeMonitors = monitors.filter((m) => m.enabled).length;
 
-  const toggleLayout = () => {
-    const order: AppSettings["layout"][] = ["horizontal", "vertical", "tabbed"];
-    const next = order[(order.indexOf(layout) + 1) % order.length];
-    updateSettings({ layout: next });
+  const layoutOrder: AppSettings["layout"][] = ["horizontal", "vertical", "tabbed"];
+  const layoutLabels: Record<AppSettings["layout"], string> = {
+    horizontal: t("settings.sideBySide"),
+    vertical: t("settings.stacked"),
+    tabbed: t("settings.tabbed"),
+  };
+
+  // "black" resolves to a dark surface, so it counts as dark for the toggle.
+  const isDark =
+    theme === "dark" ||
+    theme === "black" ||
+    (theme === "system" &&
+      typeof window !== "undefined" &&
+      window.matchMedia("(prefers-color-scheme: dark)").matches);
+
+  const toggleTheme = () => {
+    updateSettings({ theme: isDark ? "light" : "dark" });
   };
 
   return (
@@ -97,31 +122,27 @@ export function StatusBar({ onToggleTerminal, terminalOpen }: StatusBarProps) {
         </button>
 
         {/* Terminal toggle */}
-        {onToggleTerminal && (
-          <button
-            onClick={onToggleTerminal}
-            className={`flex items-center gap-1 rounded-md px-1.5 py-1 transition-colors ${
-              terminalOpen
-                ? "bg-[var(--color-accent-soft)] text-[var(--color-accent-text)]"
-                : "text-[var(--color-text-dimmed)] hover:bg-[color-mix(in_srgb,var(--color-text-primary)_6%,transparent)] hover:text-[var(--color-text-secondary)]"
-            }`}
-            title="Toggle Terminal (Ctrl+`)"
-          >
-            <Terminal className="h-3.5 w-3.5" />
-          </button>
-        )}
-
-        {/* Layout toggle */}
         <button
-          onClick={toggleLayout}
-          className="flex items-center gap-1 rounded-md px-1.5 py-1 text-[var(--color-text-dimmed)] transition-colors hover:bg-[color-mix(in_srgb,var(--color-text-primary)_6%,transparent)] hover:text-[var(--color-text-secondary)]"
-          title={
-            layout === "horizontal"
-              ? "Switch to stacked layout"
-              : layout === "vertical"
-                ? "Switch to tabbed layout"
-                : "Switch to side-by-side layout"
+          onClick={toggleTerminal}
+          className={`flex items-center gap-1 rounded-md px-1.5 py-1 transition-colors ${
+            terminalOpen
+              ? "bg-[var(--color-accent-soft)] text-[var(--color-accent-text)]"
+              : "text-[var(--color-text-dimmed)] hover:bg-[color-mix(in_srgb,var(--color-text-primary)_6%,transparent)] hover:text-[var(--color-text-secondary)]"
+          }`}
+          title={`${t("console.terminal")} (Ctrl+\`)`}
+        >
+          <Terminal className="h-3.5 w-3.5" />
+        </button>
+
+        {/* Panel layout — single button, click cycles side-by-side → stacked → tabbed */}
+        <button
+          onClick={() =>
+            updateSettings({
+              layout: layoutOrder[(layoutOrder.indexOf(layout) + 1) % layoutOrder.length],
+            })
           }
+          className="flex items-center gap-1 rounded-md px-1.5 py-1 text-[var(--color-text-dimmed)] transition-colors hover:bg-[color-mix(in_srgb,var(--color-text-primary)_6%,transparent)] hover:text-[var(--color-text-secondary)]"
+          title={`${t("settings.panelLayout")} — ${layoutLabels[layout]}`}
         >
           {layout === "horizontal" ? (
             <Columns2 className="h-3.5 w-3.5" />
@@ -130,6 +151,16 @@ export function StatusBar({ onToggleTerminal, terminalOpen }: StatusBarProps) {
           ) : (
             <LayoutList className="h-3.5 w-3.5" />
           )}
+        </button>
+
+        {/* Theme toggle */}
+        <button
+          onClick={toggleTheme}
+          className="flex items-center gap-1 rounded-md px-1.5 py-1 text-[var(--color-text-dimmed)] transition-colors hover:bg-[color-mix(in_srgb,var(--color-text-primary)_6%,transparent)] hover:text-[var(--color-text-secondary)]"
+          title={`${t("settings.toggleTheme")} — ${isDark ? t("settings.light") : t("settings.dark")}`}
+          aria-label={t("settings.toggleTheme")}
+        >
+          {isDark ? <Sun className="h-3.5 w-3.5" /> : <Moon className="h-3.5 w-3.5" />}
         </button>
 
         <span aria-hidden className="mx-1.5 h-3 w-px bg-[var(--color-border-strong)]" />

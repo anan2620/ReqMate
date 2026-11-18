@@ -9,6 +9,8 @@ import { Upload, Send, Loader2, Trash2, ArrowDown, ArrowUp, Plus, X, Search, Che
 import { Breadcrumb } from "@/components/layout/breadcrumb";
 import { UrlBar } from "@/components/request/url-bar";
 import { KeyValueEditor } from "@/components/request/key-value-editor";
+import { useSettingsStore } from "@/stores/settings-store";
+import { PanelTabSwitch } from "@/components/ui/panel-tab-switch";
 
 interface StreamMessage {
   body: string;
@@ -29,6 +31,9 @@ const CALL_TYPE_GROUP_LABELS: Record<string, string> = {
 export function GrpcView() {
   const { t } = useTranslation();
   const tab = useActiveTab();
+  // Panel layout is global — honour it instead of a hard-coded 50/50 split.
+  const panelLayout = useSettingsStore((s) => s.settings.layout);
+  const [pane, setPane] = useState<"request" | "response">("request");
   const [streamMessages, setStreamMessages] = useState<StreamMessage[]>([]);
   const [streaming, setStreaming] = useState(false);
   const [autoScroll, setAutoScroll] = useState(true);
@@ -211,9 +216,25 @@ export function GrpcView() {
         }
       />
 
-      <div className="flex flex-1 overflow-hidden">
+      <div
+        className={
+          panelLayout === "tabbed"
+            ? "flex flex-1 flex-col overflow-hidden"
+            : `flex flex-1 overflow-hidden ${panelLayout === "vertical" ? "flex-col" : "flex-row"}`
+        }
+      >
+        {panelLayout === "tabbed" && <PanelTabSwitch value={pane} onChange={setPane} />}
         {/* Left panel: service/method selection + metadata + request */}
-        <div className="flex w-1/2 flex-col border-r border-[var(--color-border)]">
+        <div
+          hidden={panelLayout === "tabbed" && pane !== "request"}
+          className={`flex min-h-0 min-w-0 flex-1 flex-col ${
+            panelLayout === "tabbed"
+              ? ""
+              : panelLayout === "vertical"
+                ? "border-b"
+                : "border-r"
+          } border-[var(--color-border)]`}
+        >
           {/* Service selector */}
           {grpc.services.length > 0 && (
             <div className="border-b border-[var(--color-border)] px-3 py-2">
@@ -270,7 +291,7 @@ export function GrpcView() {
           </div>
 
           {/* Request JSON editor */}
-          <div className="flex-1 overflow-auto p-3">
+          <div className="flex min-h-0 flex-1 flex-col overflow-y-auto p-3">
             {hasStreamRequest ? (
               /* Multi-message input for client/bidi streaming */
               <>
@@ -327,7 +348,7 @@ export function GrpcView() {
                 <textarea
                   value={grpc.requestJson}
                   onChange={(e) => updateGrpc({ requestJson: e.target.value })}
-                  className="h-full w-full resize-none rounded bg-[var(--color-elevated)] p-3 font-mono text-sm text-[var(--color-text-primary)] outline-none focus:ring-1 focus:ring-[var(--color-accent)]"
+                  className="min-h-0 w-full flex-1 resize-none rounded bg-[var(--color-elevated)] p-3 font-mono text-sm text-[var(--color-text-primary)] outline-none focus:ring-1 focus:ring-[var(--color-accent)]"
                   placeholder='{ "field": "value" }'
                   spellCheck={false}
                 />
@@ -337,7 +358,10 @@ export function GrpcView() {
         </div>
 
         {/* Right panel: response */}
-        <div className="flex w-1/2 flex-col">
+        <div
+          hidden={panelLayout === "tabbed" && pane !== "response"}
+          className="flex min-h-0 min-w-0 flex-1 flex-col"
+        >
           {grpc.error ? (
             <div className="flex flex-1 items-center justify-center p-6 text-center">
               <p className="text-sm text-red-400">{grpc.error}</p>

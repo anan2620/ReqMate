@@ -48,7 +48,7 @@ export function RequestPanel() {
   return (
     <div className="flex flex-1 flex-col overflow-hidden">
       {/* Tab bar */}
-      <div className="flex shrink-0 items-center gap-0.5 overflow-x-auto border-b border-[var(--color-border)] bg-[var(--color-surface)] px-2">
+      <div className="flex shrink-0 items-center gap-0.5 overflow-x-auto overflow-y-hidden border-b border-[var(--color-border)] bg-[var(--color-surface)] px-2">
         {TAB_IDS.map((tabId) => {
           const isActive = activeTab === tabId;
           const count =

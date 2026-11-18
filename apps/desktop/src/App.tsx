@@ -71,7 +71,6 @@ function App() {
   const [activeView, setActiveView] = useState<ActivityView>("collections");
   const [sidePanelVisible, setSidePanelVisible] = useState(true);
   const [zenMode, setZenMode] = useState(false);
-  const [terminalOpen, setTerminalOpen] = useState(false);
   const urlBarRef = useRef<HTMLInputElement>(null);
   const envSelectorRef = useRef<HTMLButtonElement>(null);
   const { isCompact } = useResponsive();
@@ -223,7 +222,7 @@ function App() {
           setZenMode((prev) => !prev);
           break;
         case "toggleTerminal":
-          setTerminalOpen((p) => !p);
+          useConsoleStore.getState().toggleTerminal();
           break;
         case "undo":
           undoTab();
@@ -246,7 +245,7 @@ function App() {
 
   // Listen for terminal toggle from command palette
   useEffect(() => {
-    const handler = () => setTerminalOpen((p) => !p);
+    const handler = () => useConsoleStore.getState().toggleTerminal();
     window.addEventListener("reqmate:toggle-terminal", handler);
     return () => window.removeEventListener("reqmate:toggle-terminal", handler);
   }, []);
@@ -315,7 +314,7 @@ function App() {
             onViewChange={handleViewChange}
             onOpenSettings={openSettings}
             onOpenAi={() => setAiOpen(true)}
-            onToggleConsole={() => useConsoleStore.getState().toggle()}
+            onToggleTerminal={() => useConsoleStore.getState().toggleTerminal()}
           />
         )}
 
@@ -347,18 +346,12 @@ function App() {
 
       {/* Bottom panel (Console + Terminal) */}
       {!zenMode && (
-        <BottomPanel
-          terminalOpen={terminalOpen}
-          onTerminalOpenChange={setTerminalOpen}
-        />
+        <BottomPanel />
       )}
 
       {/* Status bar */}
       {!zenMode && (
-        <StatusBar
-          terminalOpen={terminalOpen}
-          onToggleTerminal={() => setTerminalOpen((p) => !p)}
-        />
+        <StatusBar />
       )}
 
       {/* Zen mode indicator */}
@@ -442,7 +435,6 @@ function ProtocolView({
   protocol: TabProtocol;
   urlBarRef: React.RefObject<HTMLInputElement | null>;
 }) {
-  const { isCompact } = useResponsive();
   const panelRatio = useSettingsStore((s) => s.settings.panelRatio);
   const layout = useSettingsStore((s) => s.settings.layout);
   const { updateSettings } = useSettingsStore();
@@ -451,7 +443,9 @@ function ProtocolView({
   const [tabbedActivePanel, setTabbedActivePanel] = useState<"request" | "response">("request");
 
   const isTabbed = layout === "tabbed";
-  const isVertical = isCompact || layout === "vertical";
+  // The user's explicit layout choice wins — forcing "stacked" on narrow windows
+  // made the setting look broken (side-by-side and stacked rendered the same).
+  const isVertical = layout === "vertical";
 
   const handleResizeEnd = useCallback(
     (ratio: number) => {
