@@ -9,7 +9,7 @@ use crate::http::cookies::{CookieEntry, CookieJarManager};
 use crate::http::interpolation;
 use crate::models::auth::AuthConfig;
 use crate::models::collection::{CollectionDefaults, CollectionNode, RequestFile};
-use crate::models::request::{BodyType, KeyValuePair, RequestBody, SendRequestParams};
+use crate::models::request::{BodyType, KeyValuePair, ProxyConfig, RequestBody, SendRequestParams};
 use crate::oauth::OAuthTokenStore;
 use crate::scripting::engine::execute_script;
 use crate::scripting::{RequestSnapshot, ResponseSnapshot, ScriptContext, ScriptPhase};
@@ -31,7 +31,7 @@ fn collect_request_paths(node: &CollectionNode) -> Vec<String> {
 }
 
 /// Convert a RequestFile from disk to SendRequestParams for the HTTP engine.
-fn request_file_to_params(file: &RequestFile) -> SendRequestParams {
+fn request_file_to_params(file: &RequestFile, proxy: Option<ProxyConfig>) -> SendRequestParams {
     let headers: Vec<KeyValuePair> = file
         .headers
         .iter()
@@ -72,7 +72,7 @@ fn request_file_to_params(file: &RequestFile) -> SendRequestParams {
         params,
         body,
         auth: file.auth.clone(),
-        proxy: None,
+        proxy,
         timeout_ms: None,
         follow_redirects: true,
         verify_ssl: true,
@@ -249,8 +249,9 @@ async fn run_single_request(
     cookie_jar: &CookieJarManager,
     collection_path: &str,
     defaults: &CollectionDefaults,
+    proxy: Option<ProxyConfig>,
 ) -> RequestRunResult {
-    let params = request_file_to_params(file);
+    let params = request_file_to_params(file, proxy.clone());
     let mut interpolated = interpolate_params(&params, vars);
 
     // Inject stored cookies from the jar
@@ -479,6 +480,7 @@ pub async fn run_collection(
     history_db: Arc<HistoryDb>,
     oauth_store: &OAuthTokenStore,
     cookie_jar: &CookieJarManager,
+    proxy: Option<ProxyConfig>,
 ) -> Result<RunSummary, String> {
     let collection_path = Path::new(&config.collection_path);
     let tree = load_collection_tree(collection_path)?;
@@ -607,6 +609,7 @@ pub async fn run_collection(
                 cookie_jar,
                 &config.collection_path,
                 &defaults,
+                proxy.clone(),
             )
             .await;
 

@@ -88,8 +88,22 @@ pub struct RequestBody {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ProxyConfig {
-    pub url: String,
+    /// "off" (direct), "on" (the proxy below) or "system" (OS / env proxy)
+    pub mode: String,
+    /// Scheme when mode = "on": "http" | "https" | "socks5"
+    #[serde(default)]
+    pub proxy_type: Option<String>,
+    /// Host without scheme or port
+    #[serde(default)]
+    pub host: Option<String>,
+    #[serde(default)]
+    pub port: Option<u16>,
+    /// Comma or newline separated hosts that bypass the proxy
+    #[serde(default)]
+    pub bypass: Option<String>,
+    #[serde(default)]
     pub username: Option<String>,
+    #[serde(default)]
     pub password: Option<String>,
 }
 

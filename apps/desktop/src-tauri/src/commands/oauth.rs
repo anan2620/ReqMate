@@ -1,5 +1,6 @@
 use tauri::State;
 
+use crate::commands::settings::SettingsState;
 use crate::models::auth::AuthConfig;
 use crate::oauth::flow::execute_oauth_flow;
 use crate::oauth::{OAuthTokenStatus, OAuthTokenStore};
@@ -8,8 +9,11 @@ use crate::oauth::{OAuthTokenStatus, OAuthTokenStore};
 pub async fn oauth_start_flow(
     app: tauri::AppHandle,
     store: State<'_, OAuthTokenStore>,
+    settings: State<'_, SettingsState>,
     auth_config: AuthConfig,
 ) -> Result<String, String> {
+    // Token endpoints are outbound HTTP calls, so they honour the global proxy.
+    let proxy = settings.settings.lock().ok().map(|s| s.proxy_config());
     let open_browser = move |url: &str| -> Result<(), String> {
         let url = url.to_string();
         let app = app.clone();
@@ -26,7 +30,7 @@ pub async fn oauth_start_flow(
         Ok(())
     };
 
-    execute_oauth_flow(&auth_config, &store, open_browser).await
+    execute_oauth_flow(&auth_config, &store, open_browser, proxy).await
 }
 
 #[tauri::command]

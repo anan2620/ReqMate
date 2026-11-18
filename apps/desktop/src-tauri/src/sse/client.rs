@@ -2,6 +2,9 @@ use futures_util::StreamExt;
 use tauri::{AppHandle, Emitter};
 use tokio::sync::watch;
 
+use crate::http::request_builder::client_with_proxy;
+use crate::models::request::ProxyConfig;
+
 use super::parser::SseParser;
 use super::{SseConnectParams, SseEvent, SseStatus};
 
@@ -10,6 +13,7 @@ pub async fn connect_sse(
     app: AppHandle,
     connection_id: String,
     params: SseConnectParams,
+    proxy: Option<ProxyConfig>,
     mut cancel_rx: watch::Receiver<bool>,
 ) {
     // Emit connecting
@@ -22,8 +26,21 @@ pub async fn connect_sse(
         },
     );
 
-    // Build request
-    let client = reqwest::Client::new();
+    // Build request — use the same proxy configuration as regular requests.
+    let client = match client_with_proxy(proxy.as_ref()) {
+        Ok(client) => client,
+        Err(e) => {
+            let _ = app.emit(
+                "sse:status",
+                SseStatus {
+                    connection_id: connection_id.clone(),
+                    state: "disconnected".to_string(),
+                    error: Some(format!("Connection failed: {e}")),
+                },
+            );
+            return;
+        }
+    };
     let mut req = client
         .get(&params.url)
         .header("Accept", "text/event-stream")

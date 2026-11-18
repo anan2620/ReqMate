@@ -1,6 +1,11 @@
 use std::collections::HashMap;
 
 use serde::{Deserialize, Serialize};
+use tauri::State;
+
+use crate::commands::settings::SettingsState;
+use crate::http::request_builder::client_with_proxy;
+use crate::models::request::ProxyConfig;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -33,7 +38,11 @@ pub struct AiGeneratedTests {
 
 /// Generate an API request from natural language using an OpenAI-compatible API.
 #[tauri::command]
-pub async fn ai_generate_request(params: AiGenerateParams) -> Result<AiGeneratedRequest, String> {
+pub async fn ai_generate_request(
+    settings: State<'_, SettingsState>,
+    params: AiGenerateParams,
+) -> Result<AiGeneratedRequest, String> {
+    let proxy = settings.settings.lock().ok().map(|s| s.proxy_config());
     let system_prompt = r#"You are an API development assistant. Given a natural language description, generate an HTTP API request.
 Respond with a JSON object containing exactly these fields:
 - "name": short descriptive name for the request
@@ -70,6 +79,7 @@ Only respond with the JSON object, no other text."#;
             "temperature": 0.3,
             "max_tokens": 1000,
         }),
+        proxy,
     )
     .await?;
 
@@ -98,11 +108,13 @@ Only respond with the JSON object, no other text."#;
 /// Generate test assertions from a request/response pair using an OpenAI-compatible API.
 #[tauri::command]
 pub async fn ai_generate_tests(
+    settings: State<'_, SettingsState>,
     params: AiGenerateParams,
     request_yaml: String,
     response_body: String,
     response_status: u16,
 ) -> Result<AiGeneratedTests, String> {
+    let proxy = settings.settings.lock().ok().map(|s| s.proxy_config());
     let system_prompt = r#"You are an API testing assistant. Given an API request and its response, generate test assertions.
 Respond with a JSON object containing:
 - "tests": JavaScript test code using the req.test() and req.expect() API (similar to Chai.js)
@@ -146,6 +158,7 @@ Only respond with the JSON object, no other text."#;
             "temperature": 0.3,
             "max_tokens": 1500,
         }),
+        proxy,
     )
     .await?;
 
@@ -212,7 +225,11 @@ pub struct AiChatResponse {
 /// Chat with the AI assistant. It can answer questions about APIs and also
 /// generate HTTP requests when the user asks for one.
 #[tauri::command]
-pub async fn ai_chat(params: AiGenerateParams) -> Result<AiChatResponse, String> {
+pub async fn ai_chat(
+    settings: State<'_, SettingsState>,
+    params: AiGenerateParams,
+) -> Result<AiChatResponse, String> {
+    let proxy = settings.settings.lock().ok().map(|s| s.proxy_config());
     let system_prompt = r#"You are ReqMate, a friendly and helpful AI assistant inside ReqMate, an API testing tool. You have a warm, approachable personality. Keep your responses concise and clear.
 
 You can do two things:
@@ -252,6 +269,7 @@ Decide based on the user's message: if they want a request generated, respond wi
             "temperature": 0.3,
             "max_tokens": 1500,
         }),
+        proxy,
     )
     .await?;
 
@@ -303,8 +321,10 @@ async fn ai_request(
     url: &str,
     api_key: &str,
     payload: serde_json::Value,
+    proxy: Option<ProxyConfig>,
 ) -> Result<serde_json::Value, String> {
-    let client = reqwest::Client::new();
+    let client = client_with_proxy(proxy.as_ref())
+        .map_err(|e| format!("Failed to configure the AI request client: {e}"))?;
     let response = client
         .post(url)
         .header("Authorization", format!("Bearer {api_key}"))

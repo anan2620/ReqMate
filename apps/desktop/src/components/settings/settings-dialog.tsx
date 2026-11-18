@@ -47,6 +47,17 @@ type SettingsSectionId =
   | "backup"
   | "tokens";
 
+const PROXY_MODES: {
+  value: "off" | "on" | "system";
+  labelKey: string;
+}[] = [
+  { value: "off", labelKey: "settings.proxyOff" },
+  { value: "on", labelKey: "settings.proxyOn" },
+  { value: "system", labelKey: "settings.proxySystem" },
+];
+
+const PROXY_TYPES = ["http", "https", "socks5"] as const;
+
 const SETTINGS_SECTIONS: {
   id: SettingsSectionId;
   icon: typeof Palette;
@@ -331,31 +342,137 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
                   {/* Proxy */}
                   <div>
                     <label className="mb-2 block text-sm text-[var(--color-text-secondary)]">
-                      {t("settings.proxyUrl")}
+                      {t("settings.proxyMode")}
                     </label>
-                    <input
-                      type="text"
-                      value={settings.proxyUrl ?? ""}
-                      onChange={(e) => update({ proxyUrl: e.target.value || null })}
-                      placeholder="http://proxy.example.com:8080"
-                                        className="mb-2 w-full rounded border border-[var(--color-border)] bg-[var(--color-card)] px-3 py-1.5 text-sm text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none transition-colors focus:border-[var(--color-accent)]"
-                    />
-                    {settings.proxyUrl && (
-                      <div className="flex gap-2">
-                        <input
-                          type="text"
-                          value={settings.proxyUsername ?? ""}
-                          onChange={(e) => update({ proxyUsername: e.target.value || null })}
-                          placeholder={t("settings.proxyUsername")}
-                                                className="flex-1 rounded border border-[var(--color-border)] bg-[var(--color-card)] px-3 py-1.5 text-sm text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none transition-colors focus:border-[var(--color-accent)]"
-                        />
-                        <input
-                          type="password"
-                          value={settings.proxyPassword ?? ""}
-                          onChange={(e) => update({ proxyPassword: e.target.value || null })}
-                          placeholder={t("settings.proxyPassword")}
-                                                className="flex-1 rounded border border-[var(--color-border)] bg-[var(--color-card)] px-3 py-1.5 text-sm text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none transition-colors focus:border-[var(--color-accent)]"
-                        />
+                    <div className="flex gap-2">
+                      {PROXY_MODES.map((mode) => (
+                        <button
+                          key={mode.value}
+                          onClick={() => update({ proxyMode: mode.value })}
+                          aria-pressed={settings.proxyMode === mode.value}
+                          className={`rounded-md border px-3.5 py-1.5 text-[12.5px] transition-colors ${
+                            settings.proxyMode === mode.value
+                              ? "border-transparent bg-[var(--color-accent)] font-medium text-white"
+                              : "border-[var(--color-border)] bg-[var(--color-card)] text-[var(--color-text-secondary)] hover:border-[var(--color-border-strong)] hover:bg-[var(--color-card-hover)] hover:text-[var(--color-text-primary)]"
+                          }`}
+                        >
+                          {t(mode.labelKey)}
+                        </button>
+                      ))}
+                    </div>
+
+                    {settings.proxyMode === "system" && (
+                      <p className="mt-2 text-[11.5px] leading-relaxed text-[var(--color-text-muted)]">
+                        {t("settings.proxySystemHint")}
+                      </p>
+                    )}
+
+                    {settings.proxyMode === "on" && (
+                      <div className="mt-3 space-y-3 rounded-md border border-[var(--color-border)] bg-[color-mix(in_srgb,var(--color-text-primary)_2%,transparent)] p-3">
+                        {/* Scheme */}
+                        <div>
+                          <label className="mb-1.5 block text-[12.5px] text-[var(--color-text-secondary)]">
+                            {t("settings.proxyType")}
+                          </label>
+                          <div className="flex gap-2">
+                            {PROXY_TYPES.map((type) => (
+                              <button
+                                key={type}
+                                onClick={() => update({ proxyType: type })}
+                                aria-pressed={settings.proxyType === type}
+                                className={`rounded-md border px-2.5 py-1 text-[12px] uppercase tracking-wide transition-colors ${
+                                  settings.proxyType === type
+                                    ? "border-[var(--color-accent)] bg-[var(--color-accent-soft)] font-medium text-[var(--color-accent-text)]"
+                                    : "border-[var(--color-border)] bg-[var(--color-card)] text-[var(--color-text-muted)] hover:border-[var(--color-border-strong)] hover:text-[var(--color-text-secondary)]"
+                                }`}
+                              >
+                                {type}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Host + port */}
+                        <div className="flex gap-2">
+                          <div className="min-w-0 flex-1">
+                            <label className="mb-1.5 block text-[12.5px] text-[var(--color-text-secondary)]">
+                              {t("settings.proxyHost")}
+                            </label>
+                            <input
+                              type="text"
+                              value={settings.proxyHost ?? ""}
+                              onChange={(e) => update({ proxyHost: e.target.value.trim() || null })}
+                              placeholder="127.0.0.1"
+                              spellCheck={false}
+                              className="w-full rounded border border-[var(--color-border)] bg-[var(--color-card)] px-3 py-1.5 font-mono text-[13px] text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none transition-colors focus:border-[var(--color-accent)]"
+                            />
+                          </div>
+                          <div className="w-[96px] shrink-0">
+                            <label className="mb-1.5 block text-[12.5px] text-[var(--color-text-secondary)]">
+                              {t("settings.proxyPort")}
+                            </label>
+                            <input
+                              type="number"
+                              min={1}
+                              max={65535}
+                              value={settings.proxyPort ?? ""}
+                              onChange={(e) => {
+                                const parsed = Number(e.target.value);
+                                update({
+                                  proxyPort:
+                                    Number.isFinite(parsed) && parsed > 0 && parsed <= 65535
+                                      ? Math.trunc(parsed)
+                                      : null,
+                                });
+                              }}
+                              placeholder="8080"
+                              className="tabular w-full rounded border border-[var(--color-border)] bg-[var(--color-card)] px-3 py-1.5 text-[13px] text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none transition-colors focus:border-[var(--color-accent)]"
+                            />
+                          </div>
+                        </div>
+
+                        {/* Bypass list */}
+                        <div>
+                          <label className="mb-1.5 block text-[12.5px] text-[var(--color-text-secondary)]">
+                            {t("settings.proxyBypass")}
+                          </label>
+                          <textarea
+                            rows={3}
+                            value={settings.proxyBypass ?? ""}
+                            onChange={(e) => update({ proxyBypass: e.target.value || null })}
+                            placeholder={"localhost\n127.0.0.1\n*.internal.example.com"}
+                            spellCheck={false}
+                            className="w-full resize-none rounded border border-[var(--color-border)] bg-[var(--color-card)] px-3 py-1.5 font-mono text-[12.5px] leading-relaxed text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none transition-colors focus:border-[var(--color-accent)]"
+                          />
+                          <p className="mt-1 text-[11px] leading-relaxed text-[var(--color-text-muted)]">
+                            {t("settings.proxyBypassHint")}
+                          </p>
+                        </div>
+
+                        {/* Authentication */}
+                        <div>
+                          <label className="mb-1.5 block text-[12.5px] text-[var(--color-text-secondary)]">
+                            {t("settings.proxyAuth")}
+                          </label>
+                          <div className="flex gap-2">
+                            <input
+                              type="text"
+                              value={settings.proxyUsername ?? ""}
+                              onChange={(e) => update({ proxyUsername: e.target.value || null })}
+                              placeholder={t("settings.proxyUsername")}
+                              autoComplete="off"
+                              className="min-w-0 flex-1 rounded border border-[var(--color-border)] bg-[var(--color-card)] px-3 py-1.5 text-[13px] text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none transition-colors focus:border-[var(--color-accent)]"
+                            />
+                            <input
+                              type="password"
+                              value={settings.proxyPassword ?? ""}
+                              onChange={(e) => update({ proxyPassword: e.target.value || null })}
+                              placeholder={t("settings.proxyPassword")}
+                              autoComplete="off"
+                              className="min-w-0 flex-1 rounded border border-[var(--color-border)] bg-[var(--color-card)] px-3 py-1.5 text-[13px] text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none transition-colors focus:border-[var(--color-accent)]"
+                            />
+                          </div>
+                        </div>
                       </div>
                     )}
                   </div>

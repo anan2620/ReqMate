@@ -12,7 +12,11 @@ interface SettingsState {
 const defaultSettings: AppSettings = {
   theme: "dark",
   accentColor: "indigo",
-  proxyUrl: null,
+  proxyMode: "system",
+  proxyType: "http",
+  proxyHost: null,
+  proxyPort: null,
+  proxyBypass: null,
   proxyUsername: null,
   proxyPassword: null,
   verifySsl: true,

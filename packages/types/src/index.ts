@@ -111,7 +111,15 @@ export interface OAuthTokenStatus {
 // ── Proxy ──
 
 export interface ProxyConfig {
-  url: string;
+  /** off = direct connection, on = the proxy below, system = OS/environment proxy */
+  mode: "off" | "on" | "system";
+  /** Scheme when mode is "on" */
+  proxyType?: "http" | "https" | "socks5";
+  /** Host without scheme or port */
+  host?: string;
+  port?: number;
+  /** Comma or newline separated hosts that bypass the proxy */
+  bypass?: string;
   username?: string;
   password?: string;
 }
@@ -301,7 +309,14 @@ export interface ParsedCurlRequest {
 export interface AppSettings {
   theme: "dark" | "light" | "black" | "system";
   accentColor: "indigo" | "blue" | "emerald" | "amber" | "rose" | "violet" | "cyan" | "orange";
-  proxyUrl: string | null;
+  /** off = direct, on = custom proxy, system = OS/environment proxy */
+  proxyMode: "off" | "on" | "system";
+  /** Scheme used when proxyMode is "on" */
+  proxyType: "http" | "https" | "socks5";
+  proxyHost: string | null;
+  proxyPort: number | null;
+  /** Comma or newline separated hosts that bypass the proxy */
+  proxyBypass: string | null;
   proxyUsername: string | null;
   proxyPassword: string | null;
   verifySsl: boolean;

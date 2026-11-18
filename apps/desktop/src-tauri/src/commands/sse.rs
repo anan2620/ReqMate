@@ -4,6 +4,7 @@ use std::sync::Mutex;
 use tauri::{AppHandle, State};
 use tokio::sync::watch;
 
+use crate::commands::settings::SettingsState;
 use crate::sse::client::connect_sse;
 use crate::sse::SseConnectParams;
 
@@ -23,9 +24,13 @@ impl SseManager {
 pub async fn sse_connect(
     app: AppHandle,
     state: State<'_, SseManager>,
+    settings: State<'_, SettingsState>,
     connection_id: String,
     params: SseConnectParams,
 ) -> Result<(), String> {
+    // SSE is an outbound HTTP call like any other request, so it honours the
+    // same global proxy setting instead of reqwest's environment defaults.
+    let proxy = settings.settings.lock().ok().map(|s| s.proxy_config());
     let (cancel_tx, cancel_rx) = watch::channel(false);
 
     {
@@ -50,7 +55,7 @@ pub async fn sse_connect(
     drop(state_inner); // release lock before spawning
 
     tokio::spawn(async move {
-        connect_sse(app_clone, conn_id, params, cancel_rx).await;
+        connect_sse(app_clone, conn_id, params, proxy, cancel_rx).await;
     });
 
     Ok(())

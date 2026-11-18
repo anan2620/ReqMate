@@ -6,6 +6,7 @@ import type {
   AuthConfig,
   HttpError,
   ResponseData,
+  ProxyConfig,
   Tab,
 } from "@reqmate/types";
 import {
@@ -403,13 +404,21 @@ export const useTabStore = create<TabState>((set, get) => ({
 
     // Get network settings
     const { settings } = useSettingsStore.getState();
-    const proxy = settings.proxyUrl
-      ? {
-          url: settings.proxyUrl,
-          username: settings.proxyUsername ?? undefined,
-          password: settings.proxyPassword ?? undefined,
-        }
-      : undefined;
+    // The proxy mode always crosses the bridge so the backend knows whether to
+    // go direct ("off"), use the configured proxy ("on") or let the OS decide
+    // ("system").
+    const proxy: ProxyConfig =
+      settings.proxyMode === "on" && settings.proxyHost
+        ? {
+            mode: "on",
+            proxyType: settings.proxyType,
+            host: settings.proxyHost,
+            port: settings.proxyPort ?? undefined,
+            bypass: settings.proxyBypass ?? undefined,
+            username: settings.proxyUsername ?? undefined,
+            password: settings.proxyPassword ?? undefined,
+          }
+        : { mode: settings.proxyMode === "system" ? "system" : "off" };
 
     // Build body — for GraphQL, construct from graphql state
     let body = tab.body.type !== "none" ? tab.body : undefined;

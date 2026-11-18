@@ -1,4 +1,6 @@
+use crate::http::request_builder::client_with_proxy;
 use crate::models::auth::{AuthConfig, OAuth2GrantType};
+use crate::models::request::ProxyConfig;
 use crate::oauth::callback::start_callback_server;
 use crate::oauth::{OAuthToken, OAuthTokenStore};
 use serde::Deserialize;
@@ -10,6 +12,7 @@ pub async fn execute_oauth_flow(
     auth: &AuthConfig,
     store: &OAuthTokenStore,
     open_browser: impl Fn(&str) -> Result<(), String>,
+    proxy: Option<ProxyConfig>,
 ) -> Result<String, String> {
     let (
         grant_type,
@@ -58,7 +61,15 @@ pub async fn execute_oauth_flow(
         }
         // Try refresh if we have a refresh token
         if let Some(ref refresh_token) = token.refresh_token {
-            match refresh_token_flow(token_url, client_id, client_secret, refresh_token).await {
+            match refresh_token_flow(
+                token_url,
+                client_id,
+                client_secret,
+                refresh_token,
+                proxy.as_ref(),
+            )
+            .await
+            {
                 Ok(new_token) => {
                     let access = new_token.access_token.clone();
                     store.set(cache_key, new_token);
@@ -74,7 +85,8 @@ pub async fn execute_oauth_flow(
 
     let token = match grant_type {
         OAuth2GrantType::ClientCredentials => {
-            client_credentials_flow(token_url, client_id, client_secret, scope).await?
+            client_credentials_flow(token_url, client_id, client_secret, scope, proxy.as_ref())
+                .await?
         }
         OAuth2GrantType::Password => {
             password_flow(
@@ -84,6 +96,7 @@ pub async fn execute_oauth_flow(
                 scope,
                 username,
                 password,
+                proxy.as_ref(),
             )
             .await?
         }
@@ -97,6 +110,7 @@ pub async fn execute_oauth_flow(
                 callback_url,
                 *use_pkce,
                 &open_browser,
+                proxy.as_ref(),
             )
             .await?
         }
@@ -158,8 +172,10 @@ async fn client_credentials_flow(
     client_id: &str,
     client_secret: &str,
     scope: &str,
+    proxy: Option<&ProxyConfig>,
 ) -> Result<OAuthToken, String> {
-    let client = reqwest::Client::new();
+    let client = client_with_proxy(proxy)
+        .map_err(|e| format!("Failed to configure the token request client: {e}"))?;
     let mut params = HashMap::new();
     params.insert("grant_type", "client_credentials");
     params.insert("client_id", client_id);
@@ -201,8 +217,10 @@ async fn password_flow(
     scope: &str,
     username: &str,
     password: &str,
+    proxy: Option<&ProxyConfig>,
 ) -> Result<OAuthToken, String> {
-    let client = reqwest::Client::new();
+    let client = client_with_proxy(proxy)
+        .map_err(|e| format!("Failed to configure the token request client: {e}"))?;
     let mut params = HashMap::new();
     params.insert("grant_type", "password");
     params.insert("username", username);
@@ -250,6 +268,7 @@ async fn auth_code_flow(
     callback_url: &str,
     use_pkce: bool,
     open_browser: &impl Fn(&str) -> Result<(), String>,
+    proxy: Option<&ProxyConfig>,
 ) -> Result<OAuthToken, String> {
     let port = extract_port(callback_url)?;
     let state = uuid::Uuid::new_v4().to_string();
@@ -312,7 +331,8 @@ async fn auth_code_flow(
         .ok_or("No authorization code received")?;
 
     // Exchange code for token
-    let client = reqwest::Client::new();
+    let client = client_with_proxy(proxy)
+        .map_err(|e| format!("Failed to configure the token exchange client: {e}"))?;
     let mut params = HashMap::new();
     params.insert("grant_type", "authorization_code".to_string());
     params.insert("code", code);
@@ -416,8 +436,10 @@ async fn refresh_token_flow(
     client_id: &str,
     client_secret: &str,
     refresh_token: &str,
+    proxy: Option<&ProxyConfig>,
 ) -> Result<OAuthToken, String> {
-    let client = reqwest::Client::new();
+    let client = client_with_proxy(proxy)
+        .map_err(|e| format!("Failed to configure the token refresh client: {e}"))?;
     let mut params = HashMap::new();
     params.insert("grant_type", "refresh_token");
     params.insert("refresh_token", refresh_token);

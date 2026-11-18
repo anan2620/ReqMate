@@ -11,8 +11,22 @@ pub struct AppSettings {
     pub theme: String,
     #[serde(default = "default_accent_color")]
     pub accent_color: String,
+    /// Proxy mode: "off" (direct connection), "on" (use the proxy below),
+    /// "system" (use the OS / environment proxy configuration)
+    #[serde(default = "default_proxy_mode")]
+    pub proxy_mode: String,
+    /// Proxy scheme when proxy_mode is "on": "http" | "https" | "socks5"
+    #[serde(default = "default_proxy_type")]
+    pub proxy_type: String,
+    /// Proxy host without scheme or port (e.g. "127.0.0.1")
     #[serde(default)]
-    pub proxy_url: Option<String>,
+    pub proxy_host: Option<String>,
+    /// Proxy port (defaults to 8080 in the UI when empty)
+    #[serde(default)]
+    pub proxy_port: Option<u16>,
+    /// Comma or newline separated hosts that bypass the proxy
+    #[serde(default)]
+    pub proxy_bypass: Option<String>,
     #[serde(default)]
     pub proxy_username: Option<String>,
     #[serde(default)]
@@ -96,12 +110,24 @@ fn default_layout() -> String {
     "horizontal".to_string()
 }
 
+fn default_proxy_mode() -> String {
+    "system".to_string()
+}
+
+fn default_proxy_type() -> String {
+    "http".to_string()
+}
+
 impl Default for AppSettings {
     fn default() -> Self {
         Self {
             theme: default_theme(),
             accent_color: default_accent_color(),
-            proxy_url: None,
+            proxy_mode: default_proxy_mode(),
+            proxy_type: default_proxy_type(),
+            proxy_host: None,
+            proxy_port: None,
+            proxy_bypass: None,
             proxy_username: None,
             proxy_password: None,
             verify_ssl: true,
@@ -125,6 +151,48 @@ impl Default for AppSettings {
     }
 }
 
+impl AppSettings {
+    /// Proxy settings in the shape the HTTP engine expects.
+    ///
+    /// The settings dialog also builds this DTO on the frontend; the collection
+    /// runner and anything else that sends requests server-side uses this so the
+    /// proxy behaves identically no matter who starts the request.
+    pub fn proxy_config(&self) -> crate::models::request::ProxyConfig {
+        use crate::models::request::ProxyConfig;
+
+        if self.proxy_mode == "on"
+            && self
+                .proxy_host
+                .as_deref()
+                .is_some_and(|h| !h.trim().is_empty())
+        {
+            ProxyConfig {
+                mode: "on".to_string(),
+                proxy_type: Some(self.proxy_type.clone()),
+                host: self.proxy_host.clone(),
+                port: self.proxy_port,
+                bypass: self.proxy_bypass.clone(),
+                username: self.proxy_username.clone(),
+                password: self.proxy_password.clone(),
+            }
+        } else {
+            ProxyConfig {
+                mode: if self.proxy_mode == "system" {
+                    "system".to_string()
+                } else {
+                    "off".to_string()
+                },
+                proxy_type: None,
+                host: None,
+                port: None,
+                bypass: None,
+                username: None,
+                password: None,
+            }
+        }
+    }
+}
+
 pub fn load_settings(path: &Path) -> AppSettings {
     match std::fs::read_to_string(path) {
         Ok(contents) => {
@@ -138,12 +206,61 @@ pub fn load_settings(path: &Path) -> AppSettings {
             if let Some(dir) = path.parent() {
                 secret::decrypt_settings(dir, &mut value);
             }
+            migrate_legacy_proxy(&mut value);
             serde_json::from_value(value).unwrap_or_else(|e| {
                 tracing::warn!("Failed to read settings, using defaults: {e}");
                 AppSettings::default()
             })
         }
         Err(_) => AppSettings::default(),
+    }
+}
+
+/// Older builds stored a single `proxyUrl` string. Fold it into the
+/// mode/type/host/port fields so upgrading users keep their proxy settings.
+fn migrate_legacy_proxy(value: &mut serde_json::Value) {
+    let Some(obj) = value.as_object_mut() else {
+        return;
+    };
+
+    // Already migrated (or a fresh file) — just drop the stale key.
+    if obj.contains_key("proxyMode") {
+        obj.remove("proxyUrl");
+        return;
+    }
+
+    let legacy = obj
+        .remove("proxyUrl")
+        .and_then(|v| v.as_str().map(str::trim).map(str::to_string))
+        .filter(|s| !s.is_empty());
+
+    let Some(raw) = legacy else {
+        return;
+    };
+
+    // Accept both "http://host:port" and a bare "host:port".
+    let parsed = url::Url::parse(&raw)
+        .or_else(|_| url::Url::parse(&format!("http://{raw}")))
+        .ok();
+    let Some(parsed) = parsed else {
+        tracing::warn!("Could not migrate legacy proxy URL, ignoring: {raw}");
+        return;
+    };
+    let Some(host) = parsed.host_str() else {
+        return;
+    };
+
+    let proxy_type = match parsed.scheme().to_ascii_lowercase().as_str() {
+        "https" => "https",
+        "socks" | "socks5" | "socks5h" => "socks5",
+        _ => "http",
+    };
+
+    obj.insert("proxyMode".to_string(), serde_json::json!("on"));
+    obj.insert("proxyType".to_string(), serde_json::json!(proxy_type));
+    obj.insert("proxyHost".to_string(), serde_json::json!(host));
+    if let Some(port) = parsed.port() {
+        obj.insert("proxyPort".to_string(), serde_json::json!(port));
     }
 }
 
@@ -185,6 +302,58 @@ mod tests {
             client_cert_passphrase: Some("cert-passphrase".to_string()),
             ..AppSettings::default()
         }
+    }
+
+    #[test]
+    fn legacy_proxy_url_migrates_to_mode_on() {
+        let mut value = serde_json::json!({ "proxyUrl": "socks5://10.0.0.2:1080" });
+        migrate_legacy_proxy(&mut value);
+        let obj = value.as_object().unwrap();
+        assert_eq!(obj["proxyMode"], "on");
+        assert_eq!(obj["proxyType"], "socks5");
+        assert_eq!(obj["proxyHost"], "10.0.0.2");
+        assert_eq!(obj["proxyPort"], 1080);
+        assert!(!obj.contains_key("proxyUrl"));
+    }
+
+    #[test]
+    fn legacy_proxy_url_without_scheme_is_migrated() {
+        let mut value = serde_json::json!({ "proxyUrl": "127.0.0.1:3128" });
+        migrate_legacy_proxy(&mut value);
+        let obj = value.as_object().unwrap();
+        assert_eq!(obj["proxyMode"], "on");
+        assert_eq!(obj["proxyType"], "http");
+        assert_eq!(obj["proxyHost"], "127.0.0.1");
+        assert_eq!(obj["proxyPort"], 3128);
+    }
+
+    #[test]
+    fn proxy_config_reflects_mode() {
+        let mut settings = AppSettings::default();
+        // Fresh installs follow the OS proxy, like curl and browsers do.
+        assert_eq!(settings.proxy_mode, "system");
+        assert_eq!(settings.proxy_config().mode, "system");
+
+        settings.proxy_mode = "off".to_string();
+        assert_eq!(settings.proxy_config().mode, "off");
+
+        settings.proxy_mode = "on".to_string();
+        // No host configured → fall back to direct.
+        assert_eq!(settings.proxy_config().mode, "off");
+
+        settings.proxy_host = Some("proxy.internal".to_string());
+        settings.proxy_port = Some(8080);
+        settings.proxy_type = "https".to_string();
+        settings.proxy_bypass = Some("localhost\n127.0.0.1".to_string());
+        settings.proxy_username = Some("user".to_string());
+        settings.proxy_password = Some("pass".to_string());
+        let cfg = settings.proxy_config();
+        assert_eq!(cfg.mode, "on");
+        assert_eq!(cfg.host.as_deref(), Some("proxy.internal"));
+        assert_eq!(cfg.port, Some(8080));
+        assert_eq!(cfg.proxy_type.as_deref(), Some("https"));
+        assert_eq!(cfg.bypass.as_deref(), Some("localhost\n127.0.0.1"));
+        assert_eq!(cfg.username.as_deref(), Some("user"));
     }
 
     #[test]

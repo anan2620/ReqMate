@@ -9,6 +9,7 @@ use tokio::sync::oneshot;
 use tauri::Manager;
 
 use crate::http::cookies::CookieJarManager;
+use crate::http::request_builder::client_with_proxy;
 use crate::oauth::OAuthTokenStore;
 use crate::runner::collection_runner;
 use crate::runner::RunConfig;
@@ -208,12 +209,20 @@ async fn run_monitor_loop(
 
         let oauth_store: tauri::State<'_, OAuthTokenStore> = app.state();
         let cookie_jar: tauri::State<'_, CookieJarManager> = app.state();
+        let settings_state: tauri::State<'_, crate::commands::settings::SettingsState> =
+            app.state();
+        let proxy = settings_state
+            .settings
+            .lock()
+            .map(|s| s.proxy_config())
+            .ok();
         let result = collection_runner::run_collection(
             app.clone(),
             run_config,
             history_db.clone(),
             &oauth_store,
             &cookie_jar,
+            proxy.clone(),
         )
         .await;
 
@@ -282,8 +291,17 @@ async fn run_monitor_loop(
                     "totalFailed": monitor_result.total_failed,
                 });
                 let url = webhook_url.clone();
+                let webhook_proxy = proxy.clone();
                 tokio::spawn(async move {
-                    let client = reqwest::Client::new();
+                    // Webhooks are outbound HTTP calls too — keep the same
+                    // off/on/system behaviour as the monitored requests.
+                    let client = match client_with_proxy(webhook_proxy.as_ref()) {
+                        Ok(client) => client,
+                        Err(e) => {
+                            tracing::warn!("Webhook failed: {e}");
+                            return;
+                        }
+                    };
                     if let Err(e) = client.post(&url).json(&payload).send().await {
                         tracing::warn!("Webhook failed: {e}");
                     }
