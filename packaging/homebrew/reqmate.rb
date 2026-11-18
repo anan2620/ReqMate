@@ -1,14 +1,14 @@
 cask "reqmate" do
-  version "0.4.6"
+  version "1.1.1"
 
   on_arm do
-    url "https://github.com/anan2620/ReqMate/releases/download/v#{version}/ReqMate_aarch64.dmg",
+    url "https://github.com/anan2620/ReqMate/releases/download/v#{version}/ReqMate_#{version}_aarch64.dmg",
         verified: "github.com/anan2620/ReqMate/"
     sha256 ""
   end
 
   on_intel do
-    url "https://github.com/anan2620/ReqMate/releases/download/v#{version}/ReqMate_x64.dmg",
+    url "https://github.com/anan2620/ReqMate/releases/download/v#{version}/ReqMate_#{version}_x64.dmg",
         verified: "github.com/anan2620/ReqMate/"
     sha256 ""
   end

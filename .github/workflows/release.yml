@@ -24,12 +24,22 @@ jobs:
         include:
           - platform: macos-latest # aarch64 (Apple Silicon)
             args: --target aarch64-apple-darwin
-          - platform: macos-13 # x86_64 (Intel)
+            rust_target: aarch64-apple-darwin
+          - platform: macos-latest # x86_64 (Intel)：在 arm64 runner 上交叉编译
             args: --target x86_64-apple-darwin
-          - platform: ubuntu-22.04
+            rust_target: x86_64-apple-darwin
+          # 说明：这里故意不再写死 Intel 专用镜像。macos-13/macos-13-large 已于 2025-12-04 下线、
+          # 2026-11-02 又下线 macos-14，v1.0.0/v1.1.0 就是因为 macos-13 分不到 runner 而静默漏了 Intel 包。
+          # 现在两个 macOS 条目都跑 macos-latest（arm64），Intel 包靠 rustup target 交叉编译产出
+          # （上游 apiark 也是这么做的），从此不受 Intel 镜像存亡影响。
+          # ubuntu-22.04 自 2026-09-17 进入弃用、2027-04-17 彻底不可用；这里也不再钉死版本号，
+          # 统一跟 ubuntu-latest（当前 24.04）。Linux runner 架构稳定是 x86_64，不存在 macOS 那种漂移。
+          - platform: ubuntu-latest
             args: ""
+            rust_target: ""
           - platform: windows-latest
             args: ""
+            rust_target: ""
 
     runs-on: ${{ matrix.platform }}
     steps:
@@ -39,18 +49,25 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: pnpm
 
       - uses: dtolnay/rust-toolchain@stable
         with:
-          targets: ${{ matrix.platform == 'macos-latest' && 'aarch64-apple-darwin' || matrix.platform == 'macos-13' && 'x86_64-apple-darwin' || '' }}
+          targets: ${{ matrix.rust_target }}
 
       - name: Install Linux dependencies (Tauri v2)
-        if: matrix.platform == 'ubuntu-22.04'
+        # 用 runner.os 判断而不是比对镜像标签名，这样镜像换成 ubuntu-24.04/26.04 都不用改这里
+        if: runner.os == 'Linux'
         run: |
           sudo apt-get update
-          sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
+          # Ubuntu 24.04 起 libappindicator3-dev 已被 libayatana-appindicator3-dev 取代，
+          # 沿用旧包名会导致 apt 找不到包 / 构建时报 "Can't detect any appindicator library"。
+          sudo apt-get install -y \
+            libwebkit2gtk-4.1-dev \
+            libayatana-appindicator3-dev \
+            librsvg2-dev \
+            patchelf
 
       - name: Install frontend dependencies
         run: pnpm install --frozen-lockfile
@@ -68,4 +85,132 @@ jobs:
           releaseDraft: false
           prerelease: false
           updaterJsonPreferNsis: true
+          # 关键：每个矩阵 job 都自己生成 latest.json 会互相覆盖（后完成的把先完成的平台冲掉），
+          # 所以这里全部关掉，改由下方 publish-latest-json 汇总所有平台的 .sig 生成一份完整的清单。
+          includeUpdaterJson: false
           args: ${{ matrix.args }}
+
+  # ── 汇总 updater 清单 latest.json ─────────────────────────────────────
+  # tauri-action 生成的 latest.json 只含当前 job 构建的平台，四个 job 会互相覆盖，
+  # 导致另外三个平台的自动更新失效（v1.0.0/v1.1.0 线上就是这种半残状态）。
+  # 这里在所有构建完成后，从 release 资产里取各平台的 .sig，拼出四个平台齐全的清单。
+  publish-latest-json:
+    needs: publish
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Generate merged latest.json and upload
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const tag = context.ref.replace('refs/tags/', '');
+            const version = tag.replace(/^v/, '');
+            const { owner, repo } = context.repo;
+            const { data: release } = await github.rest.repos.getReleaseByTag({ owner, repo, tag });
+            const names = release.assets.map((a) => a.name);
+            console.log(`Release ${tag} assets:\n` + names.join('\n'));
+
+            // 取某个 updater 包对应的 .sig 内容
+            async function readSignature(bundleName) {
+              const sigName = `${bundleName}.sig`;
+              const sig = release.assets.find((a) => a.name === sigName);
+              if (!sig) return null;
+              const res = await github.request(`GET ${sig.url}`, {
+                headers: { Accept: 'application/octet-stream' },
+              });
+              return Buffer.from(res.data).toString('utf-8').trim();
+            }
+
+            // [latest.json 里的平台键, updater 包名匹配规则]
+            const targets = [
+              ['darwin-aarch64', (n) => n.endsWith('_aarch64.app.tar.gz')],
+              ['darwin-x86_64', (n) => n.endsWith('_x64.app.tar.gz')],
+              ['linux-x86_64', (n) => n.endsWith('_amd64.AppImage.tar.gz')],
+              ['windows-x86_64', (n) => n.endsWith('_x64-setup.nsis.zip')],
+            ];
+
+            const platforms = {};
+            const missing = [];
+            for (const [key, match] of targets) {
+              const bundle = names.find(match);
+              if (!bundle) {
+                missing.push(`${key}（缺 updater 包）`);
+                continue;
+              }
+              const signature = await readSignature(bundle);
+              if (!signature) {
+                missing.push(`${key}（缺 ${bundle}.sig）`);
+                continue;
+              }
+              platforms[key] = {
+                signature,
+                url: `https://github.com/${owner}/${repo}/releases/download/${tag}/${bundle}`,
+              };
+              console.log(`✓ ${key} <- ${bundle}`);
+            }
+
+            if (missing.length > 0) {
+              throw new Error(`latest.json 缺少平台：${missing.join('、')}`);
+            }
+
+            const latest = {
+              version,
+              notes: release.body || `ReqMate ${tag}`,
+              pub_date: new Date().toISOString(),
+              platforms,
+            };
+
+            // 覆盖旧的最新清单（tauri-action 之前每 job 上传的那份）
+            for (const asset of release.assets.filter((a) => a.name === 'latest.json')) {
+              await github.rest.repos.deleteReleaseAsset({ owner, repo, asset_id: asset.id });
+            }
+            await github.rest.repos.uploadReleaseAsset({
+              owner,
+              repo,
+              release_id: release.id,
+              name: 'latest.json',
+              data: JSON.stringify(latest, null, 2),
+              headers: { 'content-type': 'application/json' },
+            });
+            console.log('✅ latest.json 已上传，包含平台：' + Object.keys(platforms).join(', '));
+
+
+  # 兜底校验：v1.0.0 / v1.1.0 都因为 macos-13 runner 已下线、Intel job 被 cancel，
+  # 却仍然发布了一个没有 Intel 安装包的 release。这里在发布后逐个核对产物，
+  # 缺任何一个就让整次运行变红，避免再次“静默半残发布”。
+  verify-assets:
+    needs: [publish, publish-latest-json]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Check every expected installer is attached
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const tag = context.ref.replace('refs/tags/', '');
+            const { data: release } = await github.rest.repos.getReleaseByTag({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              tag,
+            });
+            const names = release.assets.map((a) => a.name);
+            console.log(`Release ${tag} has ${names.length} assets:\n` + names.join('\n'));
+
+            const required = [
+              ['macOS Apple Silicon', (n) => n.endsWith('_aarch64.dmg')],
+              ['macOS Intel', (n) => n.endsWith('_x64.dmg')],
+              ['Windows NSIS', (n) => n.endsWith('_x64-setup.exe')],
+              ['Linux AppImage', (n) => n.endsWith('_amd64.AppImage')],
+              ['Linux deb', (n) => n.endsWith('_amd64.deb')],
+              ['updater manifest', (n) => n === 'latest.json'],
+            ];
+
+            const missing = required.filter(([, match]) => !names.some(match)).map(([label]) => label);
+            if (missing.length > 0) {
+              core.setFailed(`缺少 ${missing.length} 个产物：${missing.join('、')}`);
+            } else {
+              console.log('✅ 所有平台安装包齐全');
+            }
+
