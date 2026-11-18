@@ -238,7 +238,7 @@
     "stacked": "Empilé",
     "tabbed": "Avec Onglets",
     "sidebarWidth": "Largeur de la barre latérale",
-    "network": "Réseau",
+    "network": "Proxy",
     "sslVerification": "Vérification du Certificat SSL",
     "followRedirects": "Suivre les Redirections",
     "timeout": "Délai d'attente (ms)",
@@ -280,7 +280,7 @@
     "autoSave": "Enregistrer automatiquement les modifications",
     "autoSaveDesc": "Écrit sur le disque une seconde après la dernière frappe. Désactivez cette option pour garder les modifications dans l’éditeur jusqu’à l’enregistrement manuel.",
     "aiAssistant": "Assistant IA",
-    "designTokens": "Jetons de design",
+    "designTokens": "Palette de couleurs",
     "toggleTheme": "Changer de thème"
   },
   "runner": {

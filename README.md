@@ -89,26 +89,6 @@
 
 </details>
 
-## Why ReqMate?
-
-|                      | Postman    | Bruno      | Hoppscotch | **ReqMate**             |
-| -------------------- | ---------- | ---------- | ---------- | ----------------------- |
-| **Framework**        | Electron   | Electron   | Tauri      | **Tauri v2**            |
-| **RAM Usage**        | 300-800 MB | 150-300 MB | 50-80 MB   | **~60 MB**              |
-| **Startup**          | 10-30s     | 3-8s       | <2s        | **<2s**                 |
-| **Account Required** | Yes        | No         | Optional   | **No**                  |
-| **Data Storage**     | Cloud      | Filesystem | IndexedDB  | **Filesystem (YAML)**   |
-| **Git-Friendly**     | No         | Yes (.bru) | No         | **Yes (standard YAML)** |
-| **gRPC**             | Yes        | Yes        | No         | **Yes**                 |
-| **WebSocket**        | Yes        | No         | Yes        | **Yes**                 |
-| **SSE**              | Yes        | No         | Yes        | **Yes**                 |
-| **MQTT**             | No         | No         | Yes        | **Yes**                 |
-| **Mock Servers**     | Cloud only | No         | No         | **Local**               |
-| **Monitors**         | Cloud only | No         | No         | **Local**               |
-| **Plugin System**    | No         | No         | No         | **JS + WASM**           |
-| **Proxy Capture**    | No         | No         | No         | **Yes**                 |
-| **Response Diff**    | No         | No         | No         | **Yes**                 |
-
 ## Download
 
 **[Latest Release](https://github.com/anan2620/ReqMate/releases/latest)**

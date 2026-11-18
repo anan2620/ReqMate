@@ -238,7 +238,7 @@
     "stacked": "Gestapelt",
     "tabbed": "Mit Tabs",
     "sidebarWidth": "Seitenleistenbreite",
-    "network": "Netzwerk",
+    "network": "Proxy",
     "sslVerification": "SSL-Zertifikatsprüfung",
     "followRedirects": "Weiterleitungen folgen",
     "timeout": "Zeitlimit (ms)",
@@ -280,7 +280,7 @@
     "autoSave": "Änderungen automatisch speichern",
     "autoSaveDesc": "Schreibt eine Sekunde nach der letzten Eingabe auf die Festplatte. Deaktiviert bleiben Änderungen im Editor, bis du auf Speichern klickst.",
     "aiAssistant": "KI-Assistent",
-    "designTokens": "Design-Tokens",
+    "designTokens": "Farbpalette",
     "toggleTheme": "Design wechseln"
   },
   "runner": {

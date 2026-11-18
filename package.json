@@ -15,12 +15,15 @@
   "packageManager": "pnpm@12.9.1",
   "scripts": {
     "dev": "pnpm --filter @reqmate/desktop dev",
+    "dev:web": "pnpm --filter @reqmate/web dev",
     "build": "pnpm --filter @reqmate/desktop build",
+    "build:web": "pnpm --filter @reqmate/web build",
     "tauri": "pnpm --filter @reqmate/desktop tauri",
     "lint": "pnpm --filter @reqmate/desktop lint",
     "check:versions": "node scripts/check-versions.mjs",
     "check:models": "node scripts/check-model-drift.mjs",
-    "preview": "pnpm --filter @reqmate/desktop preview"
+    "preview": "pnpm --filter @reqmate/desktop preview",
+    "start:web": "pnpm --filter @reqmate/web start"
   },
   "engines": {
     "node": ">=22.0.0",

@@ -56,7 +56,7 @@ There is **no Cargo workspace** at the root. `apps/desktop/src-tauri`, `apps/cli
 |---|---|---|
 | Desktop app (full Tauri) | `pnpm tauri dev` | window opens; Vite on 1420 |
 | Desktop frontend only | `pnpm dev` | http://localhost:1420 |
-| Marketing site | `pnpm --filter @reqmate/web dev` | http://localhost:3000 |
+| Marketing site | `pnpm dev:web` | http://localhost:3000 |
 | CLI | `cargo run --manifest-path apps/cli/Cargo.toml -- <args>` | — |
 | MCP server | `cargo build --manifest-path apps/mcp-server/Cargo.toml` | stdio |
 | VS Code extension | `pnpm --filter reqmate-vscode compile`, then F5 | Extension Host |
@@ -88,9 +88,10 @@ Root `package.json` scripts, all thin `pnpm --filter @reqmate/desktop` wrappers:
 ## Marketing site (Next.js)
 
 ```bash
-pnpm --filter @reqmate/web dev     # rm -rf .next && next dev --turbopack
-pnpm --filter @reqmate/web build
-pnpm --filter @reqmate/web start   # production preview
+pnpm dev:web                       # root alias → rm -rf .next && next dev --turbopack
+pnpm build:web
+pnpm start:web                     # production preview
+# or the long form: pnpm --filter @reqmate/web dev
 ```
 
 Runs on 3000 and is fully independent of the desktop app — you can run both at once. The `dev`

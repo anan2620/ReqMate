@@ -238,7 +238,7 @@
     "stacked": "Stacked",
     "tabbed": "Tabbed",
     "sidebarWidth": "Sidebar Width",
-    "network": "Network",
+    "network": "Proxy",
     "sslVerification": "SSL Certificate Verification",
     "followRedirects": "Follow Redirects",
     "timeout": "Request Timeout (ms)",
@@ -280,7 +280,7 @@
     "autoSave": "Auto-save request changes",
     "autoSaveDesc": "Write edits to disk one second after you stop typing. Turn this off to keep changes in the editor until you press Save.",
     "aiAssistant": "AI Assistant",
-    "designTokens": "Design Tokens",
+    "designTokens": "Palette",
     "toggleTheme": "Toggle theme"
   },
   "runner": {

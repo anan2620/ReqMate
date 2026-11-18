@@ -238,7 +238,7 @@
     "stacked": "縦並び",
     "tabbed": "タブ式",
     "sidebarWidth": "サイドバーの幅",
-    "network": "ネットワーク",
+    "network": "プロキシ",
     "sslVerification": "SSL 証明書の検証",
     "followRedirects": "リダイレクトを追跡",
     "timeout": "タイムアウト (ms)",
@@ -280,7 +280,7 @@
     "autoSave": "リクエストの変更を自動保存",
     "autoSaveDesc": "入力が止まって 1 秒後にディスクへ書き込みます。オフにすると、保存を押すまで変更はエディター内に残ります。",
     "aiAssistant": "AI アシスタント",
-    "designTokens": "デザイントークン",
+    "designTokens": "カラーパレット",
     "toggleTheme": "テーマを切り替え"
   },
   "runner": {

@@ -238,7 +238,7 @@
     "stacked": "Apilado",
     "tabbed": "Con Pestañas",
     "sidebarWidth": "Ancho de la barra lateral",
-    "network": "Red",
+    "network": "Proxy",
     "sslVerification": "Verificación de Certificado SSL",
     "followRedirects": "Seguir Redirecciones",
     "timeout": "Tiempo de espera (ms)",
@@ -280,7 +280,7 @@
     "autoSave": "Guardar los cambios automáticamente",
     "autoSaveDesc": "Guarda en disco un segundo después de dejar de escribir. Desactívalo para mantener los cambios en el editor hasta que pulses Guardar.",
     "aiAssistant": "Asistente de IA",
-    "designTokens": "Tokens de diseño",
+    "designTokens": "Paleta de colores",
     "toggleTheme": "Cambiar tema"
   },
   "runner": {

@@ -9,7 +9,7 @@ use crate::http::cookies::{CookieEntry, CookieJarManager};
 use crate::http::interpolation;
 use crate::models::auth::AuthConfig;
 use crate::models::collection::{CollectionDefaults, CollectionNode, RequestFile};
-use crate::models::request::{BodyType, KeyValuePair, ProxyConfig, RequestBody, SendRequestParams};
+use crate::models::request::{BodyType, KeyValuePair, RequestBody, SendRequestParams};
 use crate::oauth::OAuthTokenStore;
 use crate::scripting::engine::execute_script;
 use crate::scripting::{RequestSnapshot, ResponseSnapshot, ScriptContext, ScriptPhase};
@@ -18,7 +18,9 @@ use crate::storage::environment;
 use crate::storage::history::HistoryDb;
 
 use super::data_reader::read_data_file;
-use super::{IterationResult, RequestRunResult, RunConfig, RunProgress, RunSummary};
+use super::{
+    IterationResult, NetworkOptions, RequestRunResult, RunConfig, RunProgress, RunSummary,
+};
 
 /// Collect all request file paths from a collection tree via DFS.
 fn collect_request_paths(node: &CollectionNode) -> Vec<String> {
@@ -31,7 +33,7 @@ fn collect_request_paths(node: &CollectionNode) -> Vec<String> {
 }
 
 /// Convert a RequestFile from disk to SendRequestParams for the HTTP engine.
-fn request_file_to_params(file: &RequestFile, proxy: Option<ProxyConfig>) -> SendRequestParams {
+fn request_file_to_params(file: &RequestFile, network: &NetworkOptions) -> SendRequestParams {
     let headers: Vec<KeyValuePair> = file
         .headers
         .iter()
@@ -72,10 +74,10 @@ fn request_file_to_params(file: &RequestFile, proxy: Option<ProxyConfig>) -> Sen
         params,
         body,
         auth: file.auth.clone(),
-        proxy,
+        proxy: network.proxy.clone(),
         timeout_ms: None,
-        follow_redirects: true,
-        verify_ssl: true,
+        follow_redirects: network.follow_redirects,
+        verify_ssl: network.verify_ssl,
         cookies: file.cookies.clone(),
         ca_cert_path: None,
         client_cert_path: None,
@@ -249,9 +251,9 @@ async fn run_single_request(
     cookie_jar: &CookieJarManager,
     collection_path: &str,
     defaults: &CollectionDefaults,
-    proxy: Option<ProxyConfig>,
+    network: &NetworkOptions,
 ) -> RequestRunResult {
-    let params = request_file_to_params(file, proxy.clone());
+    let params = request_file_to_params(file, network);
     let mut interpolated = interpolate_params(&params, vars);
 
     // Inject stored cookies from the jar
@@ -480,7 +482,7 @@ pub async fn run_collection(
     history_db: Arc<HistoryDb>,
     oauth_store: &OAuthTokenStore,
     cookie_jar: &CookieJarManager,
-    proxy: Option<ProxyConfig>,
+    network: &NetworkOptions,
 ) -> Result<RunSummary, String> {
     let collection_path = Path::new(&config.collection_path);
     let tree = load_collection_tree(collection_path)?;
@@ -609,7 +611,7 @@ pub async fn run_collection(
                 cookie_jar,
                 &config.collection_path,
                 &defaults,
-                proxy.clone(),
+                network,
             )
             .await;
 

@@ -238,7 +238,7 @@
     "stacked": "堆叠",
     "tabbed": "标签式",
     "sidebarWidth": "侧边栏宽度",
-    "network": "网络",
+    "network": "代理",
     "sslVerification": "SSL 证书验证",
     "followRedirects": "跟随重定向",
     "timeout": "请求超时 (ms)",
@@ -280,7 +280,7 @@
     "autoSave": "自动保存请求改动",
     "autoSaveDesc": "停止输入 1 秒后自动写入磁盘。关闭后，改动会保留在编辑器里，直到你点击“保存”。",
     "aiAssistant": "AI 助手",
-    "designTokens": "设计令牌",
+    "designTokens": "调色板",
     "toggleTheme": "切换主题"
   },
   "runner": {

@@ -3,6 +3,40 @@ pub mod data_reader;
 
 use serde::{Deserialize, Serialize};
 
+use crate::models::request::ProxyConfig;
+
+/// Network behaviour for requests started by the collection runner / monitor.
+///
+/// A single request from the editor reads these straight from the settings
+/// store; runs and monitors used to hard-code them. Keeping them together
+/// makes every outbound request honour the same proxy, redirect and TLS rules.
+#[derive(Debug, Clone)]
+pub struct NetworkOptions {
+    pub proxy: Option<ProxyConfig>,
+    pub follow_redirects: bool,
+    pub verify_ssl: bool,
+}
+
+impl NetworkOptions {
+    pub fn from_settings(settings: &crate::storage::settings::AppSettings) -> Self {
+        Self {
+            proxy: Some(settings.proxy_config()),
+            follow_redirects: settings.follow_redirects,
+            verify_ssl: settings.verify_ssl,
+        }
+    }
+}
+
+impl Default for NetworkOptions {
+    fn default() -> Self {
+        Self {
+            proxy: None,
+            follow_redirects: true,
+            verify_ssl: true,
+        }
+    }
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct RunConfig {

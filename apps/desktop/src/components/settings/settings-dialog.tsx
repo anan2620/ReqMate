@@ -14,7 +14,6 @@ import {
   ShieldCheck,
   Sparkles,
   Keyboard,
-  SlidersHorizontal,
   DatabaseBackup,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -44,8 +43,7 @@ type SettingsSectionId =
   | "ai"
   | "updates"
   | "shortcuts"
-  | "backup"
-  | "tokens";
+  | "backup";
 
 const PROXY_MODES: {
   value: "off" | "on" | "system";
@@ -71,7 +69,6 @@ const SETTINGS_SECTIONS: {
   { id: "updates", icon: RefreshCw, labelKey: "settings.updates" },
   { id: "shortcuts", icon: Keyboard, labelKey: "settings.shortcuts" },
   { id: "backup", icon: DatabaseBackup, labelKey: "settings.backup" },
-  { id: "tokens", icon: SlidersHorizontal, labelKey: "settings.designTokens" },
 ];
 
 export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
@@ -268,6 +265,9 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
                       ))}
                     </div>
                   </div>
+
+                  {/* Palette (design tokens) — lives under Appearance now */}
+                  <PaletteSection />
                 </section>
 
                 {/* Saving Section */}
@@ -601,11 +601,6 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
                 {/* Backup Section */}
                 <div hidden={section !== "backup"}>
                   <BackupSection />
-                </div>
-
-                {/* Design Tokens Reference */}
-                <div hidden={section !== "tokens"}>
-                  <DesignTokensSection />
                 </div>
               </div>
             </div>
@@ -986,13 +981,13 @@ function ToggleSwitch({
   );
 }
 
-function DesignTokensSection() {
+function PaletteSection() {
   const { t } = useTranslation();
   return (
-    <section>
-      <h3 className="label-caps mb-3 block">
+    <div className="mt-6 border-t border-[var(--color-border)] pt-5">
+      <h4 className="mb-3 text-sm text-[var(--color-text-secondary)]">
         {t("settings.designTokens")}
-      </h3>
+      </h4>
       <p className="mb-3 text-xs text-[var(--color-text-dimmed)]">
         Active color palette for the current theme. Useful for theme creators and plugin developers.
       </p>
@@ -1022,7 +1017,7 @@ function DesignTokensSection() {
           </div>
         ))}
       </div>
-    </section>
+    </div>
   );
 }
 

@@ -12,7 +12,7 @@ use crate::http::cookies::CookieJarManager;
 use crate::http::request_builder::client_with_proxy;
 use crate::oauth::OAuthTokenStore;
 use crate::runner::collection_runner;
-use crate::runner::RunConfig;
+use crate::runner::{NetworkOptions, RunConfig};
 use crate::storage::history::HistoryDb;
 
 use super::{MonitorConfig, MonitorResult, MonitorStatus};
@@ -211,18 +211,20 @@ async fn run_monitor_loop(
         let cookie_jar: tauri::State<'_, CookieJarManager> = app.state();
         let settings_state: tauri::State<'_, crate::commands::settings::SettingsState> =
             app.state();
-        let proxy = settings_state
+        // Monitored requests use the same proxy, redirect and TLS settings as
+        // a single request from the editor.
+        let network = settings_state
             .settings
             .lock()
-            .map(|s| s.proxy_config())
-            .ok();
+            .map(|s| NetworkOptions::from_settings(&s))
+            .unwrap_or_default();
         let result = collection_runner::run_collection(
             app.clone(),
             run_config,
             history_db.clone(),
             &oauth_store,
             &cookie_jar,
-            proxy.clone(),
+            &network,
         )
         .await;
 
@@ -291,7 +293,7 @@ async fn run_monitor_loop(
                     "totalFailed": monitor_result.total_failed,
                 });
                 let url = webhook_url.clone();
-                let webhook_proxy = proxy.clone();
+                let webhook_proxy = network.proxy.clone();
                 tokio::spawn(async move {
                     // Webhooks are outbound HTTP calls too — keep the same
                     // off/on/system behaviour as the monitored requests.
