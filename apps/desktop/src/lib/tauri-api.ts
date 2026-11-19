@@ -76,6 +76,7 @@ export async function sendRequest(
   variables?: Record<string, string>,
   collectionPath?: string,
   requestName?: string,
+  requestId?: string,
 ): Promise<ResponseData> {
   try {
     return await invoke<ResponseData>("send_request", {
@@ -83,6 +84,7 @@ export async function sendRequest(
       variables: variables ?? null,
       collectionPath: collectionPath ?? null,
       requestName: requestName ?? null,
+      requestId: requestId ?? null,
     });
   } catch (err) {
     handleTauriError(err);
@@ -98,6 +100,7 @@ export async function sendRequestWithScripts(
   postResponseScript?: string | null,
   testScript?: string | null,
   assertionsYaml?: string | null,
+  requestId?: string,
 ): Promise<ScriptedResponseData> {
   try {
     return await invoke<ScriptedResponseData>("send_request_with_scripts", {
@@ -109,9 +112,24 @@ export async function sendRequestWithScripts(
       postResponseScript: postResponseScript ?? null,
       testScript: testScript ?? null,
       assertionsYaml: assertionsYaml ?? null,
+      requestId: requestId ?? null,
     });
   } catch (err) {
     handleTauriError(err);
+  }
+}
+
+/**
+ * Abort an in-flight request.
+ *
+ * Returns `false` when it already settled — the UI then keeps the real outcome
+ * instead of showing a "cancelled" state for a response that did land.
+ */
+export async function cancelRequest(requestId: string): Promise<boolean> {
+  try {
+    return await invoke<boolean>("cancel_request", { requestId });
+  } catch {
+    return false;
   }
 }
 

@@ -5,6 +5,7 @@ use serde::{Deserialize, Serialize};
 use tauri::State;
 
 use crate::commands::history::AppState;
+use crate::http::canceller::{CancelGuard, RequestCanceller};
 use crate::http::client::HttpEngine;
 use crate::http::cookies::{CookieEntry, CookieJarManager};
 use crate::http::interpolation;
@@ -58,11 +59,19 @@ pub async fn send_request(
     oauth_store: State<'_, OAuthTokenStore>,
     cookie_jar: State<'_, CookieJarManager>,
     plugin_manager: State<'_, PluginManager>,
+    canceller: State<'_, RequestCanceller>,
     params: SendRequestParams,
     variables: Option<HashMap<String, String>>,
     collection_path: Option<String>,
     request_name: Option<String>,
+    request_id: Option<String>,
 ) -> Result<ResponseData, String> {
+    // Register up front so a cancel that arrives mid-flight finds the request.
+    let _cancel_guard = request_id
+        .as_deref()
+        .map(|id| CancelGuard::new(canceller.inner(), id));
+    let cancel = request_id.as_deref().map(|id| canceller.register(id));
+
     let vars = variables.unwrap_or_default();
     let mut interpolated = interpolate_params(&params, &vars);
     resolve_oauth_token(&mut interpolated, &oauth_store)?;
@@ -94,7 +103,7 @@ pub async fn send_request(
 
     tracing::info!(method = ?interpolated.method, url = %interpolated.url, "Sending request");
 
-    let mut result = HttpEngine::send(interpolated.clone()).await;
+    let mut result = HttpEngine::send_with_cancel(interpolated.clone(), cancel.clone()).await;
 
     // NTLM challenge-response: if we get 401 with NTLM Type 2, resend with Type 3
     if let (
@@ -134,7 +143,8 @@ pub async fn send_request(
                             format!("NTLM {type3}"),
                             true,
                         ));
-                        result = HttpEngine::send(retry_params.clone()).await;
+                        result = HttpEngine::send_with_cancel(retry_params.clone(), cancel.clone())
+                            .await;
                     }
                     Err(e) => {
                         tracing::warn!("NTLM Type 3 generation failed: {e}");
@@ -171,6 +181,15 @@ pub async fn send_request(
     })
 }
 
+/// Ask an in-flight request to stop early.
+///
+/// Returns `false` when the request already finished (or never started), so the
+/// UI can avoid showing a "cancelled" state for something that actually landed.
+#[tauri::command]
+pub fn cancel_request(canceller: State<'_, RequestCanceller>, request_id: String) -> bool {
+    canceller.cancel(&request_id)
+}
+
 #[allow(clippy::too_many_arguments)]
 #[tauri::command]
 pub async fn send_request_with_scripts(
@@ -178,6 +197,7 @@ pub async fn send_request_with_scripts(
     oauth_store: State<'_, OAuthTokenStore>,
     cookie_jar: State<'_, CookieJarManager>,
     plugin_manager: State<'_, PluginManager>,
+    canceller: State<'_, RequestCanceller>,
     params: SendRequestParams,
     variables: Option<HashMap<String, String>>,
     collection_path: Option<String>,
@@ -186,7 +206,15 @@ pub async fn send_request_with_scripts(
     post_response_script: Option<String>,
     test_script: Option<String>,
     assertions_yaml: Option<String>,
+    request_id: Option<String>,
 ) -> Result<ScriptedResponseData, String> {
+    // Registered before the pre-request script runs: a cancel during a long
+    // script should still abort the request that follows it.
+    let _cancel_guard = request_id
+        .as_deref()
+        .map(|id| CancelGuard::new(canceller.inner(), id));
+    let cancel = request_id.as_deref().map(|id| canceller.register(id));
+
     let mut vars = variables.unwrap_or_default();
     let mut interpolated = interpolate_params(&params, &vars);
     resolve_oauth_token(&mut interpolated, &oauth_store)?;
@@ -269,10 +297,12 @@ pub async fn send_request_with_scripts(
     tracing::info!(method = ?interpolated.method, url = %interpolated.url, "Sending request (scripted)");
 
     // 2. Send the HTTP request
-    let response = HttpEngine::send(interpolated.clone()).await.map_err(|e| {
-        let http_error: HttpError = e.into();
-        serde_json::to_string(&http_error).unwrap_or(http_error.message)
-    })?;
+    let response = HttpEngine::send_with_cancel(interpolated.clone(), cancel.clone())
+        .await
+        .map_err(|e| {
+            let http_error: HttpError = e.into();
+            serde_json::to_string(&http_error).unwrap_or(http_error.message)
+        })?;
 
     // Store response cookies in the jar
     if defaults.store_cookies {

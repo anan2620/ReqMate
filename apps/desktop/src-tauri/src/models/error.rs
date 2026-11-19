@@ -26,6 +26,9 @@ pub enum HttpEngineError {
 
     #[error("Response body decode error: {0}")]
     BodyDecodeError(String),
+
+    #[error("Request cancelled")]
+    Cancelled,
 }
 
 /// Serializable error for the frontend.
@@ -66,6 +69,8 @@ impl From<HttpEngineError> for HttpError {
                 Some("The response exceeds the 10MB display limit.".into()),
             ),
             HttpEngineError::BodyDecodeError(_) => ("body_decode_error", None),
+            // Cancelling is a user action, not a failure — no suggestion needed.
+            HttpEngineError::Cancelled => ("cancelled", None),
         };
 
         HttpError {

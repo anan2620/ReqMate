@@ -1,4 +1,5 @@
 pub mod auth_handlers;
+pub mod canceller;
 pub mod client;
 pub mod cookies;
 pub mod curl;

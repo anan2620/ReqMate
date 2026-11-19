@@ -12,6 +12,7 @@ import type {
 import {
   sendRequest,
   sendRequestWithScripts,
+  cancelRequest,
   readRequestFile,
   saveRequestFile,
   loadPersistedState,
@@ -37,6 +38,29 @@ import {
 
 // Re-exported for the file watcher, which must ignore our own writes.
 export { wasRecentlySaved } from "./tab/recently-saved";
+
+/**
+ * Per-tab request token.
+ *
+ * Bumped whenever a request starts or is cancelled. A response that comes back
+ * with a stale token belongs to an aborted/superseded request, so it must not
+ * touch the tab any more — otherwise a cancelled request could clear the
+ * loading state of the one that replaced it.
+ */
+const requestTokens = new Map<string, number>();
+
+function nextRequestToken(tabId: string): number {
+  const next = (requestTokens.get(tabId) ?? 0) + 1;
+  requestTokens.set(tabId, next);
+  return next;
+}
+
+/** Stop a tab's request when the tab goes away — no point waiting for a timeout. */
+function abortInFlight(tab: Tab | undefined): void {
+  if (!tab?.loading) return;
+  nextRequestToken(tab.id);
+  void cancelRequest(tab.id);
+}
 
 interface TabState {
   tabs: Tab[];
@@ -83,6 +107,8 @@ interface TabState {
 
   // Actions
   send: () => Promise<void>;
+  /** Abort the in-flight request for the active tab. */
+  cancel: () => Promise<void>;
   save: () => Promise<void>;
   /** Auto-save a specific tab (defaults to the active one). */
   autoSave: (tabId?: string) => Promise<void>;
@@ -269,6 +295,7 @@ export const useTabStore = create<TabState>((set, get) => ({
     // Flush a dirty file-backed tab before it disappears from the store —
     // otherwise the pending auto-save has no tab left to write.
     const closing = get().tabs.find((t) => t.id === id);
+    abortInFlight(closing);
     if (
       closing?.filePath &&
       closing.isDirty &&
@@ -296,6 +323,9 @@ export const useTabStore = create<TabState>((set, get) => ({
   },
 
   closeOtherTabs: (id) => {
+    get()
+      .tabs.filter((t) => t.id !== id)
+      .forEach(abortInFlight);
     set((state) => ({
       tabs: state.tabs.filter((t) => t.id === id),
       activeTabId: id,
@@ -303,6 +333,7 @@ export const useTabStore = create<TabState>((set, get) => ({
   },
 
   closeAllTabs: () => {
+    get().tabs.forEach(abortInFlight);
     set({ tabs: [], activeTabId: null });
   },
 
@@ -411,6 +442,9 @@ export const useTabStore = create<TabState>((set, get) => ({
       ),
     });
 
+    const token = nextRequestToken(tab.id);
+    const isCurrent = () => requestTokens.get(tab.id) === token;
+
     // Get resolved variables from environment store
     const envStore = useEnvironmentStore.getState();
     const variables = await envStore.getResolvedVariables();
@@ -485,7 +519,10 @@ export const useTabStore = create<TabState>((set, get) => ({
           tab.postResponseScript,
           tab.testScript,
           tab.assertions,
+          activeTabId ?? undefined,
         );
+        // Cancelled or superseded while in flight — the token moved on.
+        if (!isCurrent()) return;
         // Apply env mutations to the environment store
         if (scriptedResponse.envMutations && Object.keys(scriptedResponse.envMutations).length > 0) {
           envStore.applyMutations(scriptedResponse.envMutations);
@@ -527,7 +564,9 @@ export const useTabStore = create<TabState>((set, get) => ({
           variables,
           tab.collectionPath ?? undefined,
           tab.name !== "Untitled Request" ? tab.name : undefined,
+          activeTabId ?? undefined,
         );
+        if (!isCurrent()) return;
         set({
           tabs: get().tabs.map((t) =>
             t.id === activeTabId ? { ...t, response, loading: false } : t,
@@ -537,17 +576,47 @@ export const useTabStore = create<TabState>((set, get) => ({
         useConsoleStore.getState().log(reqLabel, `${response.status} ${response.statusText} (${response.timeMs}ms)`, "info");
       }
     } catch (err) {
+      // A cancelled/superseded request reports an error too; ignore it.
+      if (!isCurrent()) return;
+      const httpErr = err as HttpError;
       set({
         tabs: get().tabs.map((t) =>
           t.id === activeTabId
-            ? { ...t, error: err as HttpError, loading: false }
+            ? { ...t, error: httpErr, loading: false }
             : t,
         ),
       });
-      const reqLabel = tab.name || tab.url || "Request";
-      const httpErr = err as HttpError;
-      useConsoleStore.getState().log(reqLabel, httpErr?.message || String(err), "error");
+      // A user-initiated cancel is not a failure worth shouting about.
+      if (httpErr?.errorType !== "cancelled") {
+        const reqLabel = tab.name || tab.url || "Request";
+        useConsoleStore.getState().log(reqLabel, httpErr?.message || String(err), "error");
+      }
     }
+  },
+
+  cancel: async () => {
+    const { tabs, activeTabId } = get();
+    const tab = tabs.find((t) => t.id === activeTabId);
+    if (!tab?.loading) return;
+
+    // The backend owns the socket; it decides whether anything was still in flight.
+    const cancelled = await cancelRequest(tab.id);
+    if (!cancelled) return;
+
+    // Invalidate the promise still awaiting the aborted request.
+    nextRequestToken(tab.id);
+
+    set({
+      tabs: get().tabs.map((t) =>
+        t.id === activeTabId
+          ? {
+              ...t,
+              loading: false,
+              error: { errorType: "cancelled", message: "Request cancelled" },
+            }
+          : t,
+      ),
+    });
   },
 
   save: async () => {

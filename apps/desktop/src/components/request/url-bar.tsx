@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { useTabStore, useActiveTab } from "@/stores/tab-store";
 import { useEnvironmentStore } from "@/stores/environment-store";
 import type { HttpMethod, EnvironmentData } from "@reqmate/types";
-import { Loader2, Send, AlertCircle, Check } from "lucide-react";
+import { Loader2, Send, AlertCircle, Check, Square } from "lucide-react";
 import * as Popover from "@radix-ui/react-popover";
 import { HintTooltip } from "@/components/ui/hint-tooltip";
 import { saveEnvironment } from "@/lib/tauri-api";
@@ -201,7 +201,7 @@ export const UrlBar = forwardRef<HTMLInputElement, UrlBarProps>(function UrlBar(
 ) {
   const { t } = useTranslation();
   const tab = useActiveTab();
-  const { setMethod, setUrl, send } = useTabStore();
+  const { setMethod, setUrl, send, cancel } = useTabStore();
   const [resolvedVars, setResolvedVars] = useState<Record<string, string>>({});
   const [inputFocused, setInputFocused] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -365,25 +365,33 @@ export const UrlBar = forwardRef<HTMLInputElement, UrlBarProps>(function UrlBar(
       {extraActions}
 
       {/* Send button (or custom override for WS/SSE) */}
-      {sendButton ?? (
-        <div className="relative">
+      {sendButton ??
+        (tab.loading ? (
+          // While the request is in flight the same slot turns into an escape
+          // hatch, so a hung endpoint does not have to be waited out.
           <button
-            ref={sendBtnRef}
-            data-tour="send-btn"
-            onClick={send}
-            disabled={tab.loading || !tab.url.trim()}
-            className="btn-accent flex h-9 items-center gap-2 rounded-md px-3.5 text-[12.5px] font-semibold disabled:cursor-not-allowed disabled:opacity-40"
+            onClick={cancel}
+            title={t("request.cancel")}
+            className="flex h-9 items-center gap-2 rounded-md border border-[var(--color-border-strong)] bg-[var(--color-elevated)] px-3.5 text-[12.5px] font-semibold text-[var(--color-text-secondary)] transition-colors hover:bg-[var(--color-card-hover)] hover:text-[var(--color-text-primary)]"
           >
-            {tab.loading ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              <Send className="h-4 w-4" />
-            )}
-            {t("request.send")}
+            <Square className="h-3 w-3 fill-current" />
+            {t("request.cancel")}
           </button>
-          <HintTooltip hintId="send-shortcut" message="Tip: Press Ctrl+Enter to send requests quickly" align="right" />
-        </div>
-      )}
+        ) : (
+          <div className="relative">
+            <button
+              ref={sendBtnRef}
+              data-tour="send-btn"
+              onClick={send}
+              disabled={!tab.url.trim()}
+              className="btn-accent flex h-9 items-center gap-2 rounded-md px-3.5 text-[12.5px] font-semibold disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              <Send className="h-4 w-4" />
+              {t("request.send")}
+            </button>
+            <HintTooltip hintId="send-shortcut" message="Tip: Press Ctrl+Enter to send requests quickly" align="right" />
+          </div>
+        ))}
     </div>
   );
 });

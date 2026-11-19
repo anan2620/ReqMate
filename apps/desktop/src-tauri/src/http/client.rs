@@ -1,5 +1,6 @@
 use std::time::Instant;
 
+use tokio::sync::watch;
 use url::Url;
 
 use crate::models::error::HttpEngineError;
@@ -43,6 +44,32 @@ pub fn redirect_mode(status: u16, method: &HttpMethod) -> RedirectMode {
     }
 }
 
+/// Wait until the caller asks for this request to stop.
+///
+/// `changed()` only errors when the sender was dropped, which happens when the
+/// same id is registered again — i.e. a newer request supersedes this one. Both
+/// cases mean "stop", so the distinction does not matter here.
+async fn wait_for_cancel(rx: &mut watch::Receiver<bool>) {
+    if *rx.borrow() {
+        return;
+    }
+    let _ = rx.changed().await;
+}
+
+/// Run a request future, giving up as soon as a cancel signal arrives.
+/// Yields `None` when the request was cancelled.
+macro_rules! await_cancellable {
+    ($fut:expr, $cancel:expr) => {
+        match $cancel.as_mut() {
+            Some(rx) => tokio::select! {
+                res = $fut => Some(res),
+                _ = wait_for_cancel(rx) => None,
+            },
+            None => Some($fut.await),
+        }
+    };
+}
+
 impl HttpEngine {
     /// Send an HTTP request and return the parsed response.
     ///
@@ -50,6 +77,18 @@ impl HttpEngine {
     /// hop can be captured, and so that method/body semantics per status code
     /// are respected (reqwest would otherwise always downgrade to GET).
     pub async fn send(params: SendRequestParams) -> Result<ResponseData, HttpEngineError> {
+        Self::send_with_cancel(params, None).await
+    }
+
+    /// Same as [`HttpEngine::send`], but abortable while in flight.
+    ///
+    /// Cancellation is cooperative: each network wait is raced against the
+    /// watch channel, so an in-flight request stops as soon as the UI asks for
+    /// it instead of blocking until the timeout expires.
+    pub async fn send_with_cancel(
+        params: SendRequestParams,
+        mut cancel: Option<watch::Receiver<bool>>,
+    ) -> Result<ResponseData, HttpEngineError> {
         let timeout_ms = params.timeout_ms.unwrap_or(30_000);
         let should_follow_redirects = params.follow_redirects;
 
@@ -61,10 +100,11 @@ impl HttpEngine {
 
         let start = Instant::now();
 
-        let mut response = build_request(&client, &current)?
-            .send()
-            .await
-            .map_err(|e| classify_reqwest_error(e, timeout_ms))?;
+        let Some(sent) = await_cancellable!(build_request(&client, &current)?.send(), cancel)
+        else {
+            return Err(HttpEngineError::Cancelled);
+        };
+        let mut response = sent.map_err(|e| classify_reqwest_error(e, timeout_ms))?;
 
         // Accumulate cookies from all responses in the redirect chain
         let mut all_cookies: Vec<CookieData> = Vec::with_capacity(4);
@@ -125,10 +165,11 @@ impl HttpEngine {
                 set_header(&mut current.headers, "Cookie", cookie_header);
             }
 
-            response = build_request(&client, &current)?
-                .send()
-                .await
-                .map_err(|e| classify_reqwest_error(e, timeout_ms))?;
+            let Some(sent) = await_cancellable!(build_request(&client, &current)?.send(), cancel)
+            else {
+                return Err(HttpEngineError::Cancelled);
+            };
+            response = sent.map_err(|e| classify_reqwest_error(e, timeout_ms))?;
 
             redirect_count += 1;
         }
@@ -138,7 +179,11 @@ impl HttpEngine {
 
         let elapsed_ms = start.elapsed().as_millis() as u64;
 
-        let mut result = parse_response(response, elapsed_ms).await?;
+        // Reading the body of a slow/large response is the other long wait.
+        let Some(parsed) = await_cancellable!(parse_response(response, elapsed_ms), cancel) else {
+            return Err(HttpEngineError::Cancelled);
+        };
+        let mut result = parsed?;
 
         // Merge accumulated cookies into the result (dedup by name)
         for cookie in all_cookies {
@@ -207,6 +252,77 @@ fn collect_set_cookie_headers(response: &reqwest::Response, cookies: &mut Vec<Co
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    // ─── Cancellation ────────────────────────────────────────────────────
+
+    /// Accepts the connection and then never answers, so the request would
+    /// block until the timeout unless it gets cancelled.
+    fn silent_server() -> u16 {
+        let listener = std::net::TcpListener::bind("127.0.0.1:0").unwrap();
+        let port = listener.local_addr().unwrap().port();
+        std::thread::spawn(move || {
+            let mut held = Vec::new();
+            for stream in listener.incoming() {
+                match stream {
+                    // Keep the socket open without replying.
+                    Ok(s) => held.push(s),
+                    Err(_) => break,
+                }
+            }
+        });
+        port
+    }
+
+    fn hanging_request(port: u16) -> SendRequestParams {
+        SendRequestParams {
+            method: HttpMethod::GET,
+            url: format!("http://127.0.0.1:{port}/hang"),
+            headers: vec![],
+            params: vec![],
+            body: None,
+            auth: None,
+            proxy: None,
+            timeout_ms: Some(30_000),
+            follow_redirects: true,
+            verify_ssl: true,
+            cookies: None,
+            ca_cert_path: None,
+            client_cert_path: None,
+            client_key_path: None,
+            client_cert_passphrase: None,
+        }
+    }
+
+    #[tokio::test]
+    async fn cancel_stops_an_in_flight_request() {
+        let port = silent_server();
+        let (tx, rx) = watch::channel(false);
+
+        let task = tokio::spawn(async move {
+            HttpEngine::send_with_cancel(hanging_request(port), Some(rx)).await
+        });
+
+        // Let the request actually reach the server before cancelling.
+        tokio::time::sleep(std::time::Duration::from_millis(200)).await;
+        assert!(tx.send(true).is_ok());
+
+        let outcome = tokio::time::timeout(std::time::Duration::from_secs(5), task)
+            .await
+            .expect("cancelled request must not wait for the 30s timeout")
+            .unwrap();
+        assert!(matches!(outcome, Err(HttpEngineError::Cancelled)));
+    }
+
+    #[tokio::test]
+    async fn requests_without_a_cancel_channel_still_run() {
+        // A closed port fails fast — the point is that the `None` path is valid.
+        let listener = std::net::TcpListener::bind("127.0.0.1:0").unwrap();
+        let port = listener.local_addr().unwrap().port();
+        drop(listener);
+
+        let outcome = HttpEngine::send_with_cancel(hanging_request(port), None).await;
+        assert!(matches!(outcome, Err(_)));
+    }
 
     // ─── Redirect method semantics ───────────────────────────────────────
 

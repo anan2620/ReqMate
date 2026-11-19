@@ -3,6 +3,7 @@ import { describe, it, expect, beforeEach, vi } from "vitest";
 vi.mock("@/lib/tauri-api", () => ({
   sendRequest: vi.fn().mockResolvedValue({}),
   sendRequestWithScripts: vi.fn().mockResolvedValue({}),
+  cancelRequest: vi.fn().mockResolvedValue(false),
   readRequestFile: vi.fn().mockResolvedValue({}),
   saveRequestFile: vi.fn().mockResolvedValue(undefined),
   loadPersistedState: vi.fn().mockResolvedValue({ tabs: [], activeTabId: null }),
@@ -21,6 +22,7 @@ vi.mock("@/stores/console-store", () => ({
   useConsoleStore: { getState: () => ({ log: vi.fn() }) },
 }));
 
+import * as api from "@/lib/tauri-api";
 import { useTabStore } from "@/stores/tab-store";
 
 describe("Tab Store", () => {
@@ -39,6 +41,82 @@ describe("Tab Store", () => {
     expect(state.tabs[0].method).toBe("GET");
     expect(state.tabs[0].name).toBe("Untitled Request");
     expect(state.activeTabId).toBe(state.tabs[0].id);
+  });
+
+  it("cancels the in-flight request of the active tab", async () => {
+    useTabStore.getState().newTab();
+    const id = useTabStore.getState().activeTabId!;
+    useTabStore.setState({
+      tabs: useTabStore.getState().tabs.map((t) => (t.id === id ? { ...t, loading: true } : t)),
+    });
+    vi.mocked(api.cancelRequest).mockResolvedValueOnce(true);
+
+    await useTabStore.getState().cancel();
+
+    const tab = useTabStore.getState().tabs[0];
+    expect(api.cancelRequest).toHaveBeenCalledWith(id);
+    expect(tab.loading).toBe(false);
+    expect(tab.error?.errorType).toBe("cancelled");
+  });
+
+  it("keeps loading when the request already settled", async () => {
+    useTabStore.getState().newTab();
+    const id = useTabStore.getState().activeTabId!;
+    useTabStore.setState({
+      tabs: useTabStore.getState().tabs.map((t) => (t.id === id ? { ...t, loading: true } : t)),
+    });
+    vi.mocked(api.cancelRequest).mockResolvedValueOnce(false);
+
+    await useTabStore.getState().cancel();
+
+    const tab = useTabStore.getState().tabs[0];
+    expect(tab.loading).toBe(true);
+    expect(tab.error).toBeNull();
+  });
+
+  it("ignores a response that lands after the request was cancelled", async () => {
+    let release: () => void = () => {};
+    vi.mocked(api.sendRequest).mockImplementationOnce(
+      () =>
+        new Promise((resolve) => {
+          release = () =>
+            resolve({
+              status: 200,
+              statusText: "OK",
+              body: "late",
+              headers: [],
+              cookies: [],
+              timeMs: 1,
+              sizeBytes: 1,
+            });
+        }),
+    );
+    vi.mocked(api.cancelRequest).mockResolvedValueOnce(true);
+
+    useTabStore.getState().newTab();
+    useTabStore.getState().setUrl("https://api.test/slow");
+    const pending = useTabStore.getState().send();
+
+    // Wait until the request actually reached the bridge.
+    await vi.waitFor(() => expect(api.sendRequest).toHaveBeenCalled());
+    await useTabStore.getState().cancel();
+
+    release();
+    await pending;
+
+    const tab = useTabStore.getState().tabs[0];
+    expect(tab.response).toBeNull();
+    expect(tab.error?.errorType).toBe("cancelled");
+    expect(tab.loading).toBe(false);
+  });
+
+  it("does nothing when no request is loading", async () => {
+    useTabStore.getState().newTab();
+    vi.mocked(api.cancelRequest).mockClear();
+
+    await useTabStore.getState().cancel();
+
+    expect(api.cancelRequest).not.toHaveBeenCalled();
   });
 
   it("creates a new WebSocket tab", () => {
