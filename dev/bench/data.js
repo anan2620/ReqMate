@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1795051843672,
+  "lastUpdate": 1795078565938,
   "repoUrl": "https://github.com/anan2620/ReqMate",
   "entries": {
     "ReqMate Benchmarks": [
@@ -659,6 +659,226 @@ window.BENCHMARK_DATA = {
             "name": "scripting/modify_request",
             "value": 706930,
             "range": "± 3369",
+            "unit": "ns/iter"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "aya@webside.de5.net",
+            "name": "hua"
+          },
+          "committer": {
+            "email": "aya@webside.de5.net",
+            "name": "hua"
+          },
+          "distinct": true,
+          "id": "364e8d42d2cd0bb2d9cb6b5eb424136a5f10a917",
+          "message": "feat(desktop): 抓包解不了的站点自动降级，并支持一键信任 CA\n\n中间人转发已经能返回真实响应；这次保证「解不了也不能把请求弄断」。\n\n- ProxyState 增加 tunnel_only 集合：TLS 握手失败（客户端证书固定、CA 未受信任）\n  或上游返回 101（wss 等无法代理的升级）时记住该 host，此后同一站点直接走\n  盲隧道，请求照常收发，抓包里写明降级原因；集合随代理启动重建\n- 新增 proxy_trust_ca 命令：macOS 经 osascript 调 security add-trusted-cert\n  写入系统信任库（弹出系统密码框），Windows 用 certutil 写入当前用户证书库，\n  Linux 返回手动导入步骤\n- 面板 CA 卡片新增「安装并信任」按钮，成功后自动重启代理，顺带清空降级名单；\n  运行中未解密时显示「HTTPS 未解密：生成并信任 CA 后可看到正文」\n- 新增 i18n proxy.mitmOff / trustCa / trusted，9 个语言包各 760 键一致\n- 测试：握手失败后同 host 第二次连接走隧道且能正常回显（cargo test 182 passed）",
+          "timestamp": "2026-11-19T16:44:14+08:00",
+          "tree_id": "7ad7e344b96db34a14e88bf2fbdfbe41b591c9b0",
+          "url": "https://github.com/anan2620/ReqMate/commit/364e8d42d2cd0bb2d9cb6b5eb424136a5f10a917"
+        },
+        "date": 1795078565311,
+        "tool": "cargo",
+        "benches": [
+          {
+            "name": "assertions/single_status_eq",
+            "value": 828,
+            "range": "± 17",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "assertions/response_time_lt",
+            "value": 953,
+            "range": "± 18",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "assertions/nested_body_path",
+            "value": 4737,
+            "range": "± 101",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "assertions/array_index_access",
+            "value": 4416,
+            "range": "± 73",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "assertions/regex_match",
+            "value": 134036,
+            "range": "± 2686",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "assertions/multiple_assertions/5",
+            "value": 19259,
+            "range": "± 336",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "assertions/multiple_assertions/10",
+            "value": 38971,
+            "range": "± 716",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "assertions/multiple_assertions/20",
+            "value": 73143,
+            "range": "± 1535",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "collection_loading/load_tree/100",
+            "value": 1685045,
+            "range": "± 18236",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "collection_loading/load_tree/500",
+            "value": 8392520,
+            "range": "± 56355",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "collection_loading/load_tree/1000",
+            "value": 17041533,
+            "range": "± 90120",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "read_request/single_yaml_parse",
+            "value": 17218,
+            "range": "± 354",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "read_request/complex_yaml_parse",
+            "value": 43252,
+            "range": "± 734",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "curl_parsing/simple_get",
+            "value": 214,
+            "range": "± 4",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "curl_parsing/post_with_json",
+            "value": 955,
+            "range": "± 19",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "curl_parsing/complex_with_auth_headers",
+            "value": 3694,
+            "range": "± 80",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "curl_parsing/many_headers_10",
+            "value": 2791,
+            "range": "± 49",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "interpolation/simple_1var",
+            "value": 333,
+            "range": "± 6",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "interpolation/medium_5vars",
+            "value": 1093,
+            "range": "± 28",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "interpolation/heavy_50vars",
+            "value": 9864,
+            "range": "± 183",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "interpolation/no_vars_passthrough",
+            "value": 83,
+            "range": "± 2",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "interpolation/dynamic_uuid",
+            "value": 699,
+            "range": "± 15",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "interpolation/dynamic_timestamp",
+            "value": 325,
+            "range": "± 8",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "interpolation/dynamic_randomString",
+            "value": 378,
+            "range": "± 11",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "interpolate_map/headers/5",
+            "value": 2091,
+            "range": "± 45",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "interpolate_map/headers/20",
+            "value": 9580,
+            "range": "± 280",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "interpolate_map/headers/50",
+            "value": 23822,
+            "range": "± 439",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "scripting/empty_script_overhead",
+            "value": 863852,
+            "range": "± 21284",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "scripting/env_set_single",
+            "value": 891873,
+            "range": "± 12543",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "scripting/env_set_10_vars",
+            "value": 919056,
+            "range": "± 22479",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "scripting/single_test_assertion",
+            "value": 948099,
+            "range": "± 13563",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "scripting/multiple_tests_with_json",
+            "value": 1055861,
+            "range": "± 20091",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "scripting/modify_request",
+            "value": 902379,
+            "range": "± 13836",
             "unit": "ns/iter"
           }
         ]
