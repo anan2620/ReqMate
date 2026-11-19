@@ -103,7 +103,7 @@ export function BottomPanel() {
           <Suspense
             fallback={
               <div className="flex h-full items-center justify-center text-sm text-[var(--color-text-dimmed)]">
-                Loading terminal...
+                {t("terminal.loading")}
               </div>
             }
           >
@@ -145,6 +145,7 @@ function PanelTab({
 }
 
 function ConsoleControls() {
+  const { t } = useTranslation();
   const filter = useConsoleStore((s) => s.filter);
   const setFilter = useConsoleStore((s) => s.setFilter);
   const clear = useConsoleStore((s) => s.clear);
@@ -170,7 +171,7 @@ function ConsoleControls() {
       <button
         onClick={clear}
         className="rounded-md p-1 text-[var(--color-text-muted)] transition-colors hover:bg-[var(--color-elevated)] hover:text-[var(--color-text-secondary)]"
-        title="Clear console"
+        title={t("console.clear")}
       >
         <Trash2 className="h-4 w-4" />
       </button>

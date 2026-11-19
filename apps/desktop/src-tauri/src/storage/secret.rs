@@ -152,17 +152,33 @@ fn master_key(dir: &Path) -> Result<[u8; 32], String> {
     Ok(key)
 }
 
-fn load_or_create_key(dir: &Path) -> Result<[u8; 32], String> {
-    if let Some(key) = read_keychain() {
-        return Ok(key);
-    }
+/// Outcome of asking the OS credential store for the master key.
+#[derive(Debug)]
+enum KeychainRead {
+    Found([u8; 32]),
+    /// No entry exists — a fresh install, or no store on this platform.
+    NoEntry,
+    /// The store exists but could not be read (locked, denied, corrupt).
+    Failed(String),
+}
 
+fn load_or_create_key(dir: &Path) -> Result<[u8; 32], String> {
     let key_path = dir.join(KEY_FILE_NAME);
-    if let Ok(contents) = std::fs::read_to_string(&key_path) {
-        if let Some(key) = decode_key(contents.trim()) {
-            return Ok(key);
+    let file_key = match std::fs::read_to_string(&key_path) {
+        Ok(contents) => {
+            let key = decode_key(contents.trim());
+            if key.is_none() {
+                tracing::warn!("Ignoring malformed master key at {}", key_path.display());
+            }
+            key
         }
-        tracing::warn!("Ignoring malformed master key at {}", key_path.display());
+        Err(_) => None,
+    };
+
+    // Deciding whether an existing key can be reused is subtle enough to be
+    // worth its own function — see `resolve_existing_key`.
+    if let Some(key) = resolve_existing_key(file_key, read_keychain())? {
+        return Ok(key);
     }
 
     let mut key = [0u8; 32];
@@ -183,6 +199,36 @@ fn load_or_create_key(dir: &Path) -> Result<[u8; 32], String> {
     Ok(key)
 }
 
+/// Pick an existing master key, or `Ok(None)` when a brand new one must be
+/// minted.
+///
+/// A *failed* credential-store read must never be treated as "no key yet":
+/// minting a replacement would either overwrite the keychain entry or create a
+/// second key file, and every secret sealed with the old key would become
+/// permanently unreadable.
+fn resolve_existing_key(
+    file_key: Option<[u8; 32]>,
+    keychain: KeychainRead,
+) -> Result<Option<[u8; 32]>, String> {
+    match keychain {
+        KeychainRead::Found(key) => Ok(Some(key)),
+        KeychainRead::Failed(err) => match file_key {
+            Some(key) => {
+                tracing::warn!(
+                    "Credential store unreadable ({err}); falling back to the local master key file"
+                );
+                Ok(Some(key))
+            }
+            None => Err(format!(
+                "Credential store is unavailable ({err}) and no local master key exists. \
+                 Unlock the credential store and restart; to bypass it entirely, start with \
+                 REQMATE_DISABLE_KEYCHAIN=1 (a 0600 key file will be used instead)."
+            )),
+        },
+        KeychainRead::NoEntry => Ok(file_key),
+    }
+}
+
 fn decode_key(encoded: &str) -> Option<[u8; 32]> {
     let raw = BASE64.decode(encoded).ok()?;
     raw.try_into().ok()
@@ -198,13 +244,20 @@ fn keychain_entry() -> Option<keyring::Entry> {
     keyring::Entry::new(KEYCHAIN_SERVICE, KEYCHAIN_USER).ok()
 }
 
-fn read_keychain() -> Option<[u8; 32]> {
-    let entry = keychain_entry()?;
+fn read_keychain() -> KeychainRead {
+    // No store configured (or running under test) — the key file is expected.
+    let Some(entry) = keychain_entry() else {
+        return KeychainRead::NoEntry;
+    };
     match entry.get_password() {
-        Ok(encoded) => decode_key(encoded.trim()),
+        Ok(encoded) => match decode_key(encoded.trim()) {
+            Some(key) => KeychainRead::Found(key),
+            None => KeychainRead::Failed("stored master key is malformed".to_string()),
+        },
+        Err(keyring::Error::NoEntry) => KeychainRead::NoEntry,
         Err(e) => {
             tracing::debug!("Credential store unavailable: {e}");
-            None
+            KeychainRead::Failed(e.to_string())
         }
     }
 }
@@ -259,6 +312,51 @@ mod tests {
 
     fn temp_dir() -> tempfile::TempDir {
         tempfile::tempdir().expect("temp dir")
+    }
+
+    #[test]
+    fn missing_keychain_and_no_file_means_generate_a_key() {
+        // Fresh install: nothing stored yet, so the caller mints a new key.
+        assert!(resolve_existing_key(None, KeychainRead::NoEntry)
+            .unwrap()
+            .is_none());
+    }
+
+    #[test]
+    fn file_key_is_used_when_keychain_has_no_entry() {
+        let key = [7u8; 32];
+        assert_eq!(
+            resolve_existing_key(Some(key), KeychainRead::NoEntry).unwrap(),
+            Some(key)
+        );
+    }
+
+    #[test]
+    fn keychain_key_wins_over_the_file() {
+        let stored = [1u8; 32];
+        let file = [2u8; 32];
+        assert_eq!(
+            resolve_existing_key(Some(file), KeychainRead::Found(stored)).unwrap(),
+            Some(stored)
+        );
+    }
+
+    #[test]
+    fn unreadable_keychain_never_mints_a_new_key() {
+        // A transient read failure must not rotate the key: that would make
+        // every existing secret undecryptable.
+        let err = resolve_existing_key(None, KeychainRead::Failed("locked".into()))
+            .expect_err("must not fall through to key generation");
+        assert!(err.contains("Credential store is unavailable"), "{err}");
+    }
+
+    #[test]
+    fn unreadable_keychain_falls_back_to_the_file_key() {
+        let key = [3u8; 32];
+        assert_eq!(
+            resolve_existing_key(Some(key), KeychainRead::Failed("locked".into())).unwrap(),
+            Some(key)
+        );
     }
 
     #[test]

@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import * as Dialog from "@radix-ui/react-dialog";
 import { X, FolderOpen, ChevronRight, ChevronDown } from "lucide-react";
@@ -25,21 +25,30 @@ export function SaveAsDialog({
   const [selectedCollectionPath, setSelectedCollectionPath] = useState<string | null>(null);
   const [expandedPaths, setExpandedPaths] = useState<Set<string>>(new Set());
 
-  // Reset state when dialog opens
-  const handleOpenChange = (open: boolean) => {
-    if (open) {
-      setName(defaultName);
-      setSelectedPath(null);
-      setSelectedCollectionPath(null);
-      // Auto-select first collection if there's only one
-      if (collections.length === 1 && collections[0].type === "collection") {
-        setSelectedPath(collections[0].path);
-        setSelectedCollectionPath(collections[0].path);
-        setExpandedPaths(new Set([collections[0].path]));
-      }
+  // `open` is controlled by the parent, so `onOpenChange` never fires when the
+  // parent flips it to true — resetting there left the dialog showing the name
+  // and selection from a previous save. Reset on the prop instead.
+  const collectionsRef = useRef(collections);
+  collectionsRef.current = collections;
+
+  useEffect(() => {
+    if (!open) return;
+    setName(defaultName);
+    setSelectedPath(null);
+    setSelectedCollectionPath(null);
+    setExpandedPaths(new Set());
+
+    // Auto-select the only collection, if there is exactly one.
+    const list = collectionsRef.current;
+    const only = list.length === 1 ? list[0] : null;
+    if (only && only.type === "collection") {
+      setSelectedPath(only.path);
+      setSelectedCollectionPath(only.path);
+      setExpandedPaths(new Set([only.path]));
     }
-    onOpenChange(open);
-  };
+  }, [open, defaultName]);
+
+  const handleOpenChange = (next: boolean) => onOpenChange(next);
 
   const filename = useMemo(
     () => name.trim().toLowerCase().replace(/\s+/g, "-"),
@@ -110,11 +119,11 @@ export function SaveAsDialog({
                 <div className="rounded border border-dashed border-[var(--color-border)] p-4 text-center">
                   <FolderOpen className="mx-auto mb-2 h-6 w-6 text-[var(--color-text-dimmed)]" />
                   <p className="text-xs text-[var(--color-text-muted)]">
-                    No collections open. Open a collection first.
+                    {t("request.noCollectionsToSave")}
                   </p>
                 </div>
               ) : (
-                <div className="max-h-48 overflow-auto rounded border border-[var(--color-border)] bg-[var(--color-bg)]">
+                <div className="max-h-48 overflow-auto rounded border border-[var(--color-border)] bg-[var(--color-input)]">
                   {collections.map((node) => (
                     <FolderTreeNode
                       key={node.path}

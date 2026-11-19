@@ -150,7 +150,7 @@ export function GraphQLView() {
             <button
               onClick={handleFetchSchema}
               disabled={fetchingSchema || !tab.url.trim()}
-              className="flex items-center gap-1 rounded-lg bg-[var(--color-elevated)] px-2.5 py-2 text-xs text-[var(--color-text-secondary)] hover:bg-[var(--color-border)] disabled:opacity-50"
+              className="flex h-8 items-center gap-1 rounded-lg bg-[var(--color-elevated)] px-2.5 text-[11.5px] text-[var(--color-text-secondary)] hover:bg-[var(--color-border)] disabled:opacity-50"
               title={t("graphql.fetchSchema")}
             >
               <Download className="h-3 w-3" />
@@ -183,21 +183,21 @@ export function GraphQLView() {
               disabled={
                 subStatus === "connecting" || !tab.url.trim()
               }
-              className={`flex items-center gap-1.5 rounded-xl px-4 py-2 text-[13px] font-semibold disabled:opacity-50 ${
+              className={`flex h-9 items-center gap-1.5 rounded-lg px-3.5 text-[12.5px] font-semibold disabled:opacity-50 ${
                 subStatus === "subscribed" || subStatus === "connected" ? "btn-danger" : "btn-accent"
               }`}
             >
               {subStatus === "subscribed" || subStatus === "connected" ? (
                 <>
                   <Unplug className="h-4 w-4" />
-                  Stop
+                  {t("graphql.stop")}
                 </>
               ) : (
                 <>
                   <Plug className="h-4 w-4" />
                   {subStatus === "connecting"
-                    ? "Connecting..."
-                    : "Subscribe"}
+                    ? t("socketio.connecting")
+                    : t("graphql.subscribe")}
                 </>
               )}
             </button>
@@ -259,7 +259,7 @@ export function GraphQLView() {
                     </label>
                     {isSubscription && (
                       <span className="rounded bg-purple-500/15 px-1.5 py-0.5 text-[10px] font-bold text-purple-400">
-                        SUBSCRIPTION
+                        {t("graphql.subscription")}
                       </span>
                     )}
                   </div>
@@ -389,6 +389,7 @@ function SubscriptionPanel({
   clearMessages: () => void;
   logRef: React.RefObject<HTMLDivElement | null>;
 }) {
+  const { t } = useTranslation();
   return (
     <div className="flex flex-1 flex-col overflow-hidden">
       {/* Error */}
@@ -404,7 +405,7 @@ function SubscriptionPanel({
           {status === "subscribed" ? (
             <span className="flex items-center gap-1.5 text-green-500">
               <Loader2 className="h-3 w-3 animate-spin" />
-              Listening...
+              {t("graphql.listening")}
             </span>
           ) : (
             <span>
@@ -423,12 +424,12 @@ function SubscriptionPanel({
               onChange={(e) => setAutoScroll(e.target.checked)}
               className="h-3 w-3"
             />
-            Auto-scroll
+            {t("graphql.autoScroll")}
           </label>
           <button
             onClick={clearMessages}
             className="rounded p-1 hover:bg-[var(--color-elevated)]"
-            title="Clear messages"
+            title={t("graphql.clearMessages")}
           >
             <Trash2 className="h-3 w-3" />
           </button>

@@ -443,7 +443,7 @@ function NewTabDropdown() {
       <button
         onClick={() => setOpen(!open)}
         className="ml-1 flex shrink-0 items-center gap-1.5 rounded-md px-2.5 py-1.5 text-xs font-medium text-[var(--color-accent-text)] transition-colors hover:bg-[var(--color-accent-soft)]"
-        title="New Tab"
+        title={t("sidebar.new")}
       >
         <Plus className="h-3.5 w-3.5" strokeWidth={2.6} />
         <span>{t("sidebar.new")}</span>
@@ -484,6 +484,7 @@ function NewTabDropdown() {
 }
 
 export function TabBar() {
+  const { t } = useTranslation();
   const {
     tabs,
     activeTabId,
@@ -594,7 +595,7 @@ export function TabBar() {
             {canScrollLeft && (
               <button
                 onClick={() => scrollTabs(-1)}
-                aria-label="Scroll tabs left"
+                aria-label={t("tabs.scrollLeft")}
                 className="flex w-6 shrink-0 items-center justify-center self-stretch rounded-md text-[var(--color-text-dimmed)] transition-colors hover:bg-[color-mix(in_srgb,var(--color-text-primary)_6%,transparent)] hover:text-[var(--color-text-primary)]"
               >
                 <ChevronLeft className="h-4 w-4" />
@@ -638,7 +639,7 @@ export function TabBar() {
             {canScrollRight && (
               <button
                 onClick={() => scrollTabs(1)}
-                aria-label="Scroll tabs right"
+                aria-label={t("tabs.scrollRight")}
                 className="flex w-6 shrink-0 items-center justify-center self-stretch rounded-md text-[var(--color-text-dimmed)] transition-colors hover:bg-[color-mix(in_srgb,var(--color-text-primary)_6%,transparent)] hover:text-[var(--color-text-primary)]"
               >
                 <ChevronRight className="h-4 w-4" />
@@ -650,7 +651,7 @@ export function TabBar() {
             <button
               onClick={() => useTabStore.getState().newTab()}
               className="ml-0.5 flex h-6 w-6 shrink-0 items-center justify-center self-center rounded-md text-[var(--color-text-muted)] transition-colors hover:bg-[color-mix(in_srgb,var(--color-text-primary)_7%,transparent)] hover:text-[var(--color-text-primary)]"
-              title="New Tab (Ctrl+T)"
+              title={t("tabs.newTabShortcut")}
             >
               <Plus className="h-4 w-4" />
             </button>

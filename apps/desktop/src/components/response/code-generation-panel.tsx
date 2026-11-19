@@ -138,7 +138,7 @@ export function CodeGenerationPanel() {
           {copied ? (
             <>
               <Check className="h-3 w-3 text-green-500" />
-              Copied
+              {t("response.copied")}
             </>
           ) : (
             <>

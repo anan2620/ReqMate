@@ -4,11 +4,13 @@ import { FitAddon } from "@xterm/addon-fit";
 import { WebLinksAddon } from "@xterm/addon-web-links";
 import { invoke } from "@tauri-apps/api/core";
 import { listen, type UnlistenFn } from "@tauri-apps/api/event";
+import { useTranslation } from "react-i18next";
 import "@xterm/xterm/css/xterm.css";
 
 const TERMINAL_ID = "main";
 
 export function TerminalPanel() {
+  const { t } = useTranslation();
   const containerRef = useRef<HTMLDivElement>(null);
   const termRef = useRef<Terminal | null>(null);
   const fitRef = useRef<FitAddon | null>(null);
@@ -55,7 +57,7 @@ export function TerminalPanel() {
       });
       setAlive(true);
     } catch (e) {
-      term.writeln(`\r\n\x1b[31mFailed to create terminal: ${e}\x1b[0m`);
+      term.writeln(`\r\n\x1b[31m${t("terminal.failedToCreate", { error: String(e) })}\x1b[0m`);
       return;
     }
 
@@ -70,7 +72,7 @@ export function TerminalPanel() {
     const unlistenExit: UnlistenFn = await listen(
       `terminal-exit-${TERMINAL_ID}`,
       () => {
-        term.writeln("\r\n\x1b[33m[Process exited]\x1b[0m");
+        term.writeln(`\r\n\x1b[33m${t("terminal.processExited")}\x1b[0m`);
         setAlive(false);
       },
     );
@@ -86,7 +88,7 @@ export function TerminalPanel() {
       unlistenOutput();
       unlistenExit();
     };
-  }, []);
+  }, [t]);
 
   // Initialize terminal on mount
   useEffect(() => {
@@ -154,7 +156,7 @@ export function TerminalPanel() {
             onClick={handleRestart}
             className="rounded-lg bg-[var(--color-accent)] px-4 py-2 text-sm font-medium text-white hover:bg-[var(--color-accent-hover)]"
           >
-            Restart Terminal
+            {t("terminal.restart")}
           </button>
         </div>
       )}

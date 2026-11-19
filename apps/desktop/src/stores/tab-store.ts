@@ -84,7 +84,8 @@ interface TabState {
   // Actions
   send: () => Promise<void>;
   save: () => Promise<void>;
-  autoSave: () => Promise<void>;
+  /** Auto-save a specific tab (defaults to the active one). */
+  autoSave: (tabId?: string) => Promise<void>;
   clearAutoSaveError: () => void;
   clearResponse: () => void;
   updateResponse: (tabId: string, updates: Partial<ResponseData>) => void;
@@ -265,6 +266,18 @@ export const useTabStore = create<TabState>((set, get) => ({
   },
 
   closeTab: (id) => {
+    // Flush a dirty file-backed tab before it disappears from the store —
+    // otherwise the pending auto-save has no tab left to write.
+    const closing = get().tabs.find((t) => t.id === id);
+    if (
+      closing?.filePath &&
+      closing.isDirty &&
+      useSettingsStore.getState().settings.autoSave
+    ) {
+      // The content snapshot is taken synchronously inside autoSave().
+      void get().autoSave(id);
+    }
+
     set((state) => {
       const idx = state.tabs.findIndex((t) => t.id === id);
       const newTabs = state.tabs.filter((t) => t.id !== id);
@@ -555,7 +568,7 @@ export const useTabStore = create<TabState>((set, get) => ({
     try {
       const requestFile = tabToRequestFile(tab);
       markRecentlySaved(tab.filePath);
-      await saveRequestFile(tab.filePath, requestFile);
+      await saveRequestFile(tab.filePath, requestFile, tab.assertions);
       set({
         savePulse: { tabId: tab.id, at: Date.now() },
         tabs: get().tabs.map((t) =>
@@ -570,21 +583,28 @@ export const useTabStore = create<TabState>((set, get) => ({
     }
   },
 
-  autoSave: async () => {
+  autoSave: async (tabId) => {
     const { tabs, activeTabId } = get();
-    const tab = tabs.find((t) => t.id === activeTabId);
+    const targetId = tabId ?? activeTabId;
+    const tab = tabs.find((t) => t.id === targetId);
     if (!tab || !tab.filePath || !tab.isDirty) return;
 
+    // Snapshot the exact object we serialise: if editing continues during the
+    // IPC round-trip the tab is replaced, and it must stay dirty so the next
+    // debounce writes those keystrokes too.
+    const snapshot = tab;
+    const filePath: string = tab.filePath;
+
     try {
-      const requestFile = tabToRequestFile(tab);
-      markRecentlySaved(tab.filePath);
-      await saveRequestFile(tab.filePath, requestFile);
-      set({
+      const requestFile = tabToRequestFile(snapshot);
+      markRecentlySaved(filePath);
+      await saveRequestFile(filePath, requestFile, snapshot.assertions);
+      set((state) => ({
         autoSaveError: null,
-        tabs: get().tabs.map((t) =>
-          t.id === activeTabId ? { ...t, isDirty: false } : t,
+        tabs: state.tabs.map((t) =>
+          t.id === targetId && t === snapshot ? { ...t, isDirty: false } : t,
         ),
-      });
+      }));
     } catch (err) {
       set({ autoSaveError: String(err) });
     }
@@ -595,11 +615,11 @@ export const useTabStore = create<TabState>((set, get) => ({
   },
 
   hasUnsavedNewTabs: () => {
-    const { autoSave } = useSettingsStore.getState().settings;
     return get().tabs.some(
       (t) =>
-        // Never-saved requests, plus any dirty tab while auto-save is off
-        (!t.filePath && (t.url.trim() || t.body.content.trim())) || (!autoSave && t.isDirty),
+        // Never-saved requests, plus anything still dirty: auto-save can be
+        // off, failing, or mid-flight, so dirty always means "not on disk".
+        (!t.filePath && (t.url.trim() || t.body.content.trim())) || t.isDirty,
     );
   },
 
@@ -731,7 +751,17 @@ export const useTabStore = create<TabState>((set, get) => ({
         return true;
       })
       .map((t) => ({ filePath: t.filePath!, collectionPath: t.collectionPath! }));
-    const activeIndex = tabs.findIndex((t) => t.id === activeTabId);
+    // The active tab has to be located inside `persistedTabs`: it is filtered
+    // (ephemeral WS/SSE/gRPC tabs and duplicates are dropped), so an index
+    // taken from `tabs` points at a different entry after a restart.
+    const activeTab = tabs.find((t) => t.id === activeTabId);
+    const activeTabPath =
+      activeTab?.filePath && persistedTabs.some((p) => p.filePath === activeTab.filePath)
+        ? activeTab.filePath
+        : null;
+    const activeIndex = activeTabPath
+      ? persistedTabs.findIndex((p) => p.filePath === activeTabPath)
+      : -1;
 
     // Capture window position/size — use normal (non-maximized) geometry
     // so restoring from maximized doesn't span multiple monitors
@@ -749,6 +779,7 @@ export const useTabStore = create<TabState>((set, get) => ({
       savePersistedState({
         tabs: persistedTabs,
         activeTabIndex: activeIndex >= 0 ? activeIndex : null,
+        activeTabPath,
         windowState,
         collections,
       }).catch(() => { /* Tab persistence failure is non-critical */ });
@@ -757,6 +788,7 @@ export const useTabStore = create<TabState>((set, get) => ({
       savePersistedState({
         tabs: persistedTabs,
         activeTabIndex: activeIndex >= 0 ? activeIndex : null,
+        activeTabPath,
         windowState,
       }).catch(() => {});
     });
@@ -788,6 +820,8 @@ export const useTabStore = create<TabState>((set, get) => ({
         return;
       }
       const seenPaths = new Set<string>();
+      // Tabs that actually made it back, in restore order.
+      const restored: { filePath: string; tabId: string }[] = [];
 
       for (const pt of persisted.tabs) {
         // Deduplicate — only restore one tab per file path
@@ -801,6 +835,7 @@ export const useTabStore = create<TabState>((set, get) => ({
             tabs: [...state.tabs, tab],
             activeTabId: state.activeTabId ?? tab.id,
           }));
+          restored.push({ filePath: pt.filePath, tabId: tab.id });
           if (pt.collectionPath) collectionPaths.add(pt.collectionPath);
         } catch {
           // File may have been deleted, skip it
@@ -809,13 +844,18 @@ export const useTabStore = create<TabState>((set, get) => ({
         }
       }
 
-      // Set active tab by index
-      if (persisted.activeTabIndex != null) {
-        const { tabs } = get();
-        if (persisted.activeTabIndex < tabs.length) {
-          set({ activeTabId: tabs[persisted.activeTabIndex].id });
-        }
-      }
+      // Prefer the persisted path — it still resolves when an earlier tab in
+      // the list could not be restored. Fall back to the index for state files
+      // written by older builds.
+      const byPath = persisted.activeTabPath
+        ? restored.find((r) => r.filePath === persisted.activeTabPath)
+        : undefined;
+      const byIndex =
+        persisted.activeTabIndex != null
+          ? restored[persisted.activeTabIndex]
+          : undefined;
+      const activeTabId = (byPath ?? byIndex)?.tabId;
+      if (activeTabId) set({ activeTabId });
 
       // Re-open collections in the sidebar (persisted collections were
       // already added above; this also includes any from open tabs).

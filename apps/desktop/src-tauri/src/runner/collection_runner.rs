@@ -61,9 +61,9 @@ fn request_file_to_params(file: &RequestFile, network: &NetworkOptions) -> SendR
             _ => BodyType::None,
         };
         RequestBody {
+            form_data: form_fields(&body_type, b),
             body_type,
             content: b.content.clone(),
-            form_data: Vec::new(),
         }
     });
 
@@ -266,8 +266,7 @@ async fn run_single_request(
                 let cookies_map = interpolated.cookies.get_or_insert_with(HashMap::new);
                 for cookie in &jar_cookies {
                     if let Some(ref req_domain) = request_domain {
-                        let cookie_domain = cookie.domain.trim_start_matches('.');
-                        if req_domain.ends_with(cookie_domain) || req_domain == cookie_domain {
+                        if crate::http::cookies::domain_matches(req_domain, &cookie.domain) {
                             cookies_map
                                 .entry(cookie.name.clone())
                                 .or_insert_with(|| cookie.value.clone());
@@ -667,4 +666,71 @@ pub async fn run_collection(
     let _ = app.emit("runner:complete", &summary);
 
     Ok(summary)
+}
+
+/// Fields for urlencoded / form-data bodies.
+///
+/// The editor stores them as a list (`formData`); files written by hand or by
+/// an importer may only carry the encoded `content` string, so fall back to
+/// parsing that instead of sending an empty body.
+fn form_fields(
+    body_type: &BodyType,
+    body: &crate::models::collection::RequestBodyFile,
+) -> Vec<KeyValuePair> {
+    if !body.form_data.is_empty() {
+        return body.form_data.clone();
+    }
+    match body_type {
+        BodyType::Urlencoded => url::form_urlencoded::parse(body.content.as_bytes())
+            .map(|(k, v)| KeyValuePair::new(k.to_string(), v.to_string(), true))
+            .collect(),
+        _ => Vec::new(),
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::models::collection::RequestBodyFile;
+
+    fn body(kind: &str, content: &str, fields: Vec<KeyValuePair>) -> RequestBodyFile {
+        RequestBodyFile {
+            body_type: kind.to_string(),
+            content: content.to_string(),
+            form_data: fields,
+        }
+    }
+
+    #[test]
+    fn explicit_form_rows_are_used_as_is() {
+        let rows = vec![KeyValuePair::new("a".into(), "1".into(), true)];
+        let fields = form_fields(&BodyType::FormData, &body("form-data", "", rows));
+        assert_eq!(fields.len(), 1);
+        assert_eq!(fields[0].key, "a");
+    }
+
+    #[test]
+    fn legacy_urlencoded_content_is_parsed() {
+        let fields = form_fields(
+            &BodyType::Urlencoded,
+            &body("urlencoded", "a=1&b=hello+world", Vec::new()),
+        );
+        let pairs: Vec<(String, String)> = fields
+            .iter()
+            .map(|f| (f.key.clone(), f.value.clone()))
+            .collect();
+        assert_eq!(
+            pairs,
+            vec![
+                ("a".to_string(), "1".to_string()),
+                ("b".to_string(), "hello world".to_string())
+            ]
+        );
+    }
+
+    #[test]
+    fn json_bodies_never_gain_form_fields() {
+        let fields = form_fields(&BodyType::Json, &body("json", "{\"a\":1}", Vec::new()));
+        assert!(fields.is_empty());
+    }
 }

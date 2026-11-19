@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
 use super::auth::AuthConfig;
-use super::request::HttpMethod;
+use super::request::{HttpMethod, KeyValuePair};
 
 /// On-disk collection config (.reqmate/reqmate.yaml)
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -79,11 +79,16 @@ pub struct RequestFile {
 
 /// Body stored in YAML files
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct RequestBodyFile {
     #[serde(rename = "type")]
     pub body_type: String,
     #[serde(default)]
     pub content: String,
+    /// urlencoded / form-data fields. Stored as a list so the editor round-trips
+    /// them; without this they were lost on every save.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub form_data: Vec<KeyValuePair>,
 }
 
 /// Optional folder config (_folder.yaml)

@@ -15,6 +15,8 @@
     "ok": "OK"
   },
   "sidebar": {
+    "folderNamePlaceholder": "Nom du dossier",
+    "requestNamePlaceholder": "Nom de la requête",
     "collections": "Collections",
     "history": "Historique",
     "environments": "Environnements",
@@ -36,9 +38,13 @@
     "import": "Importer",
     "closeCollection": "Fermer la Collection",
     "deleteCollection": "Supprimer la Collection",
+    "deleteCollectionConfirm": "Supprimer la collection « {{name}} » ? La collection entière ira dans la corbeille.",
     "collectionName": "Nom de la Collection",
     "collectionNamePlaceholder": "Mon API",
     "location": "Emplacement",
+    "changeLocation": "Modifier",
+    "willCreate": "Sera créé : {{path}}",
+    "defaultLocationFallback": "Emplacement par défaut intégré",
     "creating": "Création...",
     "exportPostman": "Exporter en Postman",
     "exportOpenapi": "Exporter en OpenAPI",
@@ -54,7 +60,11 @@
     "addVariable": "Ajouter une Variable",
     "importEnvironment": "Importer un Environnement (Postman JSON)",
     "collectionDefaults": "Valeurs par défaut de la collection",
-    "collectionDefaultsDesc": "L’authentification définie ici est héritée par toutes les requêtes qui n’en ont pas."
+    "collectionDefaultsDesc": "L’authentification définie ici est héritée par toutes les requêtes qui n’en ont pas.",
+    "environmentNamePlaceholder": "ex. Développement, Recette, Production",
+    "scopeLocal": "LOCAL",
+    "scopeShared": "Partagé",
+    "scopePersonal": "Personnel"
   },
   "tabs": {
     "untitled": "Requête sans titre",
@@ -73,7 +83,10 @@
     "httpRequest": "Requête HTTP",
     "importCurl": "Importer cURL",
     "saveAs": "Enregistrer sous…",
-    "saveOptions": "Options d’enregistrement"
+    "saveOptions": "Options d’enregistrement",
+    "scrollLeft": "Faire défiler les onglets à gauche",
+    "scrollRight": "Faire défiler les onglets à droite",
+    "newTabShortcut": "Nouvel onglet (Ctrl+T)"
   },
   "request": {
     "send": "Envoyer",
@@ -107,7 +120,10 @@
     "requestName": "Nom de la Requête",
     "requestNamePlaceholder": "Ma Requête",
     "filename": "Nom du fichier :",
-    "saveRequest": "Enregistrer la Requête"
+    "noCollectionsToSave": "Aucune collection ouverte — ouvrez d'abord une collection.",
+    "saveRequest": "Enregistrer la Requête",
+    "httpMethod": "Méthode HTTP",
+    "importCurl": "Importer cURL"
   },
   "body": {
     "json": "JSON",
@@ -171,7 +187,8 @@
     "certificate": "Certificat de l'IdP (PEM)",
     "nameIdFormat": "Format NameID",
     "samlToken": "Jeton d'Assertion SAML",
-    "apiKeyHeader": "Nom de l’en-tête"
+    "apiKeyHeader": "Nom de l’en-tête",
+    "keyNamePlaceholder": "Nom de la clé (ex. X-API-Key)"
   },
   "response": {
     "body": "Corps",
@@ -199,7 +216,25 @@
       "redirect": "Redirection",
       "clientError": "Erreur Client",
       "serverError": "Erreur Serveur"
-    }
+    },
+    "selectSnapshot": "Sélectionner un instantané...",
+    "assertions": "Assertions",
+    "compareTitle": "Comparer les réponses",
+    "diffEmpty": "Enregistrez des réponses avec « Enregistrer pour diff », puis sélectionnez-les ci-dessus.",
+    "headerCount": "{{count}} en-têtes",
+    "identical": "Les réponses sont identiques.",
+    "left": "Gauche",
+    "right": "Droite",
+    "responseSize": "Taille de la réponse",
+    "responseTime": "Temps de réponse",
+    "speedAcceptable": "Acceptable",
+    "speedFast": "Rapide",
+    "speedSlow": "Lent",
+    "speedVerySlow": "Très lent",
+    "status": "Statut",
+    "thresholds": "Seuils de performance",
+    "transfer": "Transfert",
+    "transferSpeed": "Débit de transfert"
   },
   "environment": {
     "title": "Environnements",
@@ -279,9 +314,27 @@
     "saving": "Enregistrement",
     "autoSave": "Enregistrer automatiquement les modifications",
     "autoSaveDesc": "Écrit sur le disque une seconde après la dernière frappe. Désactivez cette option pour garder les modifications dans l’éditeur jusqu’à l’enregistrement manuel.",
+    "defaultCollectionPath": "Emplacement par défaut des collections",
+    "defaultCollectionPathDesc": "Les nouvelles collections sont créées dans ce dossier. Le modifier ne déplace pas les collections existantes.",
+    "defaultCollectionPathPlaceholder": "Choisir un dossier...",
     "aiAssistant": "Assistant IA",
     "designTokens": "Palette de couleurs",
-    "toggleTheme": "Changer de thème"
+    "toggleTheme": "Changer de thème",
+    "caCertPathPlaceholder": "Chemin du certificat CA (.pem, .crt)",
+    "clientCertPathPlaceholder": "Chemin du certificat client (.pem, .crt, .pfx)",
+    "clientKeyPathPlaceholder": "Chemin de la clé privée client (.pem, .key)",
+    "passphrasePlaceholder": "Phrase secrète (facultatif)",
+    "apiEndpoint": "Endpoint de l'API",
+    "apiEndpointDesc": "Tout endpoint compatible OpenAI (OpenAI, Ollama, LM Studio, etc.)",
+    "apiKey": "Clé d'API",
+    "model": "Modèle",
+    "systemPackageUpdate": "La mise à jour automatique n'est pas disponible pour les paquets système (.deb/.rpm).",
+    "paletteDesc": "Palette de couleurs active du thème courant. Utile aux créateurs de thèmes et développeurs de plugins.",
+    "shortcutConflicts": "Certains raccourcis sont en conflit. Une seule action se déclenchera par combinaison.",
+    "pressNewShortcut": "Appuyez sur le nouveau raccourci...",
+    "rebind": "Réassigner",
+    "zenNote": "Échap quitte toujours le mode Zen (non personnalisable)",
+    "resetDefaults": "Rétablir les valeurs par défaut"
   },
   "runner": {
     "title": "Exécuteur de Collection",
@@ -294,7 +347,10 @@
     "passed": "Réussis",
     "failed": "Échoués",
     "skipped": "Ignorés",
-    "duration": "Durée"
+    "duration": "Durée",
+    "noResults": "Aucun résultat pour l'instant",
+    "runCollection": "Exécuter la collection",
+    "stopOnError": "Arrêter en cas d'erreur"
   },
   "import": {
     "title": "Importer une Collection",
@@ -383,7 +439,10 @@
     "value": "Valeur",
     "saved": "Enregistré",
     "savedTo": "« {{name}} » enregistré",
-    "saveFailed": "Échec de l’enregistrement : {{reason}}"
+    "saveFailed": "Échec de l’enregistrement : {{reason}}",
+    "removeRow": "Supprimer la ligne",
+    "dismiss": "Fermer",
+    "dismissHint": "Fermer l'astuce"
   },
   "errors": {
     "connectionRefused": "Connexion refusée — le serveur est-il en marche ?",
@@ -435,7 +494,14 @@
     "requestBody": "Corps de Requête (JSON)",
     "responseBody": "Réponse",
     "loadProtoToStart": "Chargez un fichier .proto pour commencer",
-    "selectMethodToSend": "Sélectionnez une méthode et envoyez une requête"
+    "selectMethodToSend": "Sélectionnez une méthode et envoyez une requête",
+    "selectService": "Sélectionner un service",
+    "filterMethods": "Filtrer les méthodes...",
+    "messagesCount": "{{count}} messages",
+    "responseMetadata": "Métadonnées de réponse",
+    "sending": "Envoi de la requête gRPC...",
+    "streamComplete": "Flux terminé",
+    "streaming": "Réception du flux..."
   },
   "graphql": {
     "query": "Requête GraphQL",
@@ -445,9 +511,16 @@
     "fetchSchema": "Récupérer le Schéma (Introspection)",
     "fetchingSchema": "Récupération...",
     "schema": "Schéma",
-    "schemaTypes": "Types du Schéma"
+    "schemaTypes": "Types du Schéma",
+    "clearMessages": "Vider les messages",
+    "autoScroll": "Défilement auto",
+    "listening": "À l'écoute...",
+    "stop": "Arrêter",
+    "subscription": "ABONNEMENT",
+    "subscribe": "S'abonner"
   },
   "mock": {
+    "selectCollection": "Sélectionner une collection",
     "title": "Serveurs Mock",
     "start": "Démarrer le Serveur Mock",
     "stop": "Arrêter",
@@ -470,6 +543,7 @@
     "newMockServer": "Nouveau Serveur Mock"
   },
   "monitor": {
+    "selectCollection": "Sélectionner une collection",
     "title": "Moniteurs",
     "create": "Créer un Moniteur",
     "schedule": "Planification",
@@ -478,7 +552,13 @@
     "enabled": "Activé",
     "disabled": "Désactivé",
     "createDesc": "Planifiez des exécutions automatiques de collections",
-    "newMonitor": "Nouveau Moniteur"
+    "newMonitor": "Nouveau Moniteur",
+    "schedule": "Planification",
+    "environmentOptional": "Environnement (facultatif)",
+    "webhookOptional": "URL de webhook (facultatif)",
+    "noneConfigured": "Aucun moniteur configuré",
+    "notifyOnFailure": "Notifier en cas d'échec",
+    "selectToView": "Sélectionnez un moniteur pour voir les résultats"
   },
   "docs": {
     "title": "Documentation API",
@@ -517,6 +597,63 @@
     "readOnly": "Ouvrir en Lecture Seule",
     "upgradeHint": "La mise à jour réécrira les fichiers de la collection. Validez vos changements d'abord."
   },
+  "mqtt": {
+    "brokerHost": "Hôte du broker",
+    "connect": "Connecter",
+    "connecting": "Connexion...",
+    "disconnect": "Déconnecter",
+    "statusConnected": "Connecté",
+    "statusConnecting": "Connexion",
+    "statusDisconnected": "Déconnecté",
+    "connectionSettings": "Paramètres de connexion",
+    "clientId": "Client ID",
+    "authentication": "Authentification",
+    "username": "Nom d'utilisateur",
+    "password": "Mot de passe",
+    "subscribe": "S'abonner",
+    "topicPlaceholder": "Sujet (ex. sensor/#)",
+    "qos": "QoS",
+    "publish": "Publier",
+    "topic": "Sujet",
+    "retain": "Conserver",
+    "payloadPlaceholder": "Charge du message",
+    "messagesCount": "Messages : {{count}}",
+    "sentCount": "Envoyés : {{count}}",
+    "receivedCount": "Reçus : {{count}}",
+    "topicsCount": "Sujets : {{count}}",
+    "filterPlaceholder": "Filtrer par sujet...",
+    "autoScroll": "Défilement auto",
+    "clearLog": "Vider le journal",
+    "emptyConnected": "Aucun message — abonnez-vous à un sujet",
+    "emptyDisconnected": "Connectez-vous à un broker pour commencer",
+    "qosValue": "QoS {{qos}}",
+    "retained": "conservé"
+  },
+  "socketio": {
+    "connect": "Connecter",
+    "connecting": "Connexion...",
+    "disconnect": "Déconnecter",
+    "statusConnected": "Connecté",
+    "statusConnecting": "Connexion",
+    "statusDisconnected": "Déconnecté",
+    "headers": "Headers",
+    "headerKey": "Header",
+    "headerValue": "Valeur",
+    "serverInfo": "Infos serveur",
+    "emitEvent": "Émettre un événement",
+    "eventPlaceholder": "Nom de l'événement (ex. message, chat)",
+    "argsPlaceholder": "Arguments (JSON) ex. \"hello\", {\"msg\": \"hi\"} ou [\"a\", 1]",
+    "emit": "Émettre",
+    "eventsCount": "Événements : {{count}}",
+    "emittedCount": "Émis : {{count}}",
+    "receivedCount": "Reçus : {{count}}",
+    "namespaceValue": "Namespace : {{namespace}}",
+    "filterPlaceholder": "Filtrer les événements...",
+    "autoScroll": "Défilement auto",
+    "clearLog": "Vider le journal",
+    "emptyConnected": "Aucun événement — émettez ou écoutez",
+    "emptyDisconnected": "Connectez-vous pour commencer"
+  },
   "websocket": {
     "connect": "Connecter",
     "disconnect": "Déconnecter",
@@ -524,7 +661,8 @@
     "connected": "Connecté",
     "disconnected": "Déconnecté",
     "messages": "Messages",
-    "connectToStart": "Connectez-vous pour commencer le streaming"
+    "connectToStart": "Connectez-vous pour commencer le streaming",
+    "clearLog": "Vider le journal"
   },
   "sse": {
     "connect": "Connecter",
@@ -532,9 +670,47 @@
     "events": "Événements",
     "connected": "Connecté",
     "disconnected": "Déconnecté",
-    "connectToStart": "Connectez-vous pour commencer le streaming"
+    "connectToStart": "Connectez-vous pour commencer le streaming",
+    "filterPlaceholder": "Filtrer par type d'événement..."
   },
   "ai": {
+    "optional": "Facultatif",
+    "settings": "Paramètres",
+    "clearChat": "Vider la conversation",
+    "setupTitle": "Assistant IA — fonction facultative",
+    "setupDesc": "Cette fonction facultative nécessite votre propre clé d'API (BYOK). ReqMate ne fournit aucun service d'IA : vous apportez le vôtre.",
+    "setupStepsTitle": "Pour commencer :",
+    "setupStep1": "Obtenez une clé d'API auprès de votre fournisseur d'IA",
+    "setupStep2": "Ouvrez Paramètres → IA et renseignez l'endpoint, la clé et le modèle",
+    "setupStep3": "Commencez à discuter ou à générer des requêtes",
+    "setupSupports": "Compatible avec toute API compatible OpenAI : OpenAI, Ollama, LM Studio, etc.",
+    "openSettings": "Ouvrir les paramètres",
+    "setupNote": "Toutes les autres fonctions de ReqMate fonctionnent sans configuration IA.",
+    "banner": "Cette fonction facultative se connecte à votre propre fournisseur d'IA. ReqMate ne fournit aucun service d'IA.",
+    "bannerErrors": "Les erreurs ci-dessous signifient que votre clé ou votre endpoint doit être corrigé dans",
+    "settingsAi": "Paramètres → IA",
+    "emptyHint": "Posez vos questions sur les API, générez des requêtes ou créez des tests.",
+    "thinking": "Réflexion...",
+    "generateTests": "Générer des tests",
+    "inputPlaceholder": "Décrivez une requête API...",
+    "errorOwnKey": "Cette fonction facultative utilise votre propre clé d'API.",
+    "checkSettings": "Vérifier Paramètres → IA",
+    "runIt": "Exécuter",
+    "runMyself": "Je l'exécute moi-même",
+    "applyToTab": "Appliquer à l'onglet actuel",
+    "applyTests": "Appliquer les tests",
+    "debugEndpoint": "Endpoint",
+    "debugModel": "Modèle",
+    "debugDuration": "Durée",
+    "debugPrompt": "Prompt",
+    "msgUnreachable": "Impossible de joindre votre fournisseur d'IA",
+    "msgGenerateTestsRequest": "Générer des tests pour la réponse actuelle",
+    "msgTestsGenerated": "Tests générés pour votre réponse :",
+    "msgGenerateTestsFailed": "Impossible de générer les tests — vérifiez les paramètres de votre fournisseur d'IA",
+    "msgRequestApplied": "Requête appliquée ! Voulez-vous que je l'envoie ?",
+    "msgRunDone": "Terminé ! Consultez le panneau de réponse pour les résultats et les tests.",
+    "msgRunDismissed": "Pas de souci, vous pouvez l'envoyer quand vous voulez.",
+    "msgTestsApplied": "Tests appliqués ! Voulez-vous que j'envoie la requête pour les exécuter ?",
     "title": "Assistant IA",
     "comingSoon": "AI Assistant",
     "comingSoonDesc": "Generate API requests from natural language and auto-generate tests from responses. Configure your AI provider in Settings."
@@ -583,9 +759,57 @@
     "collection": "Supprimer la collection \"{{name}}\" ? Cela déplacera toute la collection dans la corbeille."
   },
   "audit": {
-    "title": "Journal d'Audit"
+    "title": "Journal d'Audit",
+    "requestSent": "Requête envoyée",
+    "collectionOpened": "Collection ouverte",
+    "environmentChanged": "Environnement changé",
+    "requestSaved": "Requête enregistrée",
+    "requestDeleted": "Requête supprimée",
+    "settingsChanged": "Paramètres modifiés",
+    "justNow": "à l'instant",
+    "minutesAgo": "il y a {{count}} min",
+    "hoursAgo": "il y a {{count}} h",
+    "daysAgo": "il y a {{count}} j",
+    "events": "{{count}} événements",
+    "clearLogs": "Vider le journal d'audit",
+    "empty": "Aucun événement d'audit",
+    "emptyHint": "Les actions sont enregistrées pendant votre utilisation",
+    "loadingMore": "Chargement..."
   },
+  "git": {
+    "title": "Git",
+    "noCollections": "Ouvrez une collection pour utiliser Git",
+    "notARepo": "Cette collection n'est pas un dépôt Git",
+    "initRepo": "Initialiser le dépôt Git",
+    "selectCollection": "Sélectionner une collection",
+    "collection": "Collection",
+    "refresh": "Actualiser",
+    "ahead": "{{count}} en avance",
+    "behind": "{{count}} en retard",
+    "pull": "Pull",
+    "push": "Push",
+    "staged": "Indexés ({{count}})",
+    "changes": "Modifications ({{count}})",
+    "stageAll": "Tout indexer",
+    "unstageAll": "Tout désindexer",
+    "stage": "Indexer",
+    "unstage": "Désindexer",
+    "clean": "Arbre de travail propre",
+    "commitPlaceholder": "Message de commit...",
+    "commit": "Commit ({{count}})",
+    "history": "Historique ({{count}})",
+    "noCommits": "Aucun commit pour l'instant"
+  },
+
+  "terminal": {
+    "restart": "Redémarrer le terminal",
+    "failedToCreate": "Impossible de créer le terminal : {{error}}",
+    "processExited": "[Processus terminé]",
+    "loading": "Chargement du terminal..."
+  },
+
   "proxy": {
+    "captured": "{{count}} capturées",
     "title": "Capture proxy",
     "running": "En cours",
     "stopped": "Arrêté",

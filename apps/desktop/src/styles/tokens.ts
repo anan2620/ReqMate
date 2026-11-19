@@ -25,6 +25,8 @@ export const colorTokens = {
   surface: "var(--color-surface)",
   /** Elevated surface — inputs, hover backgrounds */
   elevated: "var(--color-elevated)",
+  /** Input field fill — a lighter step than `elevated`, used by form fields */
+  input: "var(--color-input)",
   /** Borders and dividers */
   border: "var(--color-border)",
   /** Primary text — headings, body */
@@ -455,6 +457,7 @@ const tokenToCSSProperty: Record<ColorTokenKey, CSSPropertyName> = {
   bg: "--color-bg",
   surface: "--color-surface",
   elevated: "--color-elevated",
+  input: "--color-input",
   border: "--color-border",
   textPrimary: "--color-text-primary",
   textSecondary: "--color-text-secondary",

@@ -91,9 +91,7 @@ pub async fn parse_response(
             // Fall through to return truncated body without temp path
         }
 
-        let truncated_bytes = &bytes[..TRUNCATE_THRESHOLD];
-        let body = String::from_utf8(truncated_bytes.to_vec())
-            .unwrap_or_else(|_| format!("<binary data: {} bytes>", size_bytes));
+        let body = truncate_body(&bytes, TRUNCATE_THRESHOLD);
 
         let temp_path_str = if temp_path.exists() {
             Some(temp_path.to_string_lossy().to_string())
@@ -173,4 +171,50 @@ fn extract_cookie_attr(attrs: &str, key: &str) -> Option<String> {
         }
     }
     None
+}
+
+/// Decode the first `limit` bytes of `bytes` as UTF-8 text.
+///
+/// Cutting at a raw byte offset can land inside a multi-byte character (very
+/// likely with CJK or emoji content), and `from_utf8` on the fragment then
+/// fails, replacing a perfectly readable body with "<binary data>". Backing off
+/// to the nearest character boundary keeps the preview intact; invalid bytes
+/// elsewhere still degrade gracefully via the lossy conversion.
+fn truncate_body(bytes: &[u8], limit: usize) -> String {
+    let mut end = limit.min(bytes.len());
+    while end > 0 && end < bytes.len() && (bytes[end] & 0xC0) == 0x80 {
+        end -= 1;
+    }
+    String::from_utf8_lossy(&bytes[..end]).into_owned()
+}
+
+#[cfg(test)]
+mod tests {
+    use super::truncate_body;
+
+    #[test]
+    fn keeps_ascii_intact() {
+        assert_eq!(truncate_body(b"hello world", 5), "hello");
+    }
+
+    #[test]
+    fn does_not_split_a_multibyte_character() {
+        // "中文" is 3 bytes per character; a 4-byte limit lands mid-character.
+        let text = "中文内容";
+        let out = truncate_body(text.as_bytes(), 4);
+        assert_eq!(out, "中");
+    }
+
+    #[test]
+    fn keeps_emoji_preview_readable() {
+        let text = "ok 🚀 done";
+        // "ok " = 3 bytes, rocket starts at 3 and is 4 bytes long.
+        let out = truncate_body(text.as_bytes(), 5);
+        assert_eq!(out, "ok ");
+    }
+
+    #[test]
+    fn short_bodies_are_returned_whole() {
+        assert_eq!(truncate_body("中文".as_bytes(), 100), "中文");
+    }
 }

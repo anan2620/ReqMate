@@ -431,14 +431,29 @@ fn apply_body(
                 .filter(|kv| kv.enabled && !kv.key.is_empty())
             {
                 if kv.value_type.as_deref() == Some("file") {
-                    // Embed file content as a text field (no filename in Content-Disposition)
-                    let content = std::fs::read_to_string(&kv.value).map_err(|e| {
+                    // Real file part: binary-safe, with a filename so servers
+                    // populate `request.files` instead of a text field.
+                    let path = std::path::Path::new(&kv.value);
+                    let bytes = std::fs::read(path).map_err(|e| {
                         HttpEngineError::RequestError(format!(
                             "Failed to read file '{}': {e}",
                             kv.value
                         ))
                     })?;
-                    form = form.text(kv.key.clone(), content);
+                    let filename = path
+                        .file_name()
+                        .map(|n| n.to_string_lossy().to_string())
+                        .unwrap_or_else(|| kv.key.clone());
+                    let mut part = reqwest::multipart::Part::bytes(bytes).file_name(filename);
+                    if let Some(mime) = mime_for_path(path) {
+                        part = part.mime_str(&mime).map_err(|e| {
+                            HttpEngineError::RequestError(format!(
+                                "Invalid content type for '{}': {e}",
+                                kv.value
+                            ))
+                        })?;
+                    }
+                    form = form.part(kv.key.clone(), part);
                 } else {
                     form = form.text(kv.key.clone(), kv.value.clone());
                 }
@@ -450,6 +465,33 @@ fn apply_body(
             .body(body.content.clone().into_bytes())),
         BodyType::None => Ok(builder),
     }
+}
+
+/// Best-effort MIME type for an uploaded file, without pulling in a full
+/// mime database. Unknown extensions fall back to `application/octet-stream`.
+fn mime_for_path(path: &std::path::Path) -> Option<String> {
+    let ext = path
+        .extension()
+        .map(|e| e.to_string_lossy().to_ascii_lowercase())?;
+    let mime = match ext.as_str() {
+        "png" => "image/png",
+        "jpg" | "jpeg" => "image/jpeg",
+        "gif" => "image/gif",
+        "webp" => "image/webp",
+        "svg" => "image/svg+xml",
+        "pdf" => "application/pdf",
+        "json" => "application/json",
+        "xml" => "application/xml",
+        "txt" | "md" | "log" => "text/plain",
+        "csv" => "text/csv",
+        "html" | "htm" => "text/html",
+        "zip" => "application/zip",
+        "mp4" => "video/mp4",
+        "mp3" => "audio/mpeg",
+        "wav" => "audio/wav",
+        _ => "application/octet-stream",
+    };
+    Some(mime.to_string())
 }
 
 #[cfg(test)]

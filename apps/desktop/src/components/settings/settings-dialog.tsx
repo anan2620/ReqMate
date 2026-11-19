@@ -66,13 +66,13 @@ const SETTINGS_SECTIONS: {
   { id: "network", icon: Network, labelKey: "settings.network" },
   { id: "certificates", icon: ShieldCheck, labelKey: "settings.certificates" },
   { id: "ai", icon: Sparkles, labelKey: "settings.aiAssistant" },
-  { id: "updates", icon: RefreshCw, labelKey: "settings.updates" },
   { id: "shortcuts", icon: Keyboard, labelKey: "settings.shortcuts" },
+  { id: "updates", icon: RefreshCw, labelKey: "settings.updates" },
   { id: "backup", icon: DatabaseBackup, labelKey: "settings.backup" },
 ];
 
 export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
-  const { settings, updateSettings } = useSettingsStore();
+  const { settings, updateSettings, flushSettings } = useSettingsStore();
   const { t, i18n } = useTranslation();
   const [section, setSection] = useState<SettingsSectionId>("appearance");
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -100,8 +100,31 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
     updateSettings(patch);
   };
 
+  // Anything still queued is written when the dialog closes, so a value typed
+  // just before dismissing is not lost to the debounce.
+  const handleOpenChange = (next: boolean) => {
+    if (!next) void flushSettings();
+    onOpenChange(next);
+  };
+
+  // Number inputs are edited as text: committing every keystroke would turn a
+  // temporarily empty field into the fallback (30000) and fight the caret.
+  const [timeoutDraft, setTimeoutDraft] = useState(String(settings.timeoutMs));
+  useEffect(() => {
+    if (open) setTimeoutDraft(String(settings.timeoutMs));
+  }, [open, settings.timeoutMs]);
+
+  const commitTimeout = () => {
+    const parsed = Number(timeoutDraft);
+    if (Number.isFinite(parsed) && parsed > 0) {
+      update({ timeoutMs: Math.round(parsed) });
+    } else {
+      setTimeoutDraft(String(settings.timeoutMs));
+    }
+  };
+
   return (
-    <Dialog.Root open={open} onOpenChange={onOpenChange}>
+    <Dialog.Root open={open} onOpenChange={handleOpenChange}>
       <Dialog.Portal>
         <Dialog.Overlay className="fixed inset-0 z-50 bg-[var(--color-overlay)]" />
         <Dialog.Content className="animate-panel-in fixed left-1/2 top-1/2 z-50 flex h-[86vh] max-h-[860px] w-[1040px] max-w-[94vw] -translate-x-1/2 -translate-y-1/2 flex-col overflow-hidden rounded-xl border border-[var(--color-border-strong)] bg-[var(--color-card)] elev-pop focus:outline-none">
@@ -313,6 +336,24 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
                       />
                     </div>
                   </div>
+
+                  <div className="mt-5 border-t border-[var(--color-border)] pt-5">
+                    <label
+                      htmlFor="setting-default-collection-path"
+                      className="block text-sm text-[var(--color-text-secondary)]"
+                    >
+                      {t("settings.defaultCollectionPath")}
+                    </label>
+                    <p className="mb-2 mt-1 text-[11.5px] leading-relaxed text-[var(--color-text-muted)]">
+                      {t("settings.defaultCollectionPathDesc")}
+                    </p>
+                    <FolderPathInput
+                      id="setting-default-collection-path"
+                      value={settings.defaultCollectionPath ?? ""}
+                      onChange={(v) => update({ defaultCollectionPath: v })}
+                      placeholder={t("settings.defaultCollectionPathPlaceholder")}
+                    />
+                  </div>
                 </section>
 
                 {/* Network Section */}
@@ -352,8 +393,12 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
                       type="number"
                       min={0}
                       step={1000}
-                      value={settings.timeoutMs}
-                      onChange={(e) => update({ timeoutMs: Number(e.target.value) || 30000 })}
+                      value={timeoutDraft}
+                      onChange={(e) => setTimeoutDraft(e.target.value)}
+                      onBlur={commitTimeout}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") commitTimeout();
+                      }}
                       className="w-full rounded-md border border-[var(--color-border)] bg-[var(--color-card)] px-3 py-1.5 text-sm text-[var(--color-text-primary)] outline-none transition-colors focus:border-[var(--color-accent)]"
                     />
                   </div>
@@ -511,7 +556,7 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
                     <FilePathInput
                       value={settings.caCertPath ?? ""}
                       onChange={(v) => update({ caCertPath: v || null })}
-                      placeholder="Path to CA certificate (.pem, .crt)"
+                      placeholder={t("settings.caCertPathPlaceholder")}
                       filters={[{ name: "Certificates", extensions: ["pem", "crt", "cer"] }]}
                     />
                   </div>
@@ -524,7 +569,7 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
                     <FilePathInput
                       value={settings.clientCertPath ?? ""}
                       onChange={(v) => update({ clientCertPath: v || null })}
-                      placeholder="Path to client certificate (.pem, .crt, .pfx)"
+                      placeholder={t("settings.clientCertPathPlaceholder")}
                       filters={[{ name: "Certificates", extensions: ["pem", "crt", "cer", "pfx", "p12"] }]}
                     />
                   </div>
@@ -537,7 +582,7 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
                     <FilePathInput
                       value={settings.clientKeyPath ?? ""}
                       onChange={(v) => update({ clientKeyPath: v || null })}
-                      placeholder="Path to client private key (.pem, .key)"
+                      placeholder={t("settings.clientKeyPathPlaceholder")}
                       filters={[{ name: "Keys", extensions: ["pem", "key"] }]}
                     />
                   </div>
@@ -552,7 +597,7 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
                         type="password"
                         value={settings.clientCertPassphrase ?? ""}
                         onChange={(e) => update({ clientCertPassphrase: e.target.value || null })}
-                        placeholder="Passphrase (optional)"
+                        placeholder={t("settings.passphrasePlaceholder")}
                                             className="w-full rounded border border-[var(--color-border)] bg-[var(--color-card)] px-3 py-1.5 text-sm text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none transition-colors focus:border-[var(--color-accent)]"
                       />
                     </div>
@@ -567,41 +612,41 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
                   <div className="space-y-3">
                     <div>
                       <label className="mb-1 block text-sm text-[var(--color-text-secondary)]">
-                        API Endpoint
+                        {t("settings.apiEndpoint")}
                       </label>
                       <input
                         type="text"
                         value={settings.aiEndpoint ?? ""}
                         onChange={(e) => update({ aiEndpoint: e.target.value.trim() || null })}
                         placeholder="https://api.openai.com/v1"
-                        className="w-full rounded border border-[var(--color-border)] bg-[var(--color-bg)] px-3 py-1.5 text-sm text-[var(--color-text-primary)] placeholder:text-[var(--color-text-dimmed)]"
+                        className="w-full rounded border border-[var(--color-border)] bg-[var(--color-input)] px-3 py-1.5 text-sm text-[var(--color-text-primary)] placeholder:text-[var(--color-text-dimmed)]"
                       />
                       <p className="mt-0.5 text-xs text-[var(--color-text-dimmed)]">
-                        Any OpenAI-compatible endpoint (OpenAI, Ollama, LM Studio, etc.)
+                        {t("settings.apiEndpointDesc")}
                       </p>
                     </div>
                     <div>
                       <label className="mb-1 block text-sm text-[var(--color-text-secondary)]">
-                        API Key
+                        {t("settings.apiKey")}
                       </label>
                       <input
                         type="password"
                         value={settings.aiApiKey ?? ""}
                         onChange={(e) => update({ aiApiKey: e.target.value || null })}
                         placeholder="sk-..."
-                        className="w-full rounded border border-[var(--color-border)] bg-[var(--color-bg)] px-3 py-1.5 text-sm text-[var(--color-text-primary)] placeholder:text-[var(--color-text-dimmed)]"
+                        className="w-full rounded border border-[var(--color-border)] bg-[var(--color-input)] px-3 py-1.5 text-sm text-[var(--color-text-primary)] placeholder:text-[var(--color-text-dimmed)]"
                       />
                     </div>
                     <div>
                       <label className="mb-1 block text-sm text-[var(--color-text-secondary)]">
-                        Model
+                        {t("settings.model")}
                       </label>
                       <input
                         type="text"
                         value={settings.aiModel ?? ""}
                         onChange={(e) => update({ aiModel: e.target.value || null })}
                         placeholder="gpt-4o-mini"
-                        className="w-full rounded border border-[var(--color-border)] bg-[var(--color-bg)] px-3 py-1.5 text-sm text-[var(--color-text-primary)] placeholder:text-[var(--color-text-dimmed)]"
+                        className="w-full rounded border border-[var(--color-border)] bg-[var(--color-input)] px-3 py-1.5 text-sm text-[var(--color-text-primary)] placeholder:text-[var(--color-text-dimmed)]"
                       />
                     </div>
                   </div>
@@ -720,7 +765,7 @@ function UpdateSection({
       {isSystemPackage && (
         <div className="mb-4 rounded-lg bg-[var(--color-warning)]/10 border border-[var(--color-warning)]/20 p-3">
           <p className="text-sm text-[var(--color-text-secondary)]">
-            Auto-update isn't available for system package installs (.deb/.rpm).
+            {t("settings.systemPackageUpdate")}
             Use your package manager or download from{" "}
             <a
               href="https://github.com/anan2620/ReqMate/releases/latest"
@@ -945,6 +990,7 @@ function FilePathInput({
   placeholder: string;
   filters: { name: string; extensions: string[] }[];
 }) {
+  const { t } = useTranslation();
   const browse = async () => {
     const selected = await openFileDialog({
       multiple: false,
@@ -967,7 +1013,53 @@ function FilePathInput({
       <button
         onClick={browse}
         className="rounded-md border border-[var(--color-border)] bg-[var(--color-card)] px-2 py-1.5 text-[var(--color-text-secondary)] transition-colors hover:border-[var(--color-border-strong)] hover:bg-[var(--color-card-hover)] hover:text-[var(--color-text-primary)]"
-        title="Browse..."
+        title={t("common.browse")}
+      >
+        <FolderOpen className="h-4 w-4" />
+      </button>
+    </div>
+  );
+}
+
+function FolderPathInput({
+  id,
+  value,
+  onChange,
+  placeholder,
+}: {
+  id?: string;
+  value: string;
+  onChange: (value: string) => void;
+  placeholder: string;
+}) {
+  const { t } = useTranslation();
+  const browse = async () => {
+    const selected = await openFileDialog({ directory: true, multiple: false });
+    if (typeof selected === "string") {
+      onChange(selected);
+    }
+  };
+
+  return (
+    <div className="flex gap-2">
+      <input
+        id={id}
+        type="text"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        onBlur={(e) => {
+          const trimmed = e.target.value.trim();
+          if (trimmed !== e.target.value) onChange(trimmed);
+        }}
+        placeholder={placeholder}
+        spellCheck={false}
+        className="flex-1 truncate rounded border border-[var(--color-border)] bg-[var(--color-card)] px-3 py-1.5 text-sm text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none transition-colors focus:border-[var(--color-accent)]"
+      />
+      <button
+        onClick={browse}
+        className="rounded-md border border-[var(--color-border)] bg-[var(--color-card)] px-2 py-1.5 text-[var(--color-text-secondary)] transition-colors hover:border-[var(--color-border-strong)] hover:bg-[var(--color-card-hover)] hover:text-[var(--color-text-primary)]"
+        title={t("common.browse")}
+        aria-label={t("common.browse")}
       >
         <FolderOpen className="h-4 w-4" />
       </button>
@@ -1004,11 +1096,8 @@ function PaletteSection() {
   const { t } = useTranslation();
   return (
     <div className="mt-6 border-t border-[var(--color-border)] pt-5">
-      <h4 className="mb-3 text-sm text-[var(--color-text-secondary)]">
-        {t("settings.designTokens")}
-      </h4>
       <p className="mb-3 text-xs text-[var(--color-text-dimmed)]">
-        Active color palette for the current theme. Useful for theme creators and plugin developers.
+        {t("settings.paletteDesc")}
       </p>
       <div className="space-y-3">
         {tokenSwatchGroups.map((group) => (
@@ -1059,7 +1148,7 @@ function KeyboardShortcutsSection() {
 
       {conflicts.length > 0 && (
         <div className="mb-3 rounded bg-[var(--color-warning)]/10 px-3 py-2 text-xs text-[var(--color-warning)]">
-          Some shortcuts have conflicting bindings. Only one action will trigger per key combination.
+          {t("settings.shortcutConflicts")}
         </div>
       )}
 
@@ -1105,7 +1194,7 @@ function KeyboardShortcutsSection() {
                       }
                     }}
                   >
-                    Press new shortcut...
+                    {t("settings.pressNewShortcut")}
                   </span>
                 ) : (
                   <div className="flex items-center gap-0.5">
@@ -1128,7 +1217,7 @@ function KeyboardShortcutsSection() {
                     onClick={() => setRecordingId(action.id)}
                     className="rounded px-1.5 py-0.5 text-[10px] text-[var(--color-text-dimmed)] hover:bg-[var(--color-border)] hover:text-[var(--color-text-secondary)]"
                   >
-                    Rebind
+                    {t("settings.rebind")}
                   </button>
                 )}
               </div>
@@ -1139,14 +1228,14 @@ function KeyboardShortcutsSection() {
 
       <div className="mt-3 flex items-center justify-between">
         <span className="text-[10px] text-[var(--color-text-dimmed)]">
-          Escape always exits Zen mode (not customizable)
+          {t("settings.zenNote")}
         </span>
         <button
           onClick={resetAll}
           className="flex items-center gap-1 rounded-md border border-[var(--color-border)] bg-[var(--color-card)] px-2.5 py-1 text-xs text-[var(--color-text-secondary)] transition-colors hover:border-[var(--color-border-strong)] hover:bg-[var(--color-card-hover)] hover:text-[var(--color-text-primary)]"
         >
           <RefreshCw className="h-3 w-3" />
-          Reset to Defaults
+          {t("settings.resetDefaults")}
         </button>
       </div>
     </section>

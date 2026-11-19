@@ -2,11 +2,15 @@ use std::fs;
 use std::io::{Read, Write};
 
 use serde::{Deserialize, Serialize};
+use tauri::State;
+
+use crate::commands::history::AppState;
 
 /// Export app state as a .zip file to the given path.
 /// Includes: settings.json, state.json, optionally data.db (history).
 #[tauri::command]
 pub async fn export_app_state(
+    state: State<'_, AppState>,
     output_path: String,
     include_history: bool,
 ) -> Result<ExportSummary, String> {
@@ -48,16 +52,22 @@ pub async fn export_app_state(
 
     // data.db (history) — optional
     if include_history {
-        let db_path = reqmate_dir.join("data.db");
-        if db_path.exists() {
-            let content =
-                fs::read(&db_path).map_err(|e| format!("Failed to read history DB: {e}"))?;
-            zip.start_file("data.db", options)
-                .map_err(|e| format!("Zip error: {e}"))?;
-            zip.write_all(&content)
-                .map_err(|e| format!("Zip write error: {e}"))?;
-            files_included.push("data.db".to_string());
+        // Snapshot through the live connection: a plain file copy would miss
+        // transactions still living in the WAL and could catch a torn write.
+        let snapshot = reqmate_dir.join("data.db.export");
+        let exported = state.history_db.export_snapshot(&snapshot);
+        if let Err(e) = exported {
+            let _ = fs::remove_file(&snapshot);
+            return Err(e);
         }
+        let content = fs::read(&snapshot).map_err(|e| format!("Failed to read history DB: {e}"))?;
+        let _ = fs::remove_file(&snapshot);
+
+        zip.start_file("data.db", options)
+            .map_err(|e| format!("Zip error: {e}"))?;
+        zip.write_all(&content)
+            .map_err(|e| format!("Zip write error: {e}"))?;
+        files_included.push("data.db".to_string());
     }
 
     zip.finish().map_err(|e| format!("Zip finish error: {e}"))?;
@@ -71,7 +81,10 @@ pub async fn export_app_state(
 /// Import app state from a .zip file.
 /// Merges settings (new values override old), replaces history if present.
 #[tauri::command]
-pub async fn import_app_state(zip_path: String) -> Result<ImportSummary, String> {
+pub async fn import_app_state(
+    state: State<'_, AppState>,
+    zip_path: String,
+) -> Result<ImportSummary, String> {
     let reqmate_dir = dirs::home_dir()
         .ok_or("Could not determine home directory")?
         .join(".reqmate");
@@ -124,15 +137,26 @@ pub async fn import_app_state(zip_path: String) -> Result<ImportSummary, String>
                     .read_to_end(&mut content)
                     .map_err(|e| format!("Failed to read history DB from zip: {e}"))?;
 
-                // Back up existing DB
                 let db_path = reqmate_dir.join("data.db");
+
+                // Keep a snapshot of what is there now, taken through the live
+                // connection so the WAL is included.
                 if db_path.exists() {
-                    let backup = reqmate_dir.join("data.db.backup");
-                    let _ = fs::copy(&db_path, &backup);
+                    let _ = state
+                        .history_db
+                        .export_snapshot(&reqmate_dir.join("data.db.backup"));
                 }
 
-                fs::write(&db_path, content)
+                // Stage the incoming DB next to the real one, then copy its
+                // tables into the open connection. Never overwrite data.db
+                // in place: that truncates the file under SQLite and leaves a
+                // stale -wal that shows up as corruption later.
+                let staged = reqmate_dir.join("data.db.import");
+                fs::write(&staged, &content)
                     .map_err(|e| format!("Failed to write history DB: {e}"))?;
+                let replaced = state.history_db.replace_from(&staged);
+                let _ = fs::remove_file(&staged);
+                replaced?;
 
                 // Count entries for summary
                 if let Ok(conn) = rusqlite::Connection::open(&db_path) {

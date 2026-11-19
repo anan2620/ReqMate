@@ -146,7 +146,7 @@ export function AuthEditor({
             type="text"
             value={auth.key}
             onChange={(e) => onChange({ ...auth, key: e.target.value })}
-            placeholder="Key name (e.g. X-API-Key)"
+            placeholder={t("auth.keyNamePlaceholder")}
             className={INPUT_CLASS}
           />
           <input

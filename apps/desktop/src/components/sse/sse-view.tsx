@@ -70,7 +70,7 @@ export function SSEView() {
           <button
             onClick={handleConnect}
             disabled={status === "connecting" || !tab.url.trim()}
-            className={`flex items-center gap-1.5 rounded-xl px-4 py-2 text-[13px] font-semibold disabled:opacity-50 ${
+            className={`flex h-9 items-center gap-1.5 rounded-lg px-3.5 text-[12.5px] font-semibold disabled:opacity-50 ${
               status === "connected" ? "btn-danger" : "btn-accent"
             }`}
           >
@@ -82,7 +82,7 @@ export function SSEView() {
             ) : (
               <>
                 <Plug className="h-4 w-4" />
-                {status === "connecting" ? "Connecting..." : t("sse.connect")}
+                {status === "connecting" ? t("socketio.connecting") : t("sse.connect")}
               </>
             )}
           </button>
@@ -96,7 +96,7 @@ export function SSEView() {
           className="flex w-full items-center gap-1 px-3 py-1.5 text-xs text-[var(--color-text-muted)] hover:text-[var(--color-text-secondary)]"
         >
           {showHeaders ? <ChevronDown className="h-3 w-3" /> : <ChevronRight className="h-3 w-3" />}
-          Headers
+          {t("socketio.headers")}
           {tab.headers.filter((h) => h.key.trim()).length > 0 && (
             <span className="text-[10px]">({tab.headers.filter((h) => h.key.trim()).length})</span>
           )}
@@ -106,8 +106,8 @@ export function SSEView() {
             <KeyValueEditor
               pairs={tab.headers}
               onChange={setHeaders}
-              keyPlaceholder="Header"
-              valuePlaceholder="Value"
+              keyPlaceholder={t("socketio.headerKey")}
+              valuePlaceholder={t("socketio.headerValue")}
             />
           </div>
         )}
@@ -133,7 +133,7 @@ export function SSEView() {
             type="text"
             value={filter}
             onChange={(e) => setFilter(e.target.value)}
-            placeholder="Filter by event type..."
+            placeholder={t("sse.filterPlaceholder")}
             className="w-36 rounded border border-[var(--color-border)] bg-[var(--color-card)] px-2 py-0.5 text-xs text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none"
           />
           <label className="flex items-center gap-1 cursor-pointer">
@@ -143,7 +143,7 @@ export function SSEView() {
               onChange={(e) => setAutoScroll(e.target.checked)}
               className="h-3 w-3"
             />
-            Auto-scroll
+            {t("graphql.autoScroll")}
           </label>
           <button
             onClick={clearEvents}

@@ -140,3 +140,51 @@ fn simple_hash(s: &str) -> String {
     s.hash(&mut hasher);
     format!("{:016x}", hasher.finish())
 }
+
+/// RFC 6265 domain matching for sending a stored cookie to `host`.
+///
+/// A plain `host.ends_with(cookie_domain)` check is wrong: `evilexample.com`
+/// ends with `example.com`, so a cookie for one site would leak to a lookalike
+/// domain. Matching must respect the `.` label boundary.
+pub fn domain_matches(host: &str, cookie_domain: &str) -> bool {
+    let host = host.trim().trim_end_matches('.').to_ascii_lowercase();
+    let domain = cookie_domain
+        .trim()
+        .trim_start_matches('.')
+        .trim_end_matches('.')
+        .to_ascii_lowercase();
+
+    // Cookies stored without a domain can't be scoped safely — don't send them.
+    if host.is_empty() || domain.is_empty() {
+        return false;
+    }
+
+    host == domain || host.ends_with(&format!(".{domain}"))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::domain_matches;
+
+    #[test]
+    fn exact_host_and_subdomains_match() {
+        assert!(domain_matches("example.com", "example.com"));
+        assert!(domain_matches("api.example.com", "example.com"));
+        assert!(domain_matches("api.example.com", ".example.com"));
+        assert!(domain_matches("Example.COM", "example.com"));
+    }
+
+    #[test]
+    fn lookalike_domains_do_not_match() {
+        assert!(!domain_matches("evilexample.com", "example.com"));
+        assert!(!domain_matches("example.com.evil.net", "example.com"));
+        assert!(!domain_matches("notexample.com", ".example.com"));
+    }
+
+    #[test]
+    fn unrelated_or_empty_domains_do_not_match() {
+        assert!(!domain_matches("example.org", "example.com"));
+        assert!(!domain_matches("example.com", ""));
+        assert!(!domain_matches("", "example.com"));
+    }
+}

@@ -1,10 +1,16 @@
 use std::collections::HashMap;
+use std::time::{Duration, Instant};
 
 use rquickjs::{Context, Runtime};
 
 use super::{ConsoleEntry, RequestSnapshot, ScriptContext, ScriptPhase, ScriptResult, TestResult};
 
 const REQ_API_JS: &str = include_str!("req_api.js");
+
+/// Wall-clock budget for one script. QuickJS evaluates synchronously, so
+/// without this an accidental `while (true) {}` froze the whole request
+/// pipeline (and the UI, since the command never returned).
+const SCRIPT_TIMEOUT: Duration = Duration::from_secs(5);
 
 /// Execute a user script in an isolated QuickJS context.
 ///
@@ -16,10 +22,24 @@ pub fn execute_script(
     context: ScriptContext,
     phase: ScriptPhase,
 ) -> Result<ScriptResult, String> {
+    execute_script_with_timeout(code, context, phase, SCRIPT_TIMEOUT)
+}
+
+/// Same as [`execute_script`], with an explicit budget (used by tests).
+fn execute_script_with_timeout(
+    code: &str,
+    context: ScriptContext,
+    phase: ScriptPhase,
+    timeout: Duration,
+) -> Result<ScriptResult, String> {
     let rt = Runtime::new().map_err(|e| format!("Failed to create JS runtime: {e}"))?;
     // Limit memory to 32MB and max stack size to 1MB
     rt.set_memory_limit(32 * 1024 * 1024);
     rt.set_max_stack_size(1024 * 1024);
+
+    // QuickJS polls this handler between bytecode instructions.
+    let deadline = Instant::now() + timeout;
+    rt.set_interrupt_handler(Some(Box::new(move || Instant::now() >= deadline)));
 
     let ctx = Context::full(&rt).map_err(|e| format!("Failed to create JS context: {e}"))?;
 
@@ -47,8 +67,16 @@ pub fn execute_script(
             .map_err(|e| format!("Failed to initialize req API: {e}"))?;
 
         // Execute user script
-        ctx.eval::<(), _>(code)
-            .map_err(|e| format!("Script error: {e}"))?;
+        ctx.eval::<(), _>(code).map_err(|e| {
+            if Instant::now() >= deadline {
+                format!(
+                    "Script timed out after {:?} — check for an infinite loop",
+                    timeout
+                )
+            } else {
+                format!("Script error: {e}")
+            }
+        })?;
 
         // Extract mutations by serializing __mutations to JSON
         let result_json: String = ctx
@@ -510,5 +538,30 @@ mod tests {
         )
         .unwrap();
         assert!(result.test_results[0].passed);
+    }
+
+    #[test]
+    fn runs_a_normal_script() {
+        let result = execute_script_with_timeout(
+            "req.test('ok', () => {});",
+            empty_context(),
+            ScriptPhase::PreRequest,
+            Duration::from_secs(2),
+        );
+        assert!(result.is_ok(), "{result:?}");
+    }
+
+    #[test]
+    fn infinite_loops_are_interrupted() {
+        let started = Instant::now();
+        let err = execute_script_with_timeout(
+            "while (true) {}",
+            empty_context(),
+            ScriptPhase::PreRequest,
+            Duration::from_millis(120),
+        )
+        .expect_err("must not hang");
+        assert!(err.contains("timed out"), "{err}");
+        assert!(started.elapsed() < Duration::from_secs(3));
     }
 }

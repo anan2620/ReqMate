@@ -1,4 +1,6 @@
 import { useState, useRef, useEffect } from "react";
+import { useTranslation } from "react-i18next";
+import type { TFunction } from "i18next";
 import { useActiveTab } from "@/stores/tab-store";
 import { useTabStore } from "@/stores/tab-store";
 import { useSocketIo, type SioEvent } from "@/hooks/use-socketio";
@@ -15,7 +17,14 @@ import {
 } from "lucide-react";
 import { Breadcrumb } from "@/components/layout/breadcrumb";
 
+function sioStatusLabel(status: string, t: TFunction): string {
+  if (status === "connected") return t("socketio.statusConnected");
+  if (status === "connecting") return t("socketio.statusConnecting");
+  return t("socketio.statusDisconnected");
+}
+
 export function SocketIoView() {
+  const { t } = useTranslation();
   const tab = useActiveTab();
   const { setHeaders } = useTabStore();
   const connectionId = tab?.id ?? "";
@@ -85,7 +94,7 @@ export function SocketIoView() {
           onChange={(e) => setUrl(e.target.value)}
           placeholder="http://localhost:3000"
           disabled={status === "connected"}
-          className="flex-1 rounded border border-[var(--color-border)] bg-[var(--color-card)] px-2.5 py-1.5 text-sm text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none focus:ring-1 focus:ring-pink-500 disabled:opacity-50"
+          className="h-9 flex-1 rounded-md border border-[var(--color-border)] bg-[var(--color-card)] px-2.5 text-[12.5px] text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none focus:ring-1 focus:ring-pink-500 disabled:opacity-50"
         />
         <div className="flex items-center gap-1">
           <span className="text-xs text-[var(--color-text-dimmed)]">ns:</span>
@@ -95,7 +104,7 @@ export function SocketIoView() {
             onChange={(e) => setNamespace(e.target.value)}
             placeholder="/"
             disabled={status === "connected"}
-            className="w-24 rounded border border-[var(--color-border)] bg-[var(--color-card)] px-2 py-1.5 text-sm text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none focus:ring-1 focus:ring-pink-500 disabled:opacity-50"
+            className="h-9 w-24 rounded-md border border-[var(--color-border)] bg-[var(--color-card)] px-2 text-[12.5px] text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none focus:ring-1 focus:ring-pink-500 disabled:opacity-50"
           />
         </div>
         <div className="flex items-center gap-1.5">
@@ -108,24 +117,24 @@ export function SocketIoView() {
                   : "bg-gray-500"
             }`}
           />
-          <span className="text-xs text-[var(--color-text-muted)] capitalize">{status}</span>
+          <span className="text-xs text-[var(--color-text-muted)]">{sioStatusLabel(status, t)}</span>
         </div>
         <button
           onClick={handleConnect}
           disabled={status === "connecting" || !url.trim()}
-          className={`flex items-center gap-1.5 rounded-lg px-4 py-1.5 text-[13px] font-semibold disabled:opacity-50 ${
+          className={`flex h-9 items-center gap-1.5 rounded-lg px-3.5 text-[12.5px] font-semibold disabled:opacity-50 ${
             status === "connected" ? "btn-danger" : "btn-accent"
           }`}
         >
           {status === "connected" ? (
             <>
-              <Unplug className="h-3.5 w-3.5" />
-              Disconnect
+              <Unplug className="h-4 w-4" />
+              {t("socketio.disconnect")}
             </>
           ) : (
             <>
-              <Plug className="h-3.5 w-3.5" />
-              {status === "connecting" ? "Connecting..." : "Connect"}
+              <Plug className="h-4 w-4" />
+              {status === "connecting" ? t("socketio.connecting") : t("socketio.connect")}
             </>
           )}
         </button>
@@ -138,7 +147,7 @@ export function SocketIoView() {
           className="flex w-full items-center gap-1 px-3 py-1.5 text-xs text-[var(--color-text-muted)] hover:text-[var(--color-text-secondary)]"
         >
           {showHeaders ? <ChevronDown className="h-3 w-3" /> : <ChevronRight className="h-3 w-3" />}
-          Headers
+          {t("socketio.headers")}
           {tab.headers.filter((h) => h.key.trim()).length > 0 && (
             <span className="text-[10px]">({tab.headers.filter((h) => h.key.trim()).length})</span>
           )}
@@ -148,8 +157,8 @@ export function SocketIoView() {
             <KeyValueEditor
               pairs={tab.headers}
               onChange={setHeaders}
-              keyPlaceholder="Header"
-              valuePlaceholder="Value"
+              keyPlaceholder={t("socketio.headerKey")}
+              valuePlaceholder={t("socketio.headerValue")}
             />
           </div>
         )}
@@ -163,7 +172,7 @@ export function SocketIoView() {
             className="flex w-full items-center gap-1 px-3 py-1.5 text-xs text-[var(--color-text-muted)] hover:text-[var(--color-text-secondary)]"
           >
             {showSettings ? <ChevronDown className="h-3 w-3" /> : <ChevronRight className="h-3 w-3" />}
-            Server Info
+            {t("socketio.serverInfo")}
           </button>
           {showSettings && (
             <div className="flex gap-4 px-3 pb-2 text-xs text-[var(--color-text-muted)]">
@@ -185,25 +194,25 @@ export function SocketIoView() {
       {/* Emit panel */}
       <div className="border-b border-[var(--color-border)] bg-[var(--color-surface)] p-2">
         <div className="mb-1.5 text-[10px] font-medium uppercase text-[var(--color-text-dimmed)]">
-          Emit Event
+          {t("socketio.emitEvent")}
         </div>
         <div className="flex items-center gap-1.5 mb-1.5">
           <input
             type="text"
             value={eventName}
             onChange={(e) => setEventName(e.target.value)}
-            placeholder="Event name (e.g. message, chat)"
+            placeholder={t("socketio.eventPlaceholder")}
             disabled={status !== "connected"}
-            className="flex-1 rounded border border-[var(--color-border)] bg-[var(--color-card)] px-2.5 py-1.5 text-sm text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none focus:ring-1 focus:ring-pink-500 disabled:opacity-50"
+            className="h-9 flex-1 rounded-md border border-[var(--color-border)] bg-[var(--color-card)] px-2.5 text-[12.5px] text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none focus:ring-1 focus:ring-pink-500 disabled:opacity-50"
           />
         </div>
-        <div className="flex items-end gap-1.5">
+        <div className="flex items-stretch gap-1.5">
           <textarea
             value={eventArgs}
             onChange={(e) => setEventArgs(e.target.value)}
-            placeholder='Arguments (JSON) e.g. "hello" or {"msg": "hi"} or ["a", 1]'
+            placeholder={t("socketio.argsPlaceholder")}
             disabled={status !== "connected"}
-            className="flex-1 resize-none rounded border border-[var(--color-border)] bg-[var(--color-card)] p-2 font-mono text-xs text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none focus:ring-1 focus:ring-pink-500 disabled:opacity-50"
+            className="h-16 flex-1 resize-none rounded-md border border-[var(--color-border)] bg-[var(--color-card)] px-2.5 py-2 font-mono text-[12.5px] leading-5 text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none focus:ring-1 focus:ring-pink-500 disabled:opacity-50"
             rows={2}
             onKeyDown={(e) => {
               if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
@@ -215,10 +224,10 @@ export function SocketIoView() {
           <button
             onClick={handleEmit}
             disabled={status !== "connected" || !eventName.trim()}
-            className="flex items-center gap-1 rounded bg-pink-600 px-3 py-2 text-sm font-medium text-white hover:bg-pink-700 disabled:opacity-50"
+            className="flex shrink-0 items-center gap-1.5 self-stretch rounded-md bg-pink-600 px-3.5 text-[12.5px] font-medium text-white hover:bg-pink-700 disabled:opacity-50"
           >
-            <Send className="h-3.5 w-3.5" />
-            Emit
+            <Send className="h-4 w-4" />
+            {t("socketio.emit")}
           </button>
         </div>
       </div>
@@ -226,11 +235,11 @@ export function SocketIoView() {
       {/* Stats bar */}
       <div className="flex items-center justify-between border-b border-[var(--color-border)] px-3 py-1 text-xs text-[var(--color-text-muted)]">
         <div className="flex items-center gap-3">
-          <span>Events: {events.length}</span>
-          <span className="text-green-500">Emitted: {sentCount}</span>
-          <span className="text-blue-500">Received: {receivedCount}</span>
+          <span>{t("socketio.eventsCount", { count: events.length })}</span>
+          <span className="text-green-500">{t("socketio.emittedCount", { count: sentCount })}</span>
+          <span className="text-blue-500">{t("socketio.receivedCount", { count: receivedCount })}</span>
           {namespace !== "/" && (
-            <span className="text-pink-400">Namespace: {namespace}</span>
+            <span className="text-pink-400">{t("socketio.namespaceValue", { namespace })}</span>
           )}
         </div>
         <div className="flex items-center gap-2">
@@ -238,7 +247,7 @@ export function SocketIoView() {
             type="text"
             value={listenFilter}
             onChange={(e) => setListenFilter(e.target.value)}
-            placeholder="Filter events..."
+            placeholder={t("socketio.filterPlaceholder")}
             className="w-36 rounded border border-[var(--color-border)] bg-[var(--color-card)] px-2 py-0.5 text-xs text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none"
           />
           <label className="flex items-center gap-1 cursor-pointer">
@@ -248,12 +257,12 @@ export function SocketIoView() {
               onChange={(e) => setAutoScroll(e.target.checked)}
               className="h-3 w-3"
             />
-            Auto-scroll
+            {t("socketio.autoScroll")}
           </label>
           <button
             onClick={clearEvents}
             className="flex items-center gap-1 rounded px-1.5 py-0.5 hover:bg-[var(--color-elevated)]"
-            title="Clear log"
+            title={t("socketio.clearLog")}
           >
             <Trash2 className="h-3 w-3" />
           </button>
@@ -264,7 +273,7 @@ export function SocketIoView() {
       <div ref={logRef} className="flex-1 overflow-auto">
         {filteredEvents.length === 0 ? (
           <div className="flex items-center justify-center py-8 text-sm text-[var(--color-text-dimmed)]">
-            {status === "connected" ? "No events yet — emit or listen" : "Connect to start"}
+            {status === "connected" ? t("socketio.emptyConnected") : t("socketio.emptyDisconnected")}
           </div>
         ) : (
           filteredEvents.map((evt, i) => (

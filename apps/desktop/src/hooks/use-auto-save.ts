@@ -3,60 +3,73 @@ import { useTabStore } from "@/stores/tab-store";
 import { useSettingsStore } from "@/stores/settings-store";
 
 /**
- * Auto-save hook: debounces saving the active tab 1 second after changes.
- * Only saves file-backed tabs (those with a filePath), and only while the
- * "auto save" preference is on — with it off, edits stay dirty until the user
- * hits Save.
+ * Auto-save hook: debounces a save for every dirty file-backed tab, with one
+ * timer per tab.
+ *
+ * Scheduling per tab (rather than "save whatever is active when the timer
+ * fires") matters because the user can switch or close a tab inside the
+ * debounce window — the previous implementation then saved the *new* active tab
+ * and left the edited one dirty forever, so it never reached disk and the quit
+ * prompt stayed silent.
+ *
  * Returns the last auto-save error (if any) for display in a banner.
  */
 export function useAutoSave() {
-  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const timersRef = useRef(new Map<string, ReturnType<typeof setTimeout>>());
   const autoSaveError = useTabStore((s) => s.autoSaveError);
   const autoSaveEnabled = useSettingsStore((s) => s.settings.autoSave);
 
   // Turning the preference off should never leave a queued write behind
   useEffect(() => {
-    if (!autoSaveEnabled && timerRef.current) {
-      clearTimeout(timerRef.current);
-      timerRef.current = null;
-    }
+    if (autoSaveEnabled) return;
+    for (const timer of timersRef.current.values()) clearTimeout(timer);
+    timersRef.current.clear();
   }, [autoSaveEnabled]);
 
   useEffect(() => {
-    // Subscribe to store changes and auto-save dirty file-backed tabs
+    const timers = timersRef.current;
+
+    const clearTimer = (tabId: string) => {
+      const timer = timers.get(tabId);
+      if (timer !== undefined) {
+        clearTimeout(timer);
+        timers.delete(tabId);
+      }
+    };
+
     const unsubscribe = useTabStore.subscribe((state, prevState) => {
       if (!useSettingsStore.getState().settings.autoSave) return;
 
-      const activeTab = state.tabs.find((t) => t.id === state.activeTabId);
-      const prevActiveTab = prevState.tabs.find((t) => t.id === prevState.activeTabId);
+      // Forget timers whose tab is gone
+      const liveIds = new Set(state.tabs.map((t) => t.id));
+      for (const id of [...timers.keys()]) {
+        if (!liveIds.has(id)) clearTimer(id);
+      }
 
-      // Only trigger auto-save if the active tab became dirty and is file-backed
-      if (
-        activeTab &&
-        activeTab.filePath &&
-        activeTab.isDirty &&
-        // Check if this is a new dirty state (wasn't dirty before, or content changed)
-        (!prevActiveTab || !prevActiveTab.isDirty || activeTab !== prevActiveTab)
-      ) {
-        // Clear previous timer
-        if (timerRef.current) {
-          clearTimeout(timerRef.current);
-        }
+      for (const tab of state.tabs) {
+        if (!tab.filePath || !tab.isDirty) continue;
 
-        // Debounce 1 second
-        timerRef.current = setTimeout(() => {
-          // The preference may have been switched off while the timer was running
-          if (!useSettingsStore.getState().settings.autoSave) return;
-          useTabStore.getState().autoSave();
-        }, 1000);
+        const prevTab = prevState.tabs.find((t) => t.id === tab.id);
+        // Only react to tabs that actually changed
+        if (prevTab === tab) continue;
+
+        clearTimer(tab.id);
+        timers.set(
+          tab.id,
+          setTimeout(() => {
+            timers.delete(tab.id);
+            // The preference may have been switched off while waiting
+            if (!useSettingsStore.getState().settings.autoSave) return;
+            void useTabStore.getState().autoSave(tab.id);
+          }, 1000),
+        );
       }
     });
 
     return () => {
       unsubscribe();
-      if (timerRef.current) {
-        clearTimeout(timerRef.current);
-      }
+      for (const timer of timers.values()) clearTimeout(timer);
+      timers.clear();
     };
   }, []);
 

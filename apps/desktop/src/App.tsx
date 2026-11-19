@@ -157,6 +157,10 @@ function App() {
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      // A child handler already claimed this key (e.g. Ctrl+Enter inside the URL
+      // bar) — running the global shortcut too would fire the action twice.
+      if (e.defaultPrevented) return;
+
       // Escape exits zen mode (not customizable)
       if (e.key === "Escape" && zenMode) {
         e.preventDefault();

@@ -220,6 +220,60 @@ impl HistoryDb {
         Ok(())
     }
 
+    /// Write a self-consistent snapshot of the live database to `dest`.
+    ///
+    /// The file is produced by `VACUUM INTO`, so rows still sitting in the WAL
+    /// (not yet checkpointed) are included. Copying `data.db` byte-for-byte
+    /// would miss them.
+    pub fn export_snapshot(&self, dest: &Path) -> Result<(), String> {
+        let conn = self.conn.lock().map_err(|e| format!("Lock error: {e}"))?;
+        // VACUUM INTO refuses to overwrite an existing file.
+        let _ = std::fs::remove_file(dest);
+        let quoted = dest.to_string_lossy().replace('\'', "''");
+        conn.execute(&format!("VACUUM INTO '{quoted}'"), [])
+            .map_err(|e| format!("Failed to snapshot history DB: {e}"))?;
+        Ok(())
+    }
+
+    /// Replace the contents of the live database with another database file.
+    ///
+    /// Overwriting `data.db` while a connection is open truncates the file
+    /// under it and leaves a stale `-wal` behind, which SQLite may then report
+    /// as corruption on next open. Attaching the source and copying tables in
+    /// a single transaction keeps the existing connection (and its WAL) valid.
+    pub fn replace_from(&self, source: &Path) -> Result<(), String> {
+        let conn = self.conn.lock().map_err(|e| format!("Lock error: {e}"))?;
+        let quoted = source.to_string_lossy().replace('\'', "''");
+        conn.execute_batch(&format!("ATTACH DATABASE '{quoted}' AS incoming"))
+            .map_err(|e| format!("Failed to attach imported history DB: {e}"))?;
+
+        let result = conn.execute_batch(
+            "BEGIN IMMEDIATE;
+             DELETE FROM history;
+             INSERT INTO history (id, method, url, status, status_text, time_ms,
+                                  size_bytes, timestamp, collection_path,
+                                  request_name, request_json)
+                SELECT id, method, url, status, status_text, time_ms,
+                       size_bytes, timestamp, collection_path,
+                       request_name, request_json
+                FROM incoming.history;
+             DELETE FROM monitor_results;
+             INSERT INTO monitor_results (id, monitor_id, timestamp, total_requests,
+                                          total_passed, total_failed, total_time_ms,
+                                          status, error)
+                SELECT id, monitor_id, timestamp, total_requests, total_passed,
+                       total_failed, total_time_ms, status, error
+                FROM incoming.monitor_results;
+             COMMIT;",
+        );
+
+        // Detach regardless of outcome; a failure here must not mask the copy error.
+        let detach = conn.execute_batch("DETACH DATABASE incoming");
+        result.map_err(|e| format!("Failed to import history DB: {e}"))?;
+        detach.map_err(|e| format!("Failed to detach imported history DB: {e}"))?;
+        Ok(())
+    }
+
     /// Delete a single history entry.
     pub fn delete(&self, id: i64) -> Result<(), String> {
         let conn = self.conn.lock().map_err(|e| format!("Lock error: {e}"))?;
@@ -285,5 +339,65 @@ impl HistoryDb {
             .map_err(|e| format!("Row error: {e}"))?;
 
         Ok(results)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn entry(url: &str) -> HistoryEntry {
+        HistoryEntry {
+            id: 0,
+            method: "GET".to_string(),
+            url: url.to_string(),
+            status: Some(200),
+            status_text: Some("OK".to_string()),
+            time_ms: Some(5),
+            size_bytes: Some(12),
+            timestamp: "2026-01-01T00:00:00Z".to_string(),
+            collection_path: None,
+            request_name: None,
+            request_json: "{}".to_string(),
+        }
+    }
+
+    #[test]
+    fn snapshot_contains_rows_still_in_the_wal() {
+        let dir = tempfile::tempdir().unwrap();
+        let db = HistoryDb::open(&dir.path().join("data.db")).unwrap();
+        db.insert(&entry("https://api.test/a")).unwrap();
+
+        let snapshot = dir.path().join("snapshot.db");
+        db.export_snapshot(&snapshot).unwrap();
+
+        let copy = HistoryDb::open(&snapshot).unwrap();
+        let rows = copy.list(10, 0).unwrap();
+        assert_eq!(rows.len(), 1);
+        assert_eq!(rows[0].url, "https://api.test/a");
+    }
+
+    #[test]
+    fn replace_from_swaps_contents_without_breaking_the_connection() {
+        let dir = tempfile::tempdir().unwrap();
+        let live = HistoryDb::open(&dir.path().join("data.db")).unwrap();
+        live.insert(&entry("https://api.test/old")).unwrap();
+
+        // Build a second database holding different rows.
+        let other_path = dir.path().join("incoming.db");
+        let other = HistoryDb::open(&other_path).unwrap();
+        other.insert(&entry("https://api.test/new-1")).unwrap();
+        other.insert(&entry("https://api.test/new-2")).unwrap();
+        // Close it so the file can be attached cleanly.
+        drop(other);
+
+        live.replace_from(&other_path).unwrap();
+
+        // The same handle must still work afterwards.
+        let rows = live.list(10, 0).unwrap();
+        assert_eq!(rows.len(), 2);
+        assert!(rows.iter().any(|r| r.url == "https://api.test/new-2"));
+        live.insert(&entry("https://api.test/after")).unwrap();
+        assert_eq!(live.list(10, 0).unwrap().len(), 3);
     }
 }

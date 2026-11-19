@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import type { TestResult, AssertionResult } from "@reqmate/types";
 
 export function TestResultsPanel({
@@ -7,6 +8,7 @@ export function TestResultsPanel({
   testResults: TestResult[];
   assertionResults: AssertionResult[];
 }) {
+  const { t } = useTranslation();
   const totalTests = testResults.length + assertionResults.length;
   const passedTests =
     testResults.filter((t) => t.passed).length +
@@ -16,7 +18,7 @@ export function TestResultsPanel({
   if (totalTests === 0) {
     return (
       <div className="flex flex-1 items-center justify-center text-sm text-[var(--color-text-dimmed)]">
-        No test results. Add assertions or test scripts to see results here.
+        {t("response.noTestResults")}
       </div>
     );
   }
@@ -44,7 +46,7 @@ export function TestResultsPanel({
       {assertionResults.length > 0 && (
         <div>
           <h4 className="mb-1.5 text-xs font-medium text-[var(--color-text-muted)]">
-            Assertions
+            {t("response.assertions")}
           </h4>
           <div className="space-y-1">
             {assertionResults.map((result, i) => (
@@ -58,7 +60,7 @@ export function TestResultsPanel({
       {testResults.length > 0 && (
         <div>
           <h4 className="mb-1.5 text-xs font-medium text-[var(--color-text-muted)]">
-            Tests
+            {t("response.tests")}
           </h4>
           <div className="space-y-1">
             {testResults.map((result, i) => (

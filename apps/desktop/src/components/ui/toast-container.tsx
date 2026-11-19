@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useToastStore } from "@/stores/toast-store";
 import { AlertCircle, AlertTriangle, CheckCircle, Info, X } from "lucide-react";
 
@@ -32,6 +33,7 @@ const styleMap = {
 };
 
 export function ToastContainer() {
+  const { t } = useTranslation();
   const toasts = useToastStore((s) => s.toasts);
   const removeToast = useToastStore((s) => s.removeToast);
 
@@ -61,7 +63,7 @@ export function ToastContainer() {
             <button
               onClick={() => removeToast(toast.id)}
               className="shrink-0 rounded p-1 text-[var(--color-text-dimmed)] opacity-70 transition-all hover:bg-[var(--color-card-hover)] hover:text-[var(--color-text-secondary)] hover:opacity-100"
-              aria-label="Dismiss"
+              aria-label={t("common.dismiss")}
             >
               <X className="h-3.5 w-3.5" />
             </button>

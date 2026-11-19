@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useState } from "react";
 import * as Dialog from "@radix-ui/react-dialog";
 import { X, Upload } from "lucide-react";
@@ -14,6 +15,7 @@ interface CurlImportDialogProps {
 }
 
 export function CurlImportDialog({ open, onOpenChange }: CurlImportDialogProps) {
+  const { t } = useTranslation();
   const [curlInput, setCurlInput] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [importing, setImporting] = useState(false);
@@ -78,7 +80,7 @@ export function CurlImportDialog({ open, onOpenChange }: CurlImportDialogProps) 
           <div className="flex items-center justify-between border-b border-[var(--color-border)] px-6 py-4">
             <Dialog.Title className="flex items-center gap-2 text-lg font-semibold text-[var(--color-text-primary)]">
               <Upload className="h-5 w-5" />
-              Import cURL
+              {t("request.importCurl")}
             </Dialog.Title>
             <Dialog.Close className="rounded p-1 text-[var(--color-text-muted)] hover:bg-[var(--color-elevated)] hover:text-[var(--color-text-primary)]">
               <X className="h-4 w-4" />
@@ -100,7 +102,7 @@ export function CurlImportDialog({ open, onOpenChange }: CurlImportDialogProps) 
 
             <div className="mt-4 flex justify-end gap-2">
               <Dialog.Close className="rounded px-4 py-2 text-sm text-[var(--color-text-secondary)] hover:bg-[var(--color-elevated)]">
-                Cancel
+                {t("common.cancel")}
               </Dialog.Close>
               <button
                 onClick={handleImport}

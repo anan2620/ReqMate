@@ -30,7 +30,7 @@ interface SelectProps
   options: SelectOption[];
   /** Shown when `value` doesn't match any option */
   placeholder?: string;
-  size?: "sm" | "md";
+  size?: "sm" | "md" | "xs";
   /** "plain" drops the default surface so callers can supply their own look */
   variant?: "default" | "plain";
   disabled?: boolean;
@@ -40,6 +40,7 @@ interface SelectProps
 }
 
 const SIZE_CLASS: Record<NonNullable<SelectProps["size"]>, string> = {
+  xs: "h-7 px-2 text-[11px]",
   sm: "h-8 px-2.5 text-[12px]",
   md: "h-9 px-3 text-[13px]",
 };

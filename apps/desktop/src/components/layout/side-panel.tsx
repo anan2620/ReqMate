@@ -42,7 +42,7 @@ export function SidePanel({
     monitor: t("monitor.title"),
     docs: t("docs.title"),
     proxy: t("proxy.title"),
-    git: "Git",
+    git: t("git.title"),
     audit: t("audit.title"),
   };
 
@@ -119,10 +119,17 @@ function CollectionsPanel({ onOpenImport }: { onOpenImport?: () => void }) {
   const [collectionMenu, setCollectionMenu] = useState<{ x: number; y: number; path: string; name: string } | null>(null);
   const [deleteCollectionTarget, setDeleteCollectionTarget] = useState<{ path: string; name: string } | null>(null);
   const [defaultsPath, setDefaultsPath] = useState<string | null>(null);
+  const defaultCollectionPath = useSettingsStore(
+    (s) => s.settings.defaultCollectionPath,
+  );
 
   const handleOpenFolder = async () => {
     try {
-      const selected = await open({ directory: true, multiple: false });
+      const selected = await open({
+        directory: true,
+        multiple: false,
+        defaultPath: defaultCollectionPath?.trim() || undefined,
+      });
       if (selected) {
         await openCollection(selected as string);
       }
@@ -450,6 +457,7 @@ function CollectionHeader({
   onDelete: () => void;
   onClose: () => void;
 }) {
+  const { t } = useTranslation();
   const { expandedPaths, toggleExpand, renameItem } = useCollectionStore();
   const isExpanded = expandedPaths.has(collection.path);
   const [renaming, setRenaming] = useState(false);
@@ -510,21 +518,21 @@ function CollectionHeader({
             <button
               onClick={(e) => { e.stopPropagation(); handleRename(); }}
               className="rounded p-0.5 text-[var(--color-text-muted)] hover:bg-[var(--color-border)] hover:text-[var(--color-text-primary)]"
-              title="Rename"
+              title={t("common.rename")}
             >
               <Pencil className="h-3 w-3" />
             </button>
             <button
               onClick={(e) => { e.stopPropagation(); onDelete(); }}
               className="rounded p-0.5 text-[var(--color-text-muted)] hover:bg-red-500/20 hover:text-red-400"
-              title="Delete"
+              title={t("common.delete")}
             >
               <Trash2 className="h-3 w-3" />
             </button>
             <button
               onClick={(e) => { e.stopPropagation(); onClose(); }}
               className="rounded p-0.5 text-[var(--color-text-muted)] hover:bg-[var(--color-border)] hover:text-[var(--color-text-primary)]"
-              title="Close"
+              title={t("common.close")}
             >
               <FolderX className="h-3 w-3" />
             </button>
@@ -557,29 +565,33 @@ function NewCollectionDialog({
   onCreated: (path: string) => Promise<void>;
 }) {
   const { t } = useTranslation();
+  const defaultCollectionPath = useSettingsStore(
+    (s) => s.settings.defaultCollectionPath,
+  );
   const [name, setName] = useState("");
-  const [parentDir, setParentDir] = useState("");
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState("");
+
+  // Location is no longer picked per collection — it comes from Settings.
+  const parentDir = defaultCollectionPath?.trim() ?? "";
 
   const handleOpenChange = (v: boolean) => {
     if (v) {
       setName("");
-      setParentDir("");
       setError("");
     }
     onOpenChange(v);
   };
 
-  const handlePickFolder = async () => {
-    try {
-      const selected = await open({ directory: true, multiple: false });
-      if (selected) setParentDir(selected as string);
-    } catch { /* cancelled */ }
+  const openPathSettings = () => {
+    onOpenChange(false);
+    window.dispatchEvent(
+      new CustomEvent("reqmate:open-settings", { detail: { section: "saving" } }),
+    );
   };
 
   const handleCreate = async () => {
-    if (!name.trim() || !parentDir) return;
+    if (!name.trim()) return;
     setCreating(true);
     setError("");
     try {
@@ -593,7 +605,7 @@ function NewCollectionDialog({
     }
   };
 
-  const canCreate = name.trim() && parentDir && !creating;
+  const canCreate = !!name.trim() && !creating;
 
   return (
     <Dialog.Root open={isOpen} onOpenChange={handleOpenChange}>
@@ -628,27 +640,40 @@ function NewCollectionDialog({
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-xs font-medium text-[var(--color-text-secondary)]">
-                {t("sidebar.location")}
-              </label>
-              <div className="flex gap-2">
-                <input
-                  type="text"
-                  value={parentDir}
-                  readOnly
-                  placeholder={t("common.browse")}
-                  className="flex-1 truncate rounded border border-[var(--color-border)] bg-[var(--color-card)] px-3 py-2 text-sm text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none"
-                />
+              <div className="flex items-baseline justify-between gap-2">
+                <span className="text-xs font-medium text-[var(--color-text-secondary)]">
+                  {t("sidebar.location")}
+                </span>
                 <button
-                  onClick={handlePickFolder}
-                  className="shrink-0 rounded bg-[var(--color-elevated)] px-3 py-2 text-sm text-[var(--color-text-secondary)] hover:bg-[var(--color-border)]"
+                  type="button"
+                  onClick={openPathSettings}
+                  className="shrink-0 text-[11px] text-[var(--color-accent-text)] hover:underline"
                 >
-                  {t("common.browse")}
+                  {t("sidebar.changeLocation")}
                 </button>
               </div>
-              {name.trim() && parentDir && (
+              <div className="flex items-center gap-2 rounded border border-[var(--color-border)] bg-[var(--color-input)] px-3 py-2">
+                <Folder className="h-3.5 w-3.5 shrink-0 text-[var(--color-text-muted)]" />
+                {parentDir ? (
+                  <span
+                    className="truncate text-sm text-[var(--color-text-secondary)]"
+                    title={parentDir}
+                  >
+                    {parentDir}
+                  </span>
+                ) : (
+                  <span className="truncate text-sm italic text-[var(--color-text-dimmed)]">
+                    {t("sidebar.defaultLocationFallback")}
+                  </span>
+                )}
+              </div>
+              {name.trim() && (
                 <p className="truncate text-[11px] text-[var(--color-text-dimmed)]">
-                  Will create: {parentDir}/{name.trim().toLowerCase().replace(/\s+/g, "-")}
+                  {t("sidebar.willCreate", {
+                    path: parentDir
+                      ? `${parentDir}/${name.trim().toLowerCase().replace(/\s+/g, "-")}`
+                      : name.trim().toLowerCase().replace(/\s+/g, "-"),
+                  })}
                 </p>
               )}
             </div>
@@ -868,7 +893,7 @@ function EnvironmentsPanel({
                 <span className="truncate">{env.name}</span>
                 {env.scope === "personal" && (
                   <span className="shrink-0 rounded bg-amber-500/15 px-1 py-0.5 text-[8px] font-bold text-amber-400">
-                    LOCAL
+                    {t("sidebar.scopeLocal")}
                   </span>
                 )}
               </div>
@@ -969,7 +994,7 @@ function EnvironmentEditor({
               : "text-[var(--color-text-muted)] hover:text-[var(--color-text-secondary)]"
           }`}
         >
-          Shared
+          {t("sidebar.scopeShared")}
         </button>
         <button
           onClick={() => setScope("personal")}
@@ -979,7 +1004,7 @@ function EnvironmentEditor({
               : "text-[var(--color-text-muted)] hover:text-[var(--color-text-secondary)]"
           }`}
         >
-          Personal
+          {t("sidebar.scopePersonal")}
         </button>
       </div>
 
@@ -1062,7 +1087,7 @@ function NewEnvironmentDialog({
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="e.g. Development, Staging, Production"
+              placeholder={t("sidebar.environmentNamePlaceholder")}
               autoFocus
               className="w-full rounded border border-[var(--color-border)] bg-[var(--color-card)] px-3 py-2 text-sm text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none"
               onKeyDown={(e) => {

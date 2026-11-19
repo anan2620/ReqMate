@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { useGitStore } from "@/stores/git-store";
 import { useCollectionStore } from "@/stores/collection-store";
 import { Select } from "@/components/ui/select";
@@ -18,6 +19,7 @@ import {
 } from "lucide-react";
 
 export function GitPanel() {
+  const { t } = useTranslation();
   const { collections } = useCollectionStore();
   const {
     collectionPath,
@@ -51,7 +53,7 @@ export function GitPanel() {
       <div className="flex flex-col items-center justify-center gap-3 p-6 text-center">
         <FolderGit2 className="h-8 w-8 text-[var(--color-text-dimmed)]" />
         <p className="text-sm text-[var(--color-text-muted)]">
-          Open a collection to use Git
+          {t("git.noCollections")}
         </p>
       </div>
     );
@@ -63,7 +65,7 @@ export function GitPanel() {
       <div className="flex flex-col items-center justify-center gap-3 p-6 text-center">
         <FolderGit2 className="h-8 w-8 text-[var(--color-text-dimmed)]" />
         <p className="text-sm text-[var(--color-text-muted)]">
-          This collection is not a Git repository
+          {t("git.notARepo")}
         </p>
         <button
           onClick={() => init()}
@@ -71,7 +73,7 @@ export function GitPanel() {
           className="btn-accent flex items-center gap-1.5 rounded-md px-4 py-2 text-[13px] font-semibold disabled:opacity-50"
         >
           <GitBranch className="h-3.5 w-3.5" />
-          Initialize Git Repo
+          {t("git.initRepo")}
         </button>
       </div>
     );
@@ -104,8 +106,8 @@ export function GitPanel() {
           value={collectionPath ?? ""}
           onChange={setCollection}
           options={collections.map((c) => ({ value: c.path, label: c.name }))}
-          placeholder="Select collection"
-          aria-label="Collection"
+          placeholder={t("git.selectCollection")}
+          aria-label={t("git.collection")}
         />
       )}
 
@@ -122,7 +124,7 @@ export function GitPanel() {
             onClick={() => loadStatus()}
             disabled={loading}
             className="rounded p-1 text-[var(--color-text-muted)] hover:bg-[var(--color-border)]"
-            title="Refresh"
+            title={t("git.refresh")}
           >
             <RefreshCw className={`h-3.5 w-3.5 ${loading ? "animate-spin" : ""}`} />
           </button>
@@ -131,12 +133,14 @@ export function GitPanel() {
           <div className="mt-1 flex gap-3 text-[10px] text-[var(--color-text-muted)]">
             {(status?.ahead ?? 0) > 0 && (
               <span className="flex items-center gap-0.5">
-                <ArrowUp className="h-2.5 w-2.5" /> {status?.ahead} ahead
+                <ArrowUp className="h-2.5 w-2.5" />{" "}
+                {t("git.ahead", { count: status?.ahead ?? 0 })}
               </span>
             )}
             {(status?.behind ?? 0) > 0 && (
               <span className="flex items-center gap-0.5">
-                <ArrowDown className="h-2.5 w-2.5" /> {status?.behind} behind
+                <ArrowDown className="h-2.5 w-2.5" />{" "}
+                {t("git.behind", { count: status?.behind ?? 0 })}
               </span>
             )}
           </div>
@@ -149,14 +153,14 @@ export function GitPanel() {
             disabled={loading}
             className="flex flex-1 items-center justify-center gap-1 rounded bg-[var(--color-surface)] px-2 py-1.5 text-xs text-[var(--color-text-secondary)] hover:bg-[var(--color-border)] disabled:opacity-50"
           >
-            <ArrowDown className="h-3 w-3" /> Pull
+            <ArrowDown className="h-3 w-3" /> {t("git.pull")}
           </button>
           <button
             onClick={() => push()}
             disabled={loading}
             className="flex flex-1 items-center justify-center gap-1 rounded bg-[var(--color-surface)] px-2 py-1.5 text-xs text-[var(--color-text-secondary)] hover:bg-[var(--color-border)] disabled:opacity-50"
           >
-            <ArrowUp className="h-3 w-3" /> Push
+            <ArrowUp className="h-3 w-3" /> {t("git.push")}
           </button>
         </div>
       </div>
@@ -173,13 +177,13 @@ export function GitPanel() {
         <div className="rounded-lg border border-[var(--color-border)] bg-[var(--color-elevated)]">
           <div className="flex items-center justify-between px-3 py-1.5">
             <span className="text-[10px] font-semibold uppercase text-green-400">
-              Staged ({stagedChanges.length})
+              {t("git.staged", { count: stagedChanges.length })}
             </span>
             <button
               onClick={handleUnstageAll}
               className="text-[10px] text-[var(--color-text-muted)] hover:text-[var(--color-text-secondary)]"
             >
-              Unstage all
+              {t("git.unstageAll")}
             </button>
           </div>
           {stagedChanges.map((change) => (
@@ -194,7 +198,7 @@ export function GitPanel() {
               <button
                 onClick={() => unstage([change.path])}
                 className="rounded p-0.5 text-[var(--color-text-muted)] hover:text-red-400"
-                title="Unstage"
+                title={t("git.unstage")}
               >
                 <Minus className="h-3 w-3" />
               </button>
@@ -208,13 +212,13 @@ export function GitPanel() {
         <div className="rounded-lg border border-[var(--color-border)] bg-[var(--color-elevated)]">
           <div className="flex items-center justify-between px-3 py-1.5">
             <span className="text-[10px] font-semibold uppercase text-[var(--color-text-muted)]">
-              Changes ({unstagedChanges.length})
+              {t("git.changes", { count: unstagedChanges.length })}
             </span>
             <button
               onClick={handleStageAll}
               className="text-[10px] text-[var(--color-text-muted)] hover:text-[var(--color-text-secondary)]"
             >
-              Stage all
+              {t("git.stageAll")}
             </button>
           </div>
           {unstagedChanges.map((change) => (
@@ -229,7 +233,7 @@ export function GitPanel() {
               <button
                 onClick={() => stage([change.path])}
                 className="rounded p-0.5 text-[var(--color-text-muted)] hover:text-green-400"
-                title="Stage"
+                title={t("git.stage")}
               >
                 <Plus className="h-3 w-3" />
               </button>
@@ -243,7 +247,7 @@ export function GitPanel() {
         <div className="rounded-lg border border-[var(--color-border)] bg-[var(--color-elevated)] px-3 py-4 text-center">
           <Check className="mx-auto h-5 w-5 text-green-500" />
           <p className="mt-1 text-xs text-[var(--color-text-muted)]">
-            Working tree clean
+            {t("git.clean")}
           </p>
         </div>
       )}
@@ -254,7 +258,7 @@ export function GitPanel() {
           <textarea
             value={commitMessage}
             onChange={(e) => setCommitMessage(e.target.value)}
-            placeholder="Commit message..."
+            placeholder={t("git.commitPlaceholder")}
             className="w-full resize-none rounded bg-[var(--color-surface)] px-2 py-1.5 text-xs text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none focus:ring-1 focus:ring-[var(--color-accent)]"
             rows={2}
             onKeyDown={(e) => {
@@ -274,7 +278,7 @@ export function GitPanel() {
             ) : (
               <Check className="h-3.5 w-3.5" />
             )}
-            Commit ({stagedChanges.length} file{stagedChanges.length !== 1 ? "s" : ""})
+            {t("git.commit", { count: stagedChanges.length })}
           </button>
         </div>
       )}
@@ -291,7 +295,7 @@ export function GitPanel() {
             <ChevronRight className="h-3 w-3" />
           )}
           <Clock className="h-3 w-3" />
-          History ({log.length})
+          {t("git.history", { count: log.length })}
         </button>
         {showLog && (
           <div className="max-h-48 overflow-auto">
@@ -315,7 +319,7 @@ export function GitPanel() {
             ))}
             {log.length === 0 && (
               <div className="border-t border-[var(--color-border)] px-3 py-3 text-center text-xs text-[var(--color-text-dimmed)]">
-                No commits yet
+                {t("git.noCommits")}
               </div>
             )}
           </div>

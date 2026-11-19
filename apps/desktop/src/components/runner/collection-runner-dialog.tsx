@@ -69,7 +69,7 @@ export function CollectionRunnerDialog({
           {/* Header */}
           <div className="flex items-center justify-between border-b border-[var(--color-border)] px-4 py-3">
             <Dialog.Title className="text-sm font-semibold text-[var(--color-text-primary)]">
-              Collection Runner
+              {t("runner.title")}
             </Dialog.Title>
             <Dialog.Close asChild>
               <button className="rounded p-1 text-[var(--color-text-muted)] hover:bg-[var(--color-elevated)]">
@@ -89,8 +89,8 @@ export function CollectionRunnerDialog({
                     value={collectionPath}
                     onChange={setCollectionPath}
                     options={collections.map((c) => ({ value: c.path, label: c.name }))}
-                    placeholder="Select collection"
-                    aria-label="Collection"
+                    placeholder={t("git.selectCollection")}
+                    aria-label={t("git.collection")}
                   />
                 </div>
                 <div>
@@ -103,7 +103,7 @@ export function CollectionRunnerDialog({
                       { value: "", label: t("body.none") },
                       ...environments.map((e) => ({ value: e.name, label: e.name })),
                     ]}
-                    aria-label="Environment"
+                    aria-label={t("sidebar.environments")}
                   />
                 </div>
               </div>
@@ -137,7 +137,7 @@ export function CollectionRunnerDialog({
                       onChange={(e) => setStopOnError(e.target.checked)}
                       className="rounded"
                     />
-                    Stop on error
+                    {t("runner.stopOnError")}
                   </label>
                 </div>
               </div>
@@ -148,7 +148,7 @@ export function CollectionRunnerDialog({
                 className="btn-success flex items-center gap-1.5 rounded-md px-4 py-2 text-[13px] font-semibold disabled:opacity-50"
               >
                 <Play className="h-3.5 w-3.5" />
-                Run Collection
+                {t("runner.runCollection")}
               </button>
             </div>
           )}

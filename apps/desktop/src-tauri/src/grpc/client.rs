@@ -613,49 +613,16 @@ impl GrpcManager {
     }
 }
 
-/// Convert a JSON value to a DynamicMessage using the serde feature.
+/// Convert a JSON value to a `DynamicMessage` via prost-reflect's serde support.
+///
+/// Type mismatches (an `int32` sent as `"123"`, an enum sent as a bare string,
+/// a message sent as a scalar) come back as an error the user can act on. The
+/// hand-rolled converter this replaced called `DynamicMessage::set_field`,
+/// which panics on invalid values, and silently dropped nested/repeated fields.
 fn json_to_dynamic_message(
     desc: &MessageDescriptor,
     value: &serde_json::Value,
 ) -> Result<DynamicMessage, String> {
-    let mut msg = DynamicMessage::new(desc.clone());
-
-    if let serde_json::Value::Object(map) = value {
-        for field in desc.fields() {
-            let field_name = field.name();
-            if let Some(val) = map.get(field_name) {
-                if let Some(pv) = json_to_prost_value(&field, val) {
-                    msg.set_field(&field, pv);
-                }
-            }
-        }
-    }
-
-    Ok(msg)
-}
-
-fn json_to_prost_value(
-    field: &prost_reflect::FieldDescriptor,
-    val: &serde_json::Value,
-) -> Option<prost_reflect::Value> {
-    use prost_reflect::Kind;
-
-    match val {
-        serde_json::Value::String(s) => Some(prost_reflect::Value::String(s.clone())),
-        serde_json::Value::Bool(b) => Some(prost_reflect::Value::Bool(*b)),
-        serde_json::Value::Number(n) => match field.kind() {
-            Kind::Int32 | Kind::Sint32 | Kind::Sfixed32 => {
-                n.as_i64().map(|v| prost_reflect::Value::I32(v as i32))
-            }
-            Kind::Int64 | Kind::Sint64 | Kind::Sfixed64 => {
-                n.as_i64().map(prost_reflect::Value::I64)
-            }
-            Kind::Uint32 | Kind::Fixed32 => n.as_u64().map(|v| prost_reflect::Value::U32(v as u32)),
-            Kind::Uint64 | Kind::Fixed64 => n.as_u64().map(prost_reflect::Value::U64),
-            Kind::Float => n.as_f64().map(|v| prost_reflect::Value::F32(v as f32)),
-            Kind::Double => n.as_f64().map(prost_reflect::Value::F64),
-            _ => n.as_i64().map(prost_reflect::Value::I64),
-        },
-        _ => None,
-    }
+    DynamicMessage::deserialize(desc.clone(), value)
+        .map_err(|e| format!("Invalid request body for {}: {e}", desc.full_name()))
 }

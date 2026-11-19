@@ -311,7 +311,9 @@ export const useCollectionStore = create<CollectionState>((set, get) => ({
         useTabStore.setState((state) => ({
           tabs: state.tabs.map((t) =>
             t.id === openTab.id
-              ? { ...t, filePath: newPath, name: newName, isDirty: false, conflictState: null }
+              // Renaming only moves the file on disk; unsaved edits in the
+              // buffer are still unsaved, so `isDirty` must survive.
+              ? { ...t, filePath: newPath, name: newName, conflictState: null }
               : t,
           ),
         }));

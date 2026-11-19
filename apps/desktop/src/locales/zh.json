@@ -15,6 +15,8 @@
     "ok": "确定"
   },
   "sidebar": {
+    "folderNamePlaceholder": "文件夹名称",
+    "requestNamePlaceholder": "请求名称",
     "collections": "集合",
     "history": "历史记录",
     "environments": "环境",
@@ -36,9 +38,13 @@
     "import": "导入",
     "closeCollection": "关闭集合",
     "deleteCollection": "删除集合",
+    "deleteCollectionConfirm": "删除集合「{{name}}」？整个集合会被移到回收站。",
     "collectionName": "集合名称",
     "collectionNamePlaceholder": "我的 API",
     "location": "位置",
+    "changeLocation": "更改",
+    "willCreate": "将创建：{{path}}",
+    "defaultLocationFallback": "使用内置默认位置",
     "creating": "创建中...",
     "exportPostman": "导出为 Postman",
     "exportOpenapi": "导出为 OpenAPI",
@@ -54,7 +60,11 @@
     "addVariable": "添加变量",
     "importEnvironment": "导入环境 (Postman JSON)",
     "collectionDefaults": "集合默认设置",
-    "collectionDefaultsDesc": "这里配置的认证会被所有自身没有认证的请求继承。"
+    "collectionDefaultsDesc": "这里配置的认证会被所有自身没有认证的请求继承。",
+    "environmentNamePlaceholder": "例如：开发、预发、生产",
+    "scopeLocal": "本地",
+    "scopeShared": "共享",
+    "scopePersonal": "个人"
   },
   "tabs": {
     "untitled": "未命名请求",
@@ -73,7 +83,10 @@
     "httpRequest": "HTTP 请求",
     "importCurl": "导入 cURL",
     "saveAs": "另存为…",
-    "saveOptions": "保存选项"
+    "saveOptions": "保存选项",
+    "scrollLeft": "向左滚动标签页",
+    "scrollRight": "向右滚动标签页",
+    "newTabShortcut": "新建标签页 (Ctrl+T)"
   },
   "request": {
     "send": "发送",
@@ -107,7 +120,10 @@
     "requestName": "请求名称",
     "requestNamePlaceholder": "我的请求",
     "filename": "文件名：",
-    "saveRequest": "保存请求"
+    "noCollectionsToSave": "还没有打开的集合，请先打开一个集合。",
+    "saveRequest": "保存请求",
+    "httpMethod": "HTTP 方法",
+    "importCurl": "导入 cURL"
   },
   "body": {
     "json": "JSON",
@@ -171,7 +187,8 @@
     "certificate": "IdP证书 (PEM)",
     "nameIdFormat": "NameID格式",
     "samlToken": "SAML断言令牌",
-    "apiKeyHeader": "请求头名称"
+    "apiKeyHeader": "请求头名称",
+    "keyNamePlaceholder": "键名（如 X-API-Key）"
   },
   "response": {
     "body": "响应体",
@@ -199,7 +216,25 @@
       "redirect": "重定向",
       "clientError": "客户端错误",
       "serverError": "服务器错误"
-    }
+    },
+    "selectSnapshot": "选择快照…",
+    "assertions": "断言",
+    "compareTitle": "响应对比",
+    "diffEmpty": "先用「保存用于对比」保存响应，再在上方选择要比较的两份。",
+    "headerCount": "{{count}} 个响应头",
+    "identical": "两份响应完全一致。",
+    "left": "左侧",
+    "right": "右侧",
+    "responseSize": "响应大小",
+    "responseTime": "响应耗时",
+    "speedAcceptable": "可接受",
+    "speedFast": "很快",
+    "speedSlow": "较慢",
+    "speedVerySlow": "很慢",
+    "status": "状态",
+    "thresholds": "性能阈值",
+    "transfer": "传输",
+    "transferSpeed": "传输速度"
   },
   "environment": {
     "title": "环境",
@@ -279,9 +314,27 @@
     "saving": "保存",
     "autoSave": "自动保存请求改动",
     "autoSaveDesc": "停止输入 1 秒后自动写入磁盘。关闭后，改动会保留在编辑器里，直到你点击“保存”。",
+    "defaultCollectionPath": "默认文件路径",
+    "defaultCollectionPathDesc": "新建集合会创建在这个目录下。修改后不会影响已有集合所在的位置。",
+    "defaultCollectionPathPlaceholder": "选择一个文件夹…",
     "aiAssistant": "AI 助手",
     "designTokens": "调色板",
-    "toggleTheme": "切换主题"
+    "toggleTheme": "切换主题",
+    "caCertPathPlaceholder": "CA 证书路径（.pem、.crt）",
+    "clientCertPathPlaceholder": "客户端证书路径（.pem、.crt、.pfx）",
+    "clientKeyPathPlaceholder": "客户端私钥路径（.pem、.key）",
+    "passphrasePlaceholder": "口令（可选）",
+    "apiEndpoint": "接口地址",
+    "apiEndpointDesc": "任何兼容 OpenAI 的接口（OpenAI、Ollama、LM Studio 等）",
+    "apiKey": "API Key",
+    "model": "模型",
+    "systemPackageUpdate": "系统包安装（.deb/.rpm）不支持自动更新。",
+    "paletteDesc": "当前主题使用的配色，供主题作者与插件开发者参考。",
+    "shortcutConflicts": "部分快捷键存在冲突，同一个按键组合只会触发一个操作。",
+    "pressNewShortcut": "请按下新的快捷键…",
+    "rebind": "重新绑定",
+    "zenNote": "Esc 始终用于退出沉浸模式（不可修改）",
+    "resetDefaults": "恢复默认"
   },
   "runner": {
     "title": "集合运行器",
@@ -294,7 +347,10 @@
     "passed": "通过",
     "failed": "失败",
     "skipped": "跳过",
-    "duration": "耗时"
+    "duration": "耗时",
+    "noResults": "暂无结果",
+    "runCollection": "运行集合",
+    "stopOnError": "出错时停止"
   },
   "import": {
     "title": "导入集合",
@@ -383,7 +439,10 @@
     "value": "值",
     "saved": "已保存",
     "savedTo": "已保存「{{name}}」",
-    "saveFailed": "保存失败：{{reason}}"
+    "saveFailed": "保存失败：{{reason}}",
+    "removeRow": "删除该行",
+    "dismiss": "关闭",
+    "dismissHint": "关闭提示"
   },
   "errors": {
     "connectionRefused": "连接被拒绝 — 服务器是否正在运行？",
@@ -435,7 +494,14 @@
     "requestBody": "请求体 (JSON)",
     "responseBody": "响应",
     "loadProtoToStart": "加载 .proto 文件以开始",
-    "selectMethodToSend": "选择方法并发送请求"
+    "selectMethodToSend": "选择方法并发送请求",
+    "selectService": "选择服务",
+    "filterMethods": "过滤方法…",
+    "messagesCount": "{{count}} 条消息",
+    "responseMetadata": "响应元数据",
+    "sending": "正在发送 gRPC 请求…",
+    "streamComplete": "流已结束",
+    "streaming": "流式接收中…"
   },
   "graphql": {
     "query": "GraphQL 查询",
@@ -445,9 +511,16 @@
     "fetchSchema": "获取 Schema（自省）",
     "fetchingSchema": "获取中...",
     "schema": "Schema",
-    "schemaTypes": "Schema 类型"
+    "schemaTypes": "Schema 类型",
+    "clearMessages": "清空消息",
+    "autoScroll": "自动滚动",
+    "listening": "监听中…",
+    "stop": "停止",
+    "subscription": "订阅",
+    "subscribe": "订阅"
   },
   "mock": {
+    "selectCollection": "选择集合",
     "title": "Mock 服务器",
     "start": "启动 Mock 服务器",
     "stop": "停止",
@@ -470,6 +543,7 @@
     "newMockServer": "新建 Mock 服务器"
   },
   "monitor": {
+    "selectCollection": "选择集合",
     "title": "监控",
     "create": "创建监控",
     "schedule": "计划",
@@ -478,7 +552,13 @@
     "enabled": "已启用",
     "disabled": "已禁用",
     "createDesc": "安排自动集合运行",
-    "newMonitor": "新建监控"
+    "newMonitor": "新建监控",
+    "schedule": "计划",
+    "environmentOptional": "环境（可选）",
+    "webhookOptional": "Webhook 地址（可选）",
+    "noneConfigured": "还没有监控任务",
+    "notifyOnFailure": "失败时通知",
+    "selectToView": "选择一个监控任务查看结果"
   },
   "docs": {
     "title": "API 文档",
@@ -517,6 +597,63 @@
     "readOnly": "以只读方式打开",
     "upgradeHint": "升级将重写集合文件。请先提交你的更改。"
   },
+  "mqtt": {
+    "brokerHost": "服务器地址",
+    "connect": "连接",
+    "connecting": "连接中…",
+    "disconnect": "断开",
+    "statusConnected": "已连接",
+    "statusConnecting": "连接中",
+    "statusDisconnected": "未连接",
+    "connectionSettings": "连接设置",
+    "clientId": "客户端 ID",
+    "authentication": "认证",
+    "username": "用户名",
+    "password": "密码",
+    "subscribe": "订阅",
+    "topicPlaceholder": "主题（如 sensor/#）",
+    "qos": "QoS",
+    "publish": "发布",
+    "topic": "主题",
+    "retain": "保留消息",
+    "payloadPlaceholder": "消息内容",
+    "messagesCount": "消息：{{count}}",
+    "sentCount": "已发送：{{count}}",
+    "receivedCount": "已接收：{{count}}",
+    "topicsCount": "主题数：{{count}}",
+    "filterPlaceholder": "按主题过滤…",
+    "autoScroll": "自动滚动",
+    "clearLog": "清空日志",
+    "emptyConnected": "暂无消息，请先订阅主题",
+    "emptyDisconnected": "连接到 Broker 后开始",
+    "qosValue": "QoS {{qos}}",
+    "retained": "保留"
+  },
+  "socketio": {
+    "connect": "连接",
+    "connecting": "连接中…",
+    "disconnect": "断开",
+    "statusConnected": "已连接",
+    "statusConnecting": "连接中",
+    "statusDisconnected": "未连接",
+    "headers": "Headers",
+    "headerKey": "Header",
+    "headerValue": "Value",
+    "serverInfo": "服务端信息",
+    "emitEvent": "发送事件",
+    "eventPlaceholder": "事件名（如 message、chat）",
+    "argsPlaceholder": "参数（JSON），例如 \"hello\"、{\"msg\": \"hi\"} 或 [\"a\", 1]",
+    "emit": "发送",
+    "eventsCount": "事件：{{count}}",
+    "emittedCount": "已发送：{{count}}",
+    "receivedCount": "已接收：{{count}}",
+    "namespaceValue": "命名空间：{{namespace}}",
+    "filterPlaceholder": "按事件过滤…",
+    "autoScroll": "自动滚动",
+    "clearLog": "清空日志",
+    "emptyConnected": "暂无事件，发送或监听试试",
+    "emptyDisconnected": "连接后开始"
+  },
   "websocket": {
     "connect": "连接",
     "disconnect": "断开",
@@ -524,7 +661,8 @@
     "connected": "已连接",
     "disconnected": "已断开",
     "messages": "消息",
-    "connectToStart": "连接以开始接收数据流"
+    "connectToStart": "连接以开始接收数据流",
+    "clearLog": "清空日志"
   },
   "sse": {
     "connect": "连接",
@@ -532,9 +670,47 @@
     "events": "事件",
     "connected": "已连接",
     "disconnected": "已断开",
-    "connectToStart": "连接以开始接收数据流"
+    "connectToStart": "连接以开始接收数据流",
+    "filterPlaceholder": "按事件类型过滤…"
   },
   "ai": {
+    "optional": "可选",
+    "settings": "设置",
+    "clearChat": "清空对话",
+    "setupTitle": "AI 助手 — 可选功能",
+    "setupDesc": "这是一个可选功能，需要你自己的 API Key（BYOK）。ReqMate 不自带也不提供 AI 服务，由你自行接入。",
+    "setupStepsTitle": "开始使用：",
+    "setupStep1": "在你常用的 AI 服务商处获取 API Key",
+    "setupStep2": "打开 设置 → AI，填入接口地址、Key 和模型",
+    "setupStep3": "开始对话，或让它生成请求",
+    "setupSupports": "支持任何兼容 OpenAI 的接口：OpenAI、Ollama、LM Studio 等。",
+    "openSettings": "打开设置",
+    "setupNote": "未配置 AI 时，ReqMate 的其它功能均可正常使用。",
+    "banner": "此可选功能连接的是你自己的 AI 服务商，ReqMate 不自带 AI 服务。",
+    "bannerErrors": "若下方出现错误，请到",
+    "settingsAi": "设置 → AI",
+    "emptyHint": "可以问任何 API 相关问题，或让它生成请求、编写测试。",
+    "thinking": "思考中…",
+    "generateTests": "生成测试",
+    "inputPlaceholder": "描述一个 API 请求…",
+    "errorOwnKey": "此可选功能使用你自己的 API Key。",
+    "checkSettings": "检查 设置 → AI",
+    "runIt": "直接发送",
+    "runMyself": "我自己来",
+    "applyToTab": "应用到当前标签页",
+    "applyTests": "应用测试",
+    "debugEndpoint": "接口",
+    "debugModel": "模型",
+    "debugDuration": "耗时",
+    "debugPrompt": "提示词",
+    "msgUnreachable": "无法连接到你的 AI 服务商",
+    "msgGenerateTestsRequest": "为当前响应生成测试",
+    "msgTestsGenerated": "已根据你的响应生成测试：",
+    "msgGenerateTestsFailed": "生成测试失败，请检查你的 AI 服务商设置",
+    "msgRequestApplied": "请求已应用！需要我帮你发送吗？",
+    "msgRunDone": "完成！可在响应面板查看结果与测试结论。",
+    "msgRunDismissed": "没问题，你随时可以自己发送。",
+    "msgTestsApplied": "测试已应用！要发送请求并运行它们吗？",
     "title": "AI 助手",
     "comingSoon": "AI Assistant",
     "comingSoonDesc": "Generate API requests from natural language and auto-generate tests from responses. Configure your AI provider in Settings."
@@ -583,9 +759,57 @@
     "collection": "删除集合 \"{{name}}\"？这将把整个集合移至回收站。"
   },
   "audit": {
-    "title": "审计日志"
+    "title": "审计日志",
+    "requestSent": "发送请求",
+    "collectionOpened": "打开集合",
+    "environmentChanged": "切换环境",
+    "requestSaved": "保存请求",
+    "requestDeleted": "删除请求",
+    "settingsChanged": "修改设置",
+    "justNow": "刚刚",
+    "minutesAgo": "{{count}} 分钟前",
+    "hoursAgo": "{{count}} 小时前",
+    "daysAgo": "{{count}} 天前",
+    "events": "{{count}} 条事件",
+    "clearLogs": "清空审计日志",
+    "empty": "暂无审计事件",
+    "emptyHint": "使用应用时会自动记录操作",
+    "loadingMore": "加载中…"
   },
+  "git": {
+    "title": "Git",
+    "noCollections": "请先打开一个集合以使用 Git",
+    "notARepo": "此集合不是 Git 仓库",
+    "initRepo": "初始化 Git 仓库",
+    "selectCollection": "选择集合",
+    "collection": "集合",
+    "refresh": "刷新",
+    "ahead": "领先 {{count}} 个提交",
+    "behind": "落后 {{count}} 个提交",
+    "pull": "拉取",
+    "push": "推送",
+    "staged": "已暂存 ({{count}})",
+    "changes": "更改 ({{count}})",
+    "stageAll": "全部暂存",
+    "unstageAll": "全部取消暂存",
+    "stage": "暂存",
+    "unstage": "取消暂存",
+    "clean": "工作区干净",
+    "commitPlaceholder": "提交信息…",
+    "commit": "提交 ({{count}})",
+    "history": "历史记录 ({{count}})",
+    "noCommits": "暂无提交"
+  },
+
+  "terminal": {
+    "restart": "重启终端",
+    "failedToCreate": "创建终端失败：{{error}}",
+    "processExited": "[进程已退出]",
+    "loading": "正在加载终端…"
+  },
+
   "proxy": {
+    "captured": "已捕获 {{count}} 条",
     "title": "代理抓包",
     "running": "运行中",
     "stopped": "已停止",

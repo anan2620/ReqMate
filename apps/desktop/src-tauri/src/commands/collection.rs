@@ -57,8 +57,15 @@ pub async fn read_request_file(path: String) -> Result<RequestFile, String> {
 }
 
 #[tauri::command]
-pub async fn save_request_file(path: String, request: RequestFile) -> Result<(), String> {
+pub async fn save_request_file(
+    path: String,
+    mut request: RequestFile,
+    assert_yaml: Option<String>,
+) -> Result<(), String> {
     tracing::debug!(path = %path, "Saving request file");
+
+    merge_assertions(&mut request, assert_yaml)?;
+
     tokio::task::spawn_blocking(move || {
         let file_path = Path::new(&path);
         collection::write_request(file_path, &request)
@@ -196,6 +203,26 @@ fn write_sample(path: &PathBuf, content: &str) -> Result<(), String> {
     std::fs::write(path, content).map_err(|e| format!("Failed to write {}: {e}", path.display()))
 }
 
+/// Apply the assertions editor text to a request before it is written.
+///
+/// The editor is free-form YAML, so parsing happens here (the frontend has no
+/// YAML parser). An empty string clears the block; `None` leaves
+/// `request.assert` untouched, which is what a caller that merely echoes the
+/// file should do.
+fn merge_assertions(request: &mut RequestFile, assert_yaml: Option<String>) -> Result<(), String> {
+    let Some(raw) = assert_yaml else {
+        return Ok(());
+    };
+    if raw.trim().is_empty() {
+        request.assert = None;
+        return Ok(());
+    }
+    let parsed = serde_yaml::from_str::<serde_yaml::Value>(&raw)
+        .map_err(|e| format!("Invalid assertions YAML: {e}"))?;
+    request.assert = Some(parsed);
+    Ok(())
+}
+
 #[tauri::command]
 pub async fn create_collection(parent_dir: String, name: String) -> Result<String, String> {
     let folder_name = name
@@ -206,7 +233,16 @@ pub async fn create_collection(parent_dir: String, name: String) -> Result<Strin
         return Err("Collection name cannot be empty".to_string());
     }
 
-    let base = Path::new(&parent_dir).join(&folder_name);
+    // An empty parent means "use the default location from Settings" — the
+    // frontend no longer asks for a location when creating a collection.
+    let parent = match parent_dir.trim() {
+        "" => PathBuf::from(crate::storage::settings::default_collection_root()),
+        dir => PathBuf::from(dir),
+    };
+    std::fs::create_dir_all(&parent)
+        .map_err(|e| format!("Failed to create directory {}: {e}", parent.display()))?;
+
+    let base = parent.join(&folder_name);
     if base.join(".reqmate").join("reqmate.yaml").exists() {
         return Err(format!("Collection already exists at {}", base.display()));
     }
@@ -246,4 +282,64 @@ pub async fn create_collection(parent_dir: String, name: String) -> Result<Strin
     }
 
     Ok(base.to_string_lossy().to_string())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn blank_request() -> RequestFile {
+        RequestFile {
+            name: "r".to_string(),
+            method: HttpMethod::GET,
+            url: "https://api.test".to_string(),
+            protocol: None,
+            description: None,
+            headers: Default::default(),
+            auth: None,
+            body: None,
+            params: None,
+            assert: None,
+            tests: None,
+            pre_request_script: None,
+            post_response_script: None,
+            cookies: None,
+        }
+    }
+
+    #[test]
+    fn assertion_text_is_parsed_into_the_yaml_value() {
+        let mut request = blank_request();
+        merge_assertions(
+            &mut request,
+            Some("status: 200\nheaders:\n  content-type: json".into()),
+        )
+        .unwrap();
+
+        let value = request.assert.expect("assert set");
+        assert_eq!(value["status"], serde_yaml::Value::Number(200.into()));
+    }
+
+    #[test]
+    fn empty_assertion_text_clears_the_block() {
+        let mut request = blank_request();
+        request.assert = Some(serde_yaml::Value::String("old".into()));
+        merge_assertions(&mut request, Some("   ".into())).unwrap();
+        assert!(request.assert.is_none());
+    }
+
+    #[test]
+    fn missing_assertion_text_keeps_whatever_was_there() {
+        let mut request = blank_request();
+        request.assert = Some(serde_yaml::Value::String("kept".into()));
+        merge_assertions(&mut request, None).unwrap();
+        assert!(request.assert.is_some());
+    }
+
+    #[test]
+    fn invalid_assertion_yaml_is_reported() {
+        let mut request = blank_request();
+        let err = merge_assertions(&mut request, Some("status: [".into())).unwrap_err();
+        assert!(err.contains("Invalid assertions YAML"), "{err}");
+    }
 }

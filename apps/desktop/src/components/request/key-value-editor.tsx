@@ -77,7 +77,7 @@ export function KeyValueEditor({
           <button
             onClick={() => removeRow(index)}
             className="rounded-md p-1.5 text-[var(--color-text-dimmed)] opacity-0 transition-all hover:bg-[var(--color-error)]/12 hover:text-[var(--color-error)] group-hover:opacity-100 focus-visible:opacity-100"
-            aria-label="Remove row"
+            aria-label={t("common.removeRow")}
           >
             <Trash2 className="h-3.5 w-3.5" />
           </button>

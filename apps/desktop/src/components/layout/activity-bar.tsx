@@ -28,7 +28,7 @@ const TOP_ITEMS: { id: ActivityView; icon: typeof FolderOpen; labelKey: string }
   { id: "collections", icon: FolderOpen, labelKey: "sidebar.collections" },
   { id: "environments", icon: Globe, labelKey: "sidebar.environments" },
   { id: "history", icon: Clock, labelKey: "history.title" },
-  { id: "git", icon: GitBranch, labelKey: "sidebar.git" },
+  { id: "git", icon: GitBranch, labelKey: "git.title" },
 ];
 
 const BOTTOM_ITEMS: { id: ActivityView; icon: typeof Server; labelKey: string }[] = [

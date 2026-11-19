@@ -194,7 +194,7 @@ export function GrpcView() {
         extraActions={
           <button
             onClick={handleLoadProto}
-            className="flex items-center gap-1 rounded-lg bg-[var(--color-elevated)] px-2.5 py-2 text-xs text-[var(--color-text-secondary)] hover:bg-[var(--color-border)]"
+            className="flex h-8 items-center gap-1 rounded-lg bg-[var(--color-elevated)] px-2.5 text-[11.5px] text-[var(--color-text-secondary)] hover:bg-[var(--color-border)]"
           >
             <Upload className="h-3 w-3" />
             {t("grpc.loadProto")}
@@ -204,7 +204,7 @@ export function GrpcView() {
           <button
             onClick={handleSend}
             disabled={grpc.loading || !grpc.selectedMethod}
-            className="flex items-center gap-2 rounded-lg bg-[var(--color-accent)] px-5 py-2 text-sm font-semibold text-white transition-all hover:bg-[var(--color-accent-hover)] disabled:cursor-not-allowed disabled:opacity-50 active:scale-[0.98]"
+            className="flex h-9 items-center gap-2 rounded-lg bg-[var(--color-accent)] px-4 text-[12.5px] font-semibold text-white transition-all hover:bg-[var(--color-accent-hover)] disabled:cursor-not-allowed disabled:opacity-50 active:scale-[0.98]"
           >
             {grpc.loading ? (
               <Loader2 className="h-4 w-4 animate-spin" />
@@ -249,8 +249,8 @@ export function GrpcView() {
                   setMethodFilter("");
                 }}
                 options={grpc.services.map((s) => ({ value: s.fullName, label: s.fullName }))}
-                placeholder="Select service"
-                aria-label="Service"
+                placeholder={t("grpc.selectService")}
+                aria-label={t("grpc.service")}
               />
             </div>
           )}
@@ -273,7 +273,7 @@ export function GrpcView() {
               className="flex w-full items-center gap-1 px-3 py-1.5 text-xs text-[var(--color-text-muted)] hover:text-[var(--color-text-secondary)]"
             >
               {showMetadata ? <ChevronDown className="h-3 w-3" /> : <ChevronRight className="h-3 w-3" />}
-              Metadata
+              {t("grpc.metadata")}
               {metadataCount > 0 && (
                 <span className="text-[10px]">({metadataCount})</span>
               )}
@@ -374,21 +374,21 @@ export function GrpcView() {
                   {streaming ? (
                     <span className="flex items-center gap-1.5 text-xs text-amber-400">
                       <Loader2 className="h-3 w-3 animate-spin" />
-                      Streaming...
+                      {t("grpc.streaming")}
                     </span>
                   ) : (
                     <span className="text-xs font-semibold text-green-500">
-                      Stream complete
+                      {t("grpc.streamComplete")}
                     </span>
                   )}
                   <span className="text-xs text-[var(--color-text-muted)]">
-                    {streamMessages.length} message{streamMessages.length !== 1 ? "s" : ""}
+                    {t("grpc.messagesCount", { count: streamMessages.length })}
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
                   <label className="flex items-center gap-1 cursor-pointer text-xs text-[var(--color-text-muted)]">
                     <input type="checkbox" checked={autoScroll} onChange={(e) => setAutoScroll(e.target.checked)} className="h-3 w-3" />
-                    Auto-scroll
+                    {t("graphql.autoScroll")}
                   </label>
                   <button
                     onClick={() => setStreamMessages([])}
@@ -443,7 +443,7 @@ export function GrpcView() {
                     className="flex w-full items-center gap-1 px-3 py-1.5 text-xs text-[var(--color-text-muted)] hover:text-[var(--color-text-secondary)]"
                   >
                     {showResponseMeta ? <ChevronDown className="h-3 w-3" /> : <ChevronRight className="h-3 w-3" />}
-                    Response Metadata
+                    {t("grpc.responseMetadata")}
                     <span className="text-[10px]">({responseMetadata.length})</span>
                   </button>
                   {showResponseMeta && (
@@ -471,7 +471,7 @@ export function GrpcView() {
             <div className="flex flex-1 items-center justify-center text-sm text-[var(--color-text-muted)]">
               <div className="flex items-center gap-2">
                 <div className="h-4 w-4 animate-spin rounded-full border-2 border-blue-500 border-t-transparent" />
-                Sending gRPC request...
+                {t("grpc.sending")}
               </div>
             </div>
           ) : grpc.services.length === 0 ? (
@@ -503,6 +503,7 @@ function MethodBrowser({
   filter: string;
   onFilterChange: (value: string) => void;
 }) {
+  const { t } = useTranslation();
   const showFilter = methods.length > 5;
 
   const filtered = useMemo(() => {
@@ -539,7 +540,7 @@ function MethodBrowser({
             type="text"
             value={filter}
             onChange={(e) => onFilterChange(e.target.value)}
-            placeholder="Filter methods..."
+            placeholder={t("grpc.filterMethods")}
             className="focus-bare flex-1 bg-transparent text-xs text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none"
           />
           {filter && (

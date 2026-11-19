@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import type { RequestRunResult } from "@reqmate/types";
 import { Check, X, AlertCircle } from "lucide-react";
 
@@ -6,10 +7,11 @@ interface RunResultsTableProps {
 }
 
 export function RunResultsTable({ results }: RunResultsTableProps) {
+  const { t } = useTranslation();
   if (results.length === 0) {
     return (
       <p className="py-4 text-center text-sm text-[var(--color-text-dimmed)]">
-        No results yet
+        {t("runner.noResults")}
       </p>
     );
   }

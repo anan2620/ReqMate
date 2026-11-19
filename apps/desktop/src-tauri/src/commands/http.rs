@@ -737,8 +737,7 @@ fn inject_jar_cookies(
 
     for cookie in &jar_cookies {
         if let Some(ref req_domain) = request_domain {
-            let cookie_domain = cookie.domain.trim_start_matches('.');
-            if req_domain.ends_with(cookie_domain) || req_domain == cookie_domain {
+            if crate::http::cookies::domain_matches(req_domain, &cookie.domain) {
                 // Don't override per-request cookie overrides
                 cookies_map
                     .entry(cookie.name.clone())

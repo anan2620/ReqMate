@@ -172,19 +172,19 @@ export function MonitorDialog() {
                   value={cronExpression}
                   onChange={setCronExpression}
                   options={CRON_PRESETS.map((p) => ({ value: p.value, label: p.label }))}
-                  aria-label="Schedule"
+                  aria-label={t("monitor.schedule")}
                 />
               </div>
               <input
                 value={environmentName}
                 onChange={(e) => setEnvironmentName(e.target.value)}
-                placeholder="Environment (optional)"
+                placeholder={t("monitor.environmentOptional")}
                 className="w-full rounded border border-[var(--color-border)] bg-[var(--color-card)] px-2 py-1.5 text-xs text-[var(--color-text-primary)] outline-none"
               />
               <input
                 value={webhookUrl}
                 onChange={(e) => setWebhookUrl(e.target.value)}
-                placeholder="Webhook URL (optional)"
+                placeholder={t("monitor.webhookOptional")}
                 className="w-full rounded border border-[var(--color-border)] bg-[var(--color-card)] px-2 py-1.5 text-xs text-[var(--color-text-primary)] outline-none"
               />
               <label className="flex items-center gap-2 text-xs text-[var(--color-text-secondary)]">
@@ -193,7 +193,7 @@ export function MonitorDialog() {
                   checked={notifyOnFailure}
                   onChange={(e) => setNotifyOnFailure(e.target.checked)}
                 />
-                Notify on failure
+                {t("monitor.notifyOnFailure")}
               </label>
               <button
                 onClick={handleCreate}
@@ -210,7 +210,7 @@ export function MonitorDialog() {
             <div className="flex-1 overflow-auto">
               {monitors.length === 0 ? (
                 <div className="flex h-full items-center justify-center text-xs text-[var(--color-text-dimmed)]">
-                  No monitors configured
+                  {t("monitor.noneConfigured")}
                 </div>
               ) : (
                 monitors.map((m) => (
@@ -324,7 +324,7 @@ export function MonitorDialog() {
               </>
             ) : (
               <div className="flex flex-1 items-center justify-center text-xs text-[var(--color-text-dimmed)]">
-                Select a monitor to view results
+                {t("monitor.selectToView")}
               </div>
             )}
           </div>

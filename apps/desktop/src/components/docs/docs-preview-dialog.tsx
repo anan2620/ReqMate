@@ -141,7 +141,7 @@ export function DocsPreviewDialog({ open, onOpenChange, targets }: DocsPreviewDi
               src={previewUrl}
               className="h-full w-full border-none"
               sandbox="allow-same-origin"
-              title="API Documentation Preview"
+              title={t("docs.preview")}
             />
           )}
         </div>

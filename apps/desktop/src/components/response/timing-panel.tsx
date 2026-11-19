@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import type { ResponseData } from "@reqmate/types";
 
 interface TimingPanelProps {
@@ -5,6 +6,7 @@ interface TimingPanelProps {
 }
 
 export function TimingPanel({ response }: TimingPanelProps) {
+  const { t } = useTranslation();
   const totalMs = response.timeMs;
 
   // We show a visual bar of the total time with size/speed metrics
@@ -16,7 +18,7 @@ export function TimingPanel({ response }: TimingPanelProps) {
       {/* Total time */}
       <div>
         <h4 className="mb-2 text-xs font-semibold uppercase tracking-wider text-[var(--color-text-muted)]">
-          Response Time
+          {t("response.responseTime")}
         </h4>
         <div className="flex items-center gap-3">
           <div className="h-6 flex-1 overflow-hidden rounded bg-[var(--color-elevated)]">
@@ -39,26 +41,26 @@ export function TimingPanel({ response }: TimingPanelProps) {
       {/* Transfer metrics */}
       <div>
         <h4 className="mb-2 text-xs font-semibold uppercase tracking-wider text-[var(--color-text-muted)]">
-          Transfer
+          {t("response.transfer")}
         </h4>
         <div className="grid grid-cols-2 gap-3">
-          <MetricCard label="Response Size" value={formatSize(response.sizeBytes)} />
-          <MetricCard label="Transfer Speed" value={`${speedKBps} KB/s`} />
-          <MetricCard label="Status" value={`${response.status} ${response.statusText}`} />
-          <MetricCard label="Headers" value={`${response.headers.length} headers`} />
+          <MetricCard label={t("response.responseSize")} value={formatSize(response.sizeBytes)} />
+          <MetricCard label={t("response.transferSpeed")} value={`${speedKBps} KB/s`} />
+          <MetricCard label={t("response.status")} value={`${response.status} ${response.statusText}`} />
+          <MetricCard label={t("response.headers")} value={t("response.headerCount", { count: response.headers.length })} />
         </div>
       </div>
 
       {/* Time comparison */}
       <div>
         <h4 className="mb-2 text-xs font-semibold uppercase tracking-wider text-[var(--color-text-muted)]">
-          Performance Thresholds
+          {t("response.thresholds")}
         </h4>
         <div className="space-y-1.5">
-          <ThresholdBar label="Fast" threshold={200} actual={totalMs} color="#22c55e" />
-          <ThresholdBar label="Acceptable" threshold={500} actual={totalMs} color="#eab308" />
-          <ThresholdBar label="Slow" threshold={1000} actual={totalMs} color="#f97316" />
-          <ThresholdBar label="Very slow" threshold={2000} actual={totalMs} color="#ef4444" />
+          <ThresholdBar label={t("response.speedFast")} threshold={200} actual={totalMs} color="#22c55e" />
+          <ThresholdBar label={t("response.speedAcceptable")} threshold={500} actual={totalMs} color="#eab308" />
+          <ThresholdBar label={t("response.speedSlow")} threshold={1000} actual={totalMs} color="#f97316" />
+          <ThresholdBar label={t("response.speedVerySlow")} threshold={2000} actual={totalMs} color="#ef4444" />
         </div>
       </div>
     </div>

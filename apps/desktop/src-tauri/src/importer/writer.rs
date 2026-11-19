@@ -144,6 +144,9 @@ fn convert_body(body: &Option<ImportBody>) -> Option<RequestBodyFile> {
     body.as_ref().map(|b| RequestBodyFile {
         body_type: b.body_type.clone(),
         content: b.content.clone(),
+        // Imported formats keep urlencoded/form-data payloads in `content`;
+        // the request builder falls back to parsing it, so no field list here.
+        form_data: Vec::new(),
     })
 }
 

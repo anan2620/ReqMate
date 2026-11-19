@@ -1,4 +1,6 @@
 import { useEffect, useRef } from "react";
+import { useTranslation } from "react-i18next";
+import type { TFunction } from "i18next";
 import { useAuditStore } from "@/stores/audit-store";
 import {
   Trash2,
@@ -11,24 +13,24 @@ import {
   ClipboardList,
 } from "lucide-react";
 
-const ACTION_CONFIG: Record<string, { icon: typeof Send; color: string; label: string }> = {
-  request_sent: { icon: Send, color: "text-blue-400", label: "Request Sent" },
-  collection_opened: { icon: FolderOpen, color: "text-amber-400", label: "Collection Opened" },
-  environment_changed: { icon: Globe, color: "text-emerald-400", label: "Environment Changed" },
-  request_saved: { icon: Save, color: "text-green-400", label: "Request Saved" },
-  request_deleted: { icon: XCircle, color: "text-red-400", label: "Request Deleted" },
-  settings_changed: { icon: Settings, color: "text-violet-400", label: "Settings Changed" },
+const ACTION_CONFIG: Record<string, { icon: typeof Send; color: string; labelKey: string }> = {
+  request_sent: { icon: Send, color: "text-blue-400", labelKey: "audit.actions.requestSent" },
+  collection_opened: { icon: FolderOpen, color: "text-amber-400", labelKey: "audit.actions.collectionOpened" },
+  environment_changed: { icon: Globe, color: "text-emerald-400", labelKey: "audit.actions.environmentChanged" },
+  request_saved: { icon: Save, color: "text-green-400", labelKey: "audit.actions.requestSaved" },
+  request_deleted: { icon: XCircle, color: "text-red-400", labelKey: "audit.actions.requestDeleted" },
+  settings_changed: { icon: Settings, color: "text-violet-400", labelKey: "audit.actions.settingsChanged" },
 };
 
-function timeAgo(timestamp: string): string {
+function timeAgo(timestamp: string, t: TFunction): string {
   const diff = Date.now() - new Date(timestamp).getTime();
   const minutes = Math.floor(diff / 60000);
-  if (minutes < 1) return "just now";
-  if (minutes < 60) return `${minutes}m ago`;
+  if (minutes < 1) return t("audit.justNow");
+  if (minutes < 60) return t("audit.minutesAgo", { count: minutes });
   const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `${hours}h ago`;
+  if (hours < 24) return t("audit.hoursAgo", { count: hours });
   const days = Math.floor(hours / 24);
-  return `${days}d ago`;
+  return t("audit.daysAgo", { count: days });
 }
 
 function formatTimestamp(timestamp: string): string {
@@ -40,6 +42,7 @@ function formatTimestamp(timestamp: string): string {
 }
 
 export function AuditPanel() {
+  const { t } = useTranslation();
   const { entries, loading, hasMore, loadLogs, loadMore, clearLogs } = useAuditStore();
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -60,13 +63,13 @@ export function AuditPanel() {
       {/* Header actions */}
       <div className="mb-1 flex items-center justify-between">
         <span className="text-xs text-[var(--color-text-dimmed)]">
-          {entries.length} event{entries.length !== 1 ? "s" : ""}
+          {t("audit.events", { count: entries.length })}
         </span>
         {entries.length > 0 && (
           <button
             onClick={clearLogs}
             className="rounded p-1 text-[var(--color-text-dimmed)] hover:bg-[var(--color-border)] hover:text-red-400"
-            title="Clear audit logs"
+            title={t("audit.clearLogs")}
           >
             <Trash2 className="h-3 w-3" />
           </button>
@@ -86,9 +89,9 @@ export function AuditPanel() {
       ) : entries.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-8 text-[var(--color-text-dimmed)]">
           <ClipboardList className="mb-2 h-8 w-8 opacity-40" />
-          <p className="text-xs">No audit events yet</p>
+          <p className="text-xs">{t("audit.empty")}</p>
           <p className="mt-1 text-[10px] opacity-60">
-            Actions will be logged as you use the app
+            {t("audit.emptyHint")}
           </p>
         </div>
       ) : (
@@ -101,7 +104,7 @@ export function AuditPanel() {
             const config = ACTION_CONFIG[entry.action] ?? {
               icon: ClipboardList,
               color: "text-[var(--color-text-muted)]",
-              label: entry.action,
+              labelKey: entry.action,
             };
             const Icon = config.icon;
 
@@ -115,10 +118,10 @@ export function AuditPanel() {
                 <div className="min-w-0 flex-1">
                   <div className="flex items-baseline justify-between gap-1">
                     <span className={`text-[11px] font-medium ${config.color}`}>
-                      {config.label}
+                      {config.labelKey.includes(".") ? t(config.labelKey) : config.labelKey}
                     </span>
                     <span className="shrink-0 text-[10px] text-[var(--color-text-dimmed)]">
-                      {timeAgo(entry.timestamp)}
+                      {timeAgo(entry.timestamp, t)}
                     </span>
                   </div>
                   <p className="truncate text-[11px] text-[var(--color-text-secondary)]">
@@ -135,7 +138,7 @@ export function AuditPanel() {
           })}
           {loading && (
             <div className="py-2 text-center text-[10px] text-[var(--color-text-dimmed)]">
-              Loading more...
+              {t("audit.loadingMore")}
             </div>
           )}
         </div>

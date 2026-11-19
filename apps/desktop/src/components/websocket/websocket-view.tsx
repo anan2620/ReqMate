@@ -4,10 +4,12 @@ import { useTabStore } from "@/stores/tab-store";
 import { useWebSocket } from "@/hooks/use-websocket";
 import { KeyValueEditor } from "@/components/request/key-value-editor";
 import { Send, Plug, Unplug, Trash2, ArrowUp, ArrowDown, ChevronDown, ChevronRight } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { Breadcrumb } from "@/components/layout/breadcrumb";
 import { UrlBar } from "@/components/request/url-bar";
 
 export function WebSocketView() {
+  const { t } = useTranslation();
   const tab = useActiveTab();
   const { setHeaders } = useTabStore();
   const [messageInput, setMessageInput] = useState("");
@@ -68,19 +70,19 @@ export function WebSocketView() {
           <button
             onClick={handleConnect}
             disabled={status === "connecting" || !tab.url.trim()}
-            className={`flex items-center gap-1.5 rounded-xl px-4 py-2 text-[13px] font-semibold disabled:opacity-50 ${
+            className={`flex h-9 items-center gap-1.5 rounded-lg px-3.5 text-[12.5px] font-semibold disabled:opacity-50 ${
               status === "connected" ? "btn-danger" : "btn-accent"
             }`}
           >
             {status === "connected" ? (
               <>
                 <Unplug className="h-4 w-4" />
-                Disconnect
+                {t("websocket.disconnect")}
               </>
             ) : (
               <>
                 <Plug className="h-4 w-4" />
-                {status === "connecting" ? "Connecting..." : "Connect"}
+                {status === "connecting" ? t("socketio.connecting") : t("websocket.connect")}
               </>
             )}
           </button>
@@ -94,7 +96,7 @@ export function WebSocketView() {
           className="flex w-full items-center gap-1 px-3 py-1.5 text-xs text-[var(--color-text-muted)] hover:text-[var(--color-text-secondary)]"
         >
           {showHeaders ? <ChevronDown className="h-3 w-3" /> : <ChevronRight className="h-3 w-3" />}
-          Headers
+          {t("socketio.headers")}
           {tab.headers.filter((h) => h.key.trim()).length > 0 && (
             <span className="text-[10px]">({tab.headers.filter((h) => h.key.trim()).length})</span>
           )}
@@ -119,13 +121,13 @@ export function WebSocketView() {
       )}
 
       {/* Message input */}
-      <div className="flex items-end gap-2 border-b border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2">
+      <div className="flex items-stretch gap-2 border-b border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2">
         <textarea
           value={messageInput}
           onChange={(e) => setMessageInput(e.target.value)}
           placeholder={status === "connected" ? "Type a message..." : "Connect first to send messages"}
           disabled={status !== "connected"}
-          className="flex-1 resize-none rounded border border-[var(--color-border)] bg-[var(--color-card)] p-2 font-mono text-sm text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none disabled:opacity-50"
+          className="h-[68px] flex-1 resize-none rounded-md border border-[var(--color-border)] bg-[var(--color-card)] px-2.5 py-2 font-mono text-[12.5px] leading-5 text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none disabled:opacity-50"
           rows={2}
           onKeyDown={(e) => {
             if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
@@ -137,19 +139,19 @@ export function WebSocketView() {
         <button
           onClick={handleSend}
           disabled={status !== "connected" || !messageInput.trim()}
-          className="btn-accent flex items-center gap-1.5 rounded-md px-3 py-2 text-[13px] font-semibold disabled:opacity-50"
+          className="btn-accent flex shrink-0 items-center gap-1.5 self-stretch rounded-md px-4 text-[12.5px] font-semibold disabled:opacity-50"
         >
-          <Send className="h-3.5 w-3.5" />
-          Send
+          <Send className="h-4 w-4" />
+          {t("websocket.send")}
         </button>
       </div>
 
       {/* Stats bar */}
       <div className="flex items-center justify-between border-b border-[var(--color-border)] px-3 py-1 text-xs text-[var(--color-text-muted)]">
         <div className="flex gap-3">
-          <span>Messages: {messages.length}</span>
-          <span className="text-green-500">Sent: {sentCount}</span>
-          <span className="text-blue-500">Received: {receivedCount}</span>
+          <span>{t("mqtt.messagesCount", { count: messages.length })}</span>
+          <span className="text-green-500">{t("mqtt.sentCount", { count: sentCount })}</span>
+          <span className="text-blue-500">{t("mqtt.receivedCount", { count: receivedCount })}</span>
         </div>
         <div className="flex items-center gap-2">
           <label className="flex items-center gap-1 cursor-pointer">
@@ -159,12 +161,12 @@ export function WebSocketView() {
               onChange={(e) => setAutoScroll(e.target.checked)}
               className="h-3 w-3"
             />
-            Auto-scroll
+            {t("graphql.autoScroll")}
           </label>
           <button
             onClick={clearMessages}
             className="flex items-center gap-1 rounded px-1.5 py-0.5 hover:bg-[var(--color-elevated)]"
-            title="Clear log"
+            title={t("websocket.clearLog")}
           >
             <Trash2 className="h-3 w-3" />
           </button>

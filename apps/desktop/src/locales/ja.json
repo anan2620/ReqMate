@@ -15,6 +15,8 @@
     "ok": "OK"
   },
   "sidebar": {
+    "folderNamePlaceholder": "フォルダ名",
+    "requestNamePlaceholder": "リクエスト名",
     "collections": "コレクション",
     "history": "履歴",
     "environments": "環境",
@@ -36,9 +38,13 @@
     "import": "インポート",
     "closeCollection": "コレクションを閉じる",
     "deleteCollection": "コレクションを削除",
+    "deleteCollectionConfirm": "コレクション「{{name}}」を削除しますか？コレクション全体がゴミ箱に移動します。",
     "collectionName": "コレクション名",
     "collectionNamePlaceholder": "マイ API",
     "location": "場所",
+    "changeLocation": "変更",
+    "willCreate": "作成先：{{path}}",
+    "defaultLocationFallback": "組み込みの既定の場所を使用",
     "creating": "作成中...",
     "exportPostman": "Postman として書き出す",
     "exportOpenapi": "OpenAPI として書き出す",
@@ -54,7 +60,11 @@
     "addVariable": "変数を追加",
     "importEnvironment": "環境をインポート (Postman JSON)",
     "collectionDefaults": "コレクションの既定値",
-    "collectionDefaultsDesc": "ここで設定した認証は、独自の認証を持たないすべてのリクエストに継承されます。"
+    "collectionDefaultsDesc": "ここで設定した認証は、独自の認証を持たないすべてのリクエストに継承されます。",
+    "environmentNamePlaceholder": "例：開発、ステージング、本番",
+    "scopeLocal": "ローカル",
+    "scopeShared": "共有",
+    "scopePersonal": "個人"
   },
   "tabs": {
     "untitled": "無題のリクエスト",
@@ -73,7 +83,10 @@
     "httpRequest": "HTTP リクエスト",
     "importCurl": "cURL をインポート",
     "saveAs": "名前を付けて保存…",
-    "saveOptions": "保存オプション"
+    "saveOptions": "保存オプション",
+    "scrollLeft": "タブを左へスクロール",
+    "scrollRight": "タブを右へスクロール",
+    "newTabShortcut": "新しいタブ (Ctrl+T)"
   },
   "request": {
     "send": "送信",
@@ -107,7 +120,10 @@
     "requestName": "リクエスト名",
     "requestNamePlaceholder": "マイリクエスト",
     "filename": "ファイル名：",
-    "saveRequest": "リクエストを保存"
+    "noCollectionsToSave": "開いているコレクションがありません。先にコレクションを開いてください。",
+    "saveRequest": "リクエストを保存",
+    "httpMethod": "HTTP メソッド",
+    "importCurl": "cURL をインポート"
   },
   "body": {
     "json": "JSON",
@@ -171,7 +187,8 @@
     "certificate": "IdP証明書 (PEM)",
     "nameIdFormat": "NameIDフォーマット",
     "samlToken": "SAMLアサーショントークン",
-    "apiKeyHeader": "ヘッダー名"
+    "apiKeyHeader": "ヘッダー名",
+    "keyNamePlaceholder": "キー名（例：X-API-Key）"
   },
   "response": {
     "body": "ボディ",
@@ -199,7 +216,25 @@
       "redirect": "リダイレクト",
       "clientError": "クライアントエラー",
       "serverError": "サーバーエラー"
-    }
+    },
+    "selectSnapshot": "スナップショットを選択…",
+    "assertions": "アサーション",
+    "compareTitle": "レスポンスを比較",
+    "diffEmpty": "「比較用に保存」でレスポンスを保存し、上で 2 つ選んでください。",
+    "headerCount": "{{count}} ヘッダー",
+    "identical": "レスポンスは同一です。",
+    "left": "左",
+    "right": "右",
+    "responseSize": "レスポンスサイズ",
+    "responseTime": "レスポンス時間",
+    "speedAcceptable": "許容",
+    "speedFast": "高速",
+    "speedSlow": "低速",
+    "speedVerySlow": "非常に遅い",
+    "status": "ステータス",
+    "thresholds": "パフォーマンス基準",
+    "transfer": "転送",
+    "transferSpeed": "転送速度"
   },
   "environment": {
     "title": "環境",
@@ -279,9 +314,27 @@
     "saving": "保存",
     "autoSave": "リクエストの変更を自動保存",
     "autoSaveDesc": "入力が止まって 1 秒後にディスクへ書き込みます。オフにすると、保存を押すまで変更はエディター内に残ります。",
+    "defaultCollectionPath": "コレクションの既定の保存先",
+    "defaultCollectionPathDesc": "新しいコレクションはこのフォルダに作成されます。変更しても既存のコレクションは移動しません。",
+    "defaultCollectionPathPlaceholder": "フォルダを選択…",
     "aiAssistant": "AI アシスタント",
     "designTokens": "カラーパレット",
-    "toggleTheme": "テーマを切り替え"
+    "toggleTheme": "テーマを切り替え",
+    "caCertPathPlaceholder": "CA 証明書のパス（.pem、.crt）",
+    "clientCertPathPlaceholder": "クライアント証明書のパス（.pem、.crt、.pfx）",
+    "clientKeyPathPlaceholder": "クライアント秘密鍵のパス（.pem、.key）",
+    "passphrasePlaceholder": "パスフレーズ（任意）",
+    "apiEndpoint": "API エンドポイント",
+    "apiEndpointDesc": "OpenAI 互換のエンドポイント（OpenAI、Ollama、LM Studio など）",
+    "apiKey": "API キー",
+    "model": "モデル",
+    "systemPackageUpdate": "システムパッケージ版（.deb/.rpm）では自動更新を利用できません。",
+    "paletteDesc": "現在のテーマの配色です。テーマ作者やプラグイン開発者向けの情報です。",
+    "shortcutConflicts": "一部のショートカットが競合しています。同じ組み合わせで実行される操作は 1 つだけです。",
+    "pressNewShortcut": "新しいショートカットを押してください…",
+    "rebind": "再割り当て",
+    "zenNote": "Esc は常に Zen モードを終了します（変更不可）",
+    "resetDefaults": "既定値に戻す"
   },
   "runner": {
     "title": "コレクションランナー",
@@ -294,7 +347,10 @@
     "passed": "成功",
     "failed": "失敗",
     "skipped": "スキップ",
-    "duration": "所要時間"
+    "duration": "所要時間",
+    "noResults": "結果はまだありません",
+    "runCollection": "コレクションを実行",
+    "stopOnError": "エラー時に停止"
   },
   "import": {
     "title": "コレクションをインポート",
@@ -383,7 +439,10 @@
     "value": "値",
     "saved": "保存しました",
     "savedTo": "「{{name}}」を保存しました",
-    "saveFailed": "保存に失敗しました: {{reason}}"
+    "saveFailed": "保存に失敗しました: {{reason}}",
+    "removeRow": "行を削除",
+    "dismiss": "閉じる",
+    "dismissHint": "ヒントを閉じる"
   },
   "errors": {
     "connectionRefused": "接続が拒否されました — サーバーは稼働中ですか？",
@@ -435,7 +494,14 @@
     "requestBody": "リクエストボディ (JSON)",
     "responseBody": "レスポンス",
     "loadProtoToStart": ".proto ファイルを読み込んで開始",
-    "selectMethodToSend": "メソッドを選択してリクエストを送信"
+    "selectMethodToSend": "メソッドを選択してリクエストを送信",
+    "selectService": "サービスを選択",
+    "filterMethods": "メソッドを絞り込み…",
+    "messagesCount": "{{count}} 件のメッセージ",
+    "responseMetadata": "レスポンスメタデータ",
+    "sending": "gRPC リクエストを送信中…",
+    "streamComplete": "ストリーム完了",
+    "streaming": "受信中…"
   },
   "graphql": {
     "query": "GraphQL クエリ",
@@ -445,9 +511,16 @@
     "fetchSchema": "スキーマを取得（イントロスペクション）",
     "fetchingSchema": "取得中...",
     "schema": "スキーマ",
-    "schemaTypes": "スキーマタイプ"
+    "schemaTypes": "スキーマタイプ",
+    "clearMessages": "メッセージを消去",
+    "autoScroll": "自動スクロール",
+    "listening": "受信中…",
+    "stop": "停止",
+    "subscription": "サブスクリプション",
+    "subscribe": "購読"
   },
   "mock": {
+    "selectCollection": "コレクションを選択",
     "title": "Mock サーバー",
     "start": "Mock サーバーを起動",
     "stop": "停止",
@@ -470,6 +543,7 @@
     "newMockServer": "新しい Mock サーバー"
   },
   "monitor": {
+    "selectCollection": "コレクションを選択",
     "title": "モニター",
     "create": "モニターを作成",
     "schedule": "スケジュール",
@@ -478,7 +552,13 @@
     "enabled": "有効",
     "disabled": "無効",
     "createDesc": "自動コレクション実行をスケジュール",
-    "newMonitor": "新しいモニター"
+    "newMonitor": "新しいモニター",
+    "schedule": "スケジュール",
+    "environmentOptional": "環境（任意）",
+    "webhookOptional": "Webhook URL（任意）",
+    "noneConfigured": "モニターが設定されていません",
+    "notifyOnFailure": "失敗時に通知",
+    "selectToView": "モニターを選択して結果を表示"
   },
   "docs": {
     "title": "API ドキュメント",
@@ -517,6 +597,63 @@
     "readOnly": "読み取り専用で開く",
     "upgradeHint": "アップグレードするとコレクションファイルが書き換えられます。先に変更をコミットしてください。"
   },
+  "mqtt": {
+    "brokerHost": "ブローカーホスト",
+    "connect": "接続",
+    "connecting": "接続中…",
+    "disconnect": "切断",
+    "statusConnected": "接続済み",
+    "statusConnecting": "接続中",
+    "statusDisconnected": "未接続",
+    "connectionSettings": "接続設定",
+    "clientId": "クライアント ID",
+    "authentication": "認証",
+    "username": "ユーザー名",
+    "password": "パスワード",
+    "subscribe": "購読",
+    "topicPlaceholder": "トピック（例：sensor/#）",
+    "qos": "QoS",
+    "publish": "パブリッシュ",
+    "topic": "トピック",
+    "retain": "保持",
+    "payloadPlaceholder": "メッセージ本文",
+    "messagesCount": "メッセージ：{{count}}",
+    "sentCount": "送信：{{count}}",
+    "receivedCount": "受信：{{count}}",
+    "topicsCount": "トピック数：{{count}}",
+    "filterPlaceholder": "トピックで絞り込み…",
+    "autoScroll": "自動スクロール",
+    "clearLog": "ログを消去",
+    "emptyConnected": "メッセージはまだありません — トピックを購読してください",
+    "emptyDisconnected": "開始するにはブローカーに接続してください",
+    "qosValue": "QoS {{qos}}",
+    "retained": "保持"
+  },
+  "socketio": {
+    "connect": "接続",
+    "connecting": "接続中…",
+    "disconnect": "切断",
+    "statusConnected": "接続済み",
+    "statusConnecting": "接続中",
+    "statusDisconnected": "未接続",
+    "headers": "Headers",
+    "headerKey": "Header",
+    "headerValue": "Value",
+    "serverInfo": "サーバー情報",
+    "emitEvent": "イベント送信",
+    "eventPlaceholder": "イベント名（例：message、chat）",
+    "argsPlaceholder": "引数（JSON）例：\"hello\"、{\"msg\": \"hi\"}、[\"a\", 1]",
+    "emit": "送信",
+    "eventsCount": "イベント：{{count}}",
+    "emittedCount": "送信：{{count}}",
+    "receivedCount": "受信：{{count}}",
+    "namespaceValue": "名前空間：{{namespace}}",
+    "filterPlaceholder": "イベントで絞り込み…",
+    "autoScroll": "自動スクロール",
+    "clearLog": "ログを消去",
+    "emptyConnected": "イベントはまだありません — 送信か購読をしてください",
+    "emptyDisconnected": "接続すると開始します"
+  },
   "websocket": {
     "connect": "接続",
     "disconnect": "切断",
@@ -524,7 +661,8 @@
     "connected": "接続済み",
     "disconnected": "切断済み",
     "messages": "メッセージ",
-    "connectToStart": "接続してストリーミングを開始"
+    "connectToStart": "接続してストリーミングを開始",
+    "clearLog": "ログを消去"
   },
   "sse": {
     "connect": "接続",
@@ -532,9 +670,47 @@
     "events": "イベント",
     "connected": "接続済み",
     "disconnected": "切断済み",
-    "connectToStart": "接続してストリーミングを開始"
+    "connectToStart": "接続してストリーミングを開始",
+    "filterPlaceholder": "イベント種別で絞り込み…"
   },
   "ai": {
+    "optional": "オプション",
+    "settings": "設定",
+    "clearChat": "チャットを消去",
+    "setupTitle": "AI アシスタント — オプション機能",
+    "setupDesc": "これは自分の API キーが必要なオプション機能です（BYOK）。ReqMate は AI サービスを同梱も提供もせず、ご自身で用意します。",
+    "setupStepsTitle": "はじめに：",
+    "setupStep1": "お使いの AI プロバイダーで API キーを取得します",
+    "setupStep2": "設定 → AI を開き、エンドポイント・キー・モデルを入力します",
+    "setupStep3": "チャットを始めるか、リクエストを生成させます",
+    "setupSupports": "OpenAI 互換の API に対応：OpenAI、Ollama、LM Studio など。",
+    "openSettings": "設定を開く",
+    "setupNote": "AI を設定しなくても ReqMate の他の機能はすべて使えます。",
+    "banner": "このオプション機能はご自身の AI プロバイダーに接続します。ReqMate は AI サービスを同梱していません。",
+    "bannerErrors": "下にエラーが出る場合は、次の場所で API キーまたはエンドポイントを確認してください：",
+    "settingsAi": "設定 → AI",
+    "emptyHint": "API について何でも質問でき、リクエスト生成やテスト作成も可能です。",
+    "thinking": "考え中…",
+    "generateTests": "テストを生成",
+    "inputPlaceholder": "API リクエストを説明してください…",
+    "errorOwnKey": "このオプション機能はご自身の API キーを使用します。",
+    "checkSettings": "設定 → AI を確認",
+    "runIt": "実行する",
+    "runMyself": "自分で実行します",
+    "applyToTab": "現在のタブに適用",
+    "applyTests": "テストを適用",
+    "debugEndpoint": "エンドポイント",
+    "debugModel": "モデル",
+    "debugDuration": "所要時間",
+    "debugPrompt": "プロンプト",
+    "msgUnreachable": "AI プロバイダーに接続できませんでした",
+    "msgGenerateTestsRequest": "現在のレスポンスのテストを生成",
+    "msgTestsGenerated": "レスポンスのテストを生成しました：",
+    "msgGenerateTestsFailed": "テストを生成できませんでした — AI プロバイダーの設定を確認してください",
+    "msgRequestApplied": "リクエストを適用しました！送信しますか？",
+    "msgRunDone": "完了しました！結果とテストはレスポンスパネルで確認できます。",
+    "msgRunDismissed": "問題ありません。いつでもご自身で送信できます。",
+    "msgTestsApplied": "テストを適用しました！送信して実行しますか？",
     "title": "AI アシスタント",
     "comingSoon": "AI Assistant",
     "comingSoonDesc": "Generate API requests from natural language and auto-generate tests from responses. Configure your AI provider in Settings."
@@ -583,9 +759,57 @@
     "collection": "コレクション \"{{name}}\" を削除しますか？コレクション全体がゴミ箱に移動されます。"
   },
   "audit": {
-    "title": "監査ログ"
+    "title": "監査ログ",
+    "requestSent": "リクエスト送信",
+    "collectionOpened": "コレクションを開く",
+    "environmentChanged": "環境切替",
+    "requestSaved": "リクエスト保存",
+    "requestDeleted": "リクエスト削除",
+    "settingsChanged": "設定変更",
+    "justNow": "たった今",
+    "minutesAgo": "{{count}} 分前",
+    "hoursAgo": "{{count}} 時間前",
+    "daysAgo": "{{count}} 日前",
+    "events": "{{count}} 件",
+    "clearLogs": "監査ログを消去",
+    "empty": "監査イベントはまだありません",
+    "emptyHint": "操作すると自動で記録されます",
+    "loadingMore": "読み込み中…"
   },
+  "git": {
+    "title": "Git",
+    "noCollections": "Git を使うにはコレクションを開いてください",
+    "notARepo": "このコレクションは Git リポジトリではありません",
+    "initRepo": "Git リポジトリを初期化",
+    "selectCollection": "コレクションを選択",
+    "collection": "コレクション",
+    "refresh": "更新",
+    "ahead": "{{count}} コミット先行",
+    "behind": "{{count}} コミット遅れ",
+    "pull": "プル",
+    "push": "プッシュ",
+    "staged": "ステージ済み ({{count}})",
+    "changes": "変更 ({{count}})",
+    "stageAll": "すべてステージ",
+    "unstageAll": "すべてステージ解除",
+    "stage": "ステージ",
+    "unstage": "ステージ解除",
+    "clean": "作業ツリーはクリーンです",
+    "commitPlaceholder": "コミットメッセージ…",
+    "commit": "コミット ({{count}})",
+    "history": "履歴 ({{count}})",
+    "noCommits": "コミットはまだありません"
+  },
+
+  "terminal": {
+    "restart": "ターミナルを再起動",
+    "failedToCreate": "ターミナルの作成に失敗しました：{{error}}",
+    "processExited": "[プロセスが終了しました]",
+    "loading": "ターミナルを読み込み中…"
+  },
+
   "proxy": {
+    "captured": "{{count}} 件キャプチャ",
     "title": "プロキシキャプチャ",
     "running": "実行中",
     "stopped": "停止中",

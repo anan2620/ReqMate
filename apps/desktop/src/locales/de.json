@@ -15,6 +15,8 @@
     "ok": "OK"
   },
   "sidebar": {
+    "folderNamePlaceholder": "Ordnername",
+    "requestNamePlaceholder": "Anfragename",
     "collections": "Sammlungen",
     "history": "Verlauf",
     "environments": "Umgebungen",
@@ -36,9 +38,13 @@
     "import": "Importieren",
     "closeCollection": "Sammlung Schließen",
     "deleteCollection": "Sammlung Löschen",
+    "deleteCollectionConfirm": "Sammlung \"{{name}}\" löschen? Die gesamte Sammlung wird in den Papierkorb verschoben.",
     "collectionName": "Sammlungsname",
     "collectionNamePlaceholder": "Meine API",
     "location": "Speicherort",
+    "changeLocation": "Ändern",
+    "willCreate": "Wird erstellt: {{path}}",
+    "defaultLocationFallback": "Integrierter Standardordner wird verwendet",
     "creating": "Erstelle...",
     "exportPostman": "Als Postman exportieren",
     "exportOpenapi": "Als OpenAPI exportieren",
@@ -54,7 +60,11 @@
     "addVariable": "Variable Hinzufügen",
     "importEnvironment": "Umgebung Importieren (Postman JSON)",
     "collectionDefaults": "Sammlungs-Standardwerte",
-    "collectionDefaultsDesc": "Die hier konfigurierte Authentifizierung wird von allen Anfragen ohne eigene Authentifizierung übernommen."
+    "collectionDefaultsDesc": "Die hier konfigurierte Authentifizierung wird von allen Anfragen ohne eigene Authentifizierung übernommen.",
+    "environmentNamePlaceholder": "z. B. Entwicklung, Staging, Produktion",
+    "scopeLocal": "LOKAL",
+    "scopeShared": "Geteilt",
+    "scopePersonal": "Persönlich"
   },
   "tabs": {
     "untitled": "Unbenannte Anfrage",
@@ -73,7 +83,10 @@
     "httpRequest": "HTTP-Anfrage",
     "importCurl": "cURL Importieren",
     "saveAs": "Speichern unter…",
-    "saveOptions": "Speicheroptionen"
+    "saveOptions": "Speicheroptionen",
+    "scrollLeft": "Tabs nach links scrollen",
+    "scrollRight": "Tabs nach rechts scrollen",
+    "newTabShortcut": "Neuer Tab (Strg+T)"
   },
   "request": {
     "send": "Senden",
@@ -107,7 +120,10 @@
     "requestName": "Anfragename",
     "requestNamePlaceholder": "Meine Anfrage",
     "filename": "Dateiname:",
-    "saveRequest": "Anfrage Speichern"
+    "noCollectionsToSave": "Noch keine Sammlung geöffnet — öffne zuerst eine Sammlung.",
+    "saveRequest": "Anfrage Speichern",
+    "httpMethod": "HTTP-Methode",
+    "importCurl": "cURL importieren"
   },
   "body": {
     "json": "JSON",
@@ -171,7 +187,8 @@
     "certificate": "IdP-Zertifikat (PEM)",
     "nameIdFormat": "NameID-Format",
     "samlToken": "SAML-Assertion-Token",
-    "apiKeyHeader": "Header-Name"
+    "apiKeyHeader": "Header-Name",
+    "keyNamePlaceholder": "Schlüsselname (z. B. X-API-Key)"
   },
   "response": {
     "body": "Body",
@@ -199,7 +216,25 @@
       "redirect": "Weiterleitung",
       "clientError": "Client-Fehler",
       "serverError": "Server-Fehler"
-    }
+    },
+    "selectSnapshot": "Snapshot auswählen...",
+    "assertions": "Assertions",
+    "compareTitle": "Antworten vergleichen",
+    "diffEmpty": "Speichere Antworten über \"Für Diff speichern\" und wähle sie oben aus.",
+    "headerCount": "{{count}} Header",
+    "identical": "Antworten sind identisch.",
+    "left": "Links",
+    "right": "Rechts",
+    "responseSize": "Antwortgröße",
+    "responseTime": "Antwortzeit",
+    "speedAcceptable": "Akzeptabel",
+    "speedFast": "Schnell",
+    "speedSlow": "Langsam",
+    "speedVerySlow": "Sehr langsam",
+    "status": "Status",
+    "thresholds": "Performance-Schwellen",
+    "transfer": "Übertragung",
+    "transferSpeed": "Übertragungsrate"
   },
   "environment": {
     "title": "Umgebungen",
@@ -279,9 +314,27 @@
     "saving": "Speichern",
     "autoSave": "Änderungen automatisch speichern",
     "autoSaveDesc": "Schreibt eine Sekunde nach der letzten Eingabe auf die Festplatte. Deaktiviert bleiben Änderungen im Editor, bis du auf Speichern klickst.",
+    "defaultCollectionPath": "Standardordner für Sammlungen",
+    "defaultCollectionPathDesc": "Neue Sammlungen werden in diesem Ordner erstellt. Eine Änderung verschiebt bereits vorhandene Sammlungen nicht.",
+    "defaultCollectionPathPlaceholder": "Ordner auswählen...",
     "aiAssistant": "KI-Assistent",
     "designTokens": "Farbpalette",
-    "toggleTheme": "Design wechseln"
+    "toggleTheme": "Design wechseln",
+    "caCertPathPlaceholder": "Pfad zum CA-Zertifikat (.pem, .crt)",
+    "clientCertPathPlaceholder": "Pfad zum Client-Zertifikat (.pem, .crt, .pfx)",
+    "clientKeyPathPlaceholder": "Pfad zum privaten Client-Schlüssel (.pem, .key)",
+    "passphrasePlaceholder": "Passphrase (optional)",
+    "apiEndpoint": "API-Endpunkt",
+    "apiEndpointDesc": "Jeder OpenAI-kompatible Endpunkt (OpenAI, Ollama, LM Studio usw.)",
+    "apiKey": "API-Schlüssel",
+    "model": "Modell",
+    "systemPackageUpdate": "Auto-Update ist bei Systempaket-Installationen (.deb/.rpm) nicht verfügbar.",
+    "paletteDesc": "Aktive Farbpalette des aktuellen Themes. Nützlich für Theme- und Plugin-Entwickler.",
+    "shortcutConflicts": "Einige Tastenkürzel überschneiden sich. Pro Kombination wird nur eine Aktion ausgelöst.",
+    "pressNewShortcut": "Neues Tastenkürzel drücken...",
+    "rebind": "Neu belegen",
+    "zenNote": "Esc beendet immer den Zen-Modus (nicht änderbar)",
+    "resetDefaults": "Auf Standard zurücksetzen"
   },
   "runner": {
     "title": "Sammlungsausführer",
@@ -294,7 +347,10 @@
     "passed": "Bestanden",
     "failed": "Fehlgeschlagen",
     "skipped": "Übersprungen",
-    "duration": "Dauer"
+    "duration": "Dauer",
+    "noResults": "Noch keine Ergebnisse",
+    "runCollection": "Sammlung ausführen",
+    "stopOnError": "Bei Fehler stoppen"
   },
   "import": {
     "title": "Sammlung Importieren",
@@ -383,7 +439,10 @@
     "value": "Wert",
     "saved": "Gespeichert",
     "savedTo": "„{{name}}“ gespeichert",
-    "saveFailed": "Speichern fehlgeschlagen: {{reason}}"
+    "saveFailed": "Speichern fehlgeschlagen: {{reason}}",
+    "removeRow": "Zeile entfernen",
+    "dismiss": "Schließen",
+    "dismissHint": "Hinweis schließen"
   },
   "errors": {
     "connectionRefused": "Verbindung abgelehnt — läuft der Server?",
@@ -435,7 +494,14 @@
     "requestBody": "Anfrage-Body (JSON)",
     "responseBody": "Antwort",
     "loadProtoToStart": "Lade eine .proto-Datei, um loszulegen",
-    "selectMethodToSend": "Wähle eine Methode und sende eine Anfrage"
+    "selectMethodToSend": "Wähle eine Methode und sende eine Anfrage",
+    "selectService": "Dienst auswählen",
+    "filterMethods": "Methoden filtern...",
+    "messagesCount": "{{count}} Nachrichten",
+    "responseMetadata": "Antwort-Metadaten",
+    "sending": "gRPC-Anfrage wird gesendet...",
+    "streamComplete": "Stream beendet",
+    "streaming": "Streame..."
   },
   "graphql": {
     "query": "GraphQL-Abfrage",
@@ -445,9 +511,16 @@
     "fetchSchema": "Schema Abrufen (Introspection)",
     "fetchingSchema": "Abrufen...",
     "schema": "Schema",
-    "schemaTypes": "Schema-Typen"
+    "schemaTypes": "Schema-Typen",
+    "clearMessages": "Nachrichten leeren",
+    "autoScroll": "Automatisch scrollen",
+    "listening": "Lausche...",
+    "stop": "Stopp",
+    "subscription": "SUBSCRIPTION",
+    "subscribe": "Abonnieren"
   },
   "mock": {
+    "selectCollection": "Sammlung auswählen",
     "title": "Mock-Server",
     "start": "Mock-Server Starten",
     "stop": "Stoppen",
@@ -470,6 +543,7 @@
     "newMockServer": "Neuer Mock-Server"
   },
   "monitor": {
+    "selectCollection": "Sammlung auswählen",
     "title": "Monitore",
     "create": "Monitor Erstellen",
     "schedule": "Zeitplan",
@@ -478,7 +552,13 @@
     "enabled": "Aktiviert",
     "disabled": "Deaktiviert",
     "createDesc": "Plane automatische Sammlungsausführungen",
-    "newMonitor": "Neuer Monitor"
+    "newMonitor": "Neuer Monitor",
+    "schedule": "Zeitplan",
+    "environmentOptional": "Umgebung (optional)",
+    "webhookOptional": "Webhook-URL (optional)",
+    "noneConfigured": "Keine Monitore konfiguriert",
+    "notifyOnFailure": "Bei Fehler benachrichtigen",
+    "selectToView": "Wähle einen Monitor, um Ergebnisse zu sehen"
   },
   "docs": {
     "title": "API-Dokumentation",
@@ -517,6 +597,63 @@
     "readOnly": "Schreibgeschützt Öffnen",
     "upgradeHint": "Die Aktualisierung schreibt die Sammlungsdateien neu. Committe deine Änderungen zuerst."
   },
+  "mqtt": {
+    "brokerHost": "Broker-Host",
+    "connect": "Verbinden",
+    "connecting": "Verbinde...",
+    "disconnect": "Trennen",
+    "statusConnected": "Verbunden",
+    "statusConnecting": "Verbinde",
+    "statusDisconnected": "Getrennt",
+    "connectionSettings": "Verbindungseinstellungen",
+    "clientId": "Client-ID",
+    "authentication": "Authentifizierung",
+    "username": "Benutzername",
+    "password": "Passwort",
+    "subscribe": "Abonnieren",
+    "topicPlaceholder": "Thema (z. B. sensor/#)",
+    "qos": "QoS",
+    "publish": "Senden",
+    "topic": "Thema",
+    "retain": "Behalten",
+    "payloadPlaceholder": "Nachricht",
+    "messagesCount": "Nachrichten: {{count}}",
+    "sentCount": "Gesendet: {{count}}",
+    "receivedCount": "Empfangen: {{count}}",
+    "topicsCount": "Themen: {{count}}",
+    "filterPlaceholder": "Nach Thema filtern...",
+    "autoScroll": "Automatisch scrollen",
+    "clearLog": "Protokoll leeren",
+    "emptyConnected": "Noch keine Nachrichten — abonniere ein Thema",
+    "emptyDisconnected": "Verbinde mit einem Broker, um zu starten",
+    "qosValue": "QoS {{qos}}",
+    "retained": "behalten"
+  },
+  "socketio": {
+    "connect": "Verbinden",
+    "connecting": "Verbinde...",
+    "disconnect": "Trennen",
+    "statusConnected": "Verbunden",
+    "statusConnecting": "Verbinde",
+    "statusDisconnected": "Getrennt",
+    "headers": "Headers",
+    "headerKey": "Header",
+    "headerValue": "Wert",
+    "serverInfo": "Server-Info",
+    "emitEvent": "Ereignis senden",
+    "eventPlaceholder": "Ereignisname (z. B. message, chat)",
+    "argsPlaceholder": "Argumente (JSON), z. B. \"hello\", {\"msg\": \"hi\"} oder [\"a\", 1]",
+    "emit": "Senden",
+    "eventsCount": "Ereignisse: {{count}}",
+    "emittedCount": "Gesendet: {{count}}",
+    "receivedCount": "Empfangen: {{count}}",
+    "namespaceValue": "Namespace: {{namespace}}",
+    "filterPlaceholder": "Ereignisse filtern...",
+    "autoScroll": "Automatisch scrollen",
+    "clearLog": "Protokoll leeren",
+    "emptyConnected": "Noch keine Ereignisse — senden oder lauschen",
+    "emptyDisconnected": "Verbinde, um zu starten"
+  },
   "websocket": {
     "connect": "Verbinden",
     "disconnect": "Trennen",
@@ -524,7 +661,8 @@
     "connected": "Verbunden",
     "disconnected": "Getrennt",
     "messages": "Nachrichten",
-    "connectToStart": "Verbinde dich, um das Streaming zu starten"
+    "connectToStart": "Verbinde dich, um das Streaming zu starten",
+    "clearLog": "Protokoll leeren"
   },
   "sse": {
     "connect": "Verbinden",
@@ -532,9 +670,47 @@
     "events": "Ereignisse",
     "connected": "Verbunden",
     "disconnected": "Getrennt",
-    "connectToStart": "Verbinde dich, um das Streaming zu starten"
+    "connectToStart": "Verbinde dich, um das Streaming zu starten",
+    "filterPlaceholder": "Nach Ereignistyp filtern..."
   },
   "ai": {
+    "optional": "Optional",
+    "settings": "Einstellungen",
+    "clearChat": "Chat leeren",
+    "setupTitle": "KI-Assistent — optionales Feature",
+    "setupDesc": "Dieses optionale Feature benötigt einen eigenen API-Schlüssel (BYOK). ReqMate enthält keinen KI-Dienst – du bringst deinen eigenen mit.",
+    "setupStepsTitle": "So legst du los:",
+    "setupStep1": "Hole dir einen API-Schlüssel bei deinem KI-Anbieter",
+    "setupStep2": "Öffne Einstellungen → KI und trage Endpunkt, Schlüssel und Modell ein",
+    "setupStep3": "Starte den Chat oder lasse Anfragen generieren",
+    "setupSupports": "Unterstützt jede OpenAI-kompatible API: OpenAI, Ollama, LM Studio und mehr.",
+    "openSettings": "Einstellungen öffnen",
+    "setupNote": "Alle anderen Funktionen von ReqMate arbeiten ohne KI-Konfiguration.",
+    "banner": "Dieses optionale Feature verbindet sich mit deinem eigenen KI-Anbieter. ReqMate enthält keinen KI-Dienst.",
+    "bannerErrors": "Fehler unten bedeuten, dass Schlüssel oder Endpunkt angepasst werden müssen unter",
+    "settingsAi": "Einstellungen → KI",
+    "emptyHint": "Frag alles über APIs, lass Anfragen generieren oder Tests erstellen.",
+    "thinking": "Denke nach...",
+    "generateTests": "Tests generieren",
+    "inputPlaceholder": "Beschreibe eine API-Anfrage...",
+    "errorOwnKey": "Dieses optionale Feature nutzt deinen eigenen API-Schlüssel.",
+    "checkSettings": "Einstellungen → KI prüfen",
+    "runIt": "Ausführen",
+    "runMyself": "Ich führe es selbst aus",
+    "applyToTab": "Auf aktuellen Tab anwenden",
+    "applyTests": "Tests anwenden",
+    "debugEndpoint": "Endpunkt",
+    "debugModel": "Modell",
+    "debugDuration": "Dauer",
+    "debugPrompt": "Prompt",
+    "msgUnreachable": "KI-Anbieter nicht erreichbar",
+    "msgGenerateTestsRequest": "Tests für die aktuelle Antwort generieren",
+    "msgTestsGenerated": "Tests für deine Antwort wurden generiert:",
+    "msgGenerateTestsFailed": "Tests konnten nicht generiert werden — prüfe deine KI-Einstellungen",
+    "msgRequestApplied": "Anfrage übernommen! Soll ich sie senden?",
+    "msgRunDone": "Fertig! Ergebnisse und Testergebnisse stehen im Antwortbereich.",
+    "msgRunDismissed": "Kein Problem, du kannst sie jederzeit selbst senden.",
+    "msgTestsApplied": "Tests übernommen! Soll ich die Anfrage senden, um sie auszuführen?",
     "title": "KI-Assistent",
     "comingSoon": "AI Assistant",
     "comingSoonDesc": "Generate API requests from natural language and auto-generate tests from responses. Configure your AI provider in Settings."
@@ -583,9 +759,57 @@
     "collection": "Sammlung \"{{name}}\" löschen? Die gesamte Sammlung wird in den Papierkorb verschoben."
   },
   "audit": {
-    "title": "Audit-Protokolle"
+    "title": "Audit-Protokolle",
+    "requestSent": "Anfrage gesendet",
+    "collectionOpened": "Sammlung geöffnet",
+    "environmentChanged": "Umgebung gewechselt",
+    "requestSaved": "Anfrage gespeichert",
+    "requestDeleted": "Anfrage gelöscht",
+    "settingsChanged": "Einstellungen geändert",
+    "justNow": "gerade eben",
+    "minutesAgo": "vor {{count}} Min.",
+    "hoursAgo": "vor {{count}} Std.",
+    "daysAgo": "vor {{count}} Tagen",
+    "events": "{{count}} Ereignisse",
+    "clearLogs": "Audit-Protokoll leeren",
+    "empty": "Noch keine Audit-Ereignisse",
+    "emptyHint": "Aktionen werden bei der Nutzung protokolliert",
+    "loadingMore": "Weitere werden geladen..."
   },
+  "git": {
+    "title": "Git",
+    "noCollections": "Öffne eine Sammlung, um Git zu verwenden",
+    "notARepo": "Diese Sammlung ist kein Git-Repository",
+    "initRepo": "Git-Repository initialisieren",
+    "selectCollection": "Sammlung auswählen",
+    "collection": "Sammlung",
+    "refresh": "Aktualisieren",
+    "ahead": "{{count}} voraus",
+    "behind": "{{count}} zurück",
+    "pull": "Pull",
+    "push": "Push",
+    "staged": "Vorgemerkt ({{count}})",
+    "changes": "Änderungen ({{count}})",
+    "stageAll": "Alle vormerken",
+    "unstageAll": "Alle zurücksetzen",
+    "stage": "Vormerken",
+    "unstage": "Zurücksetzen",
+    "clean": "Arbeitsverzeichnis sauber",
+    "commitPlaceholder": "Commit-Nachricht...",
+    "commit": "Commit ({{count}})",
+    "history": "Verlauf ({{count}})",
+    "noCommits": "Noch keine Commits"
+  },
+
+  "terminal": {
+    "restart": "Terminal neu starten",
+    "failedToCreate": "Terminal konnte nicht erstellt werden: {{error}}",
+    "processExited": "[Prozess beendet]",
+    "loading": "Terminal wird geladen..."
+  },
+
   "proxy": {
+    "captured": "{{count}} erfasst",
     "title": "Proxy-Aufzeichnung",
     "running": "Läuft",
     "stopped": "Gestoppt",

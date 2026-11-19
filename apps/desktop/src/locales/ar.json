@@ -15,6 +15,8 @@
     "ok": "موافق"
   },
   "sidebar": {
+    "folderNamePlaceholder": "اسم المجلد",
+    "requestNamePlaceholder": "اسم الطلب",
     "collections": "المجموعات",
     "history": "السجل",
     "environments": "البيئات",
@@ -36,9 +38,13 @@
     "import": "استيراد",
     "closeCollection": "إغلاق المجموعة",
     "deleteCollection": "حذف المجموعة",
+    "deleteCollectionConfirm": "حذف المجموعة \"{{name}}\"؟ ستُنقل المجموعة كاملة إلى المهملات.",
     "collectionName": "اسم المجموعة",
     "collectionNamePlaceholder": "واجهة برمجتي",
     "location": "الموقع",
+    "changeLocation": "تغيير",
+    "willCreate": "سيُنشأ: {{path}}",
+    "defaultLocationFallback": "يُستخدم الموقع الافتراضي المضمّن",
     "creating": "جارٍ الإنشاء...",
     "exportPostman": "تصدير كـ Postman",
     "exportOpenapi": "تصدير كـ OpenAPI",
@@ -54,7 +60,11 @@
     "addVariable": "إضافة متغير",
     "importEnvironment": "استيراد بيئة (Postman JSON)",
     "collectionDefaults": "الإعدادات الافتراضية للمجموعة",
-    "collectionDefaultsDesc": "المصادقة المُعدّة هنا ترثها كل الطلبات التي لا تملك مصادقة خاصة بها."
+    "collectionDefaultsDesc": "المصادقة المُعدّة هنا ترثها كل الطلبات التي لا تملك مصادقة خاصة بها.",
+    "environmentNamePlaceholder": "مثل: التطوير، الاختبار، الإنتاج",
+    "scopeLocal": "محلي",
+    "scopeShared": "مشترك",
+    "scopePersonal": "شخصي"
   },
   "tabs": {
     "untitled": "طلب بدون عنوان",
@@ -73,7 +83,10 @@
     "httpRequest": "طلب HTTP",
     "importCurl": "استيراد cURL",
     "saveAs": "حفظ باسم…",
-    "saveOptions": "خيارات الحفظ"
+    "saveOptions": "خيارات الحفظ",
+    "scrollLeft": "تمرير التبويبات لليسار",
+    "scrollRight": "تمرير التبويبات لليمين",
+    "newTabShortcut": "تبويب جديد (Ctrl+T)"
   },
   "request": {
     "send": "إرسال",
@@ -107,7 +120,10 @@
     "requestName": "اسم الطلب",
     "requestNamePlaceholder": "طلبي",
     "filename": "اسم الملف:",
-    "saveRequest": "حفظ الطلب"
+    "noCollectionsToSave": "لا توجد مجموعات مفتوحة — افتح مجموعة أولًا.",
+    "saveRequest": "حفظ الطلب",
+    "httpMethod": "طريقة HTTP",
+    "importCurl": "استيراد cURL"
   },
   "body": {
     "json": "JSON",
@@ -171,7 +187,8 @@
     "certificate": "شهادة موفر الهوية (PEM)",
     "nameIdFormat": "تنسيق NameID",
     "samlToken": "رمز تأكيد SAML",
-    "apiKeyHeader": "اسم الترويسة"
+    "apiKeyHeader": "اسم الترويسة",
+    "keyNamePlaceholder": "اسم المفتاح (مثل X-API-Key)"
   },
   "response": {
     "body": "المحتوى",
@@ -199,7 +216,25 @@
       "redirect": "إعادة توجيه",
       "clientError": "خطأ العميل",
       "serverError": "خطأ الخادم"
-    }
+    },
+    "selectSnapshot": "اختر لقطة…",
+    "assertions": "التوكيدات",
+    "compareTitle": "مقارنة الاستجابات",
+    "diffEmpty": "احفظ الاستجابات عبر \"حفظ للمقارنة\" ثم اخترها أعلاه.",
+    "headerCount": "{{count}} ترويسة",
+    "identical": "الاستجابتان متطابقتان.",
+    "left": "يسار",
+    "right": "يمين",
+    "responseSize": "حجم الاستجابة",
+    "responseTime": "زمن الاستجابة",
+    "speedAcceptable": "مقبول",
+    "speedFast": "سريع",
+    "speedSlow": "بطيء",
+    "speedVerySlow": "بطيء جدًا",
+    "status": "الحالة",
+    "thresholds": "حدود الأداء",
+    "transfer": "النقل",
+    "transferSpeed": "سرعة النقل"
   },
   "environment": {
     "title": "البيئات",
@@ -279,9 +314,27 @@
     "saving": "الحفظ",
     "autoSave": "حفظ تغييرات الطلب تلقائيًا",
     "autoSaveDesc": "يُحفظ على القرص بعد ثانية من التوقف عن الكتابة. أوقف هذا الخيار لتبقى التغييرات في المحرر حتى تضغط حفظ.",
+    "defaultCollectionPath": "المجلد الافتراضي للمجموعات",
+    "defaultCollectionPathDesc": "تُنشأ المجموعات الجديدة في هذا المجلد. تغييره لا ينقل المجموعات الموجودة.",
+    "defaultCollectionPathPlaceholder": "اختر مجلدًا…",
     "aiAssistant": "مساعد الذكاء الاصطناعي",
     "designTokens": "لوحة الألوان",
-    "toggleTheme": "تبديل السمة"
+    "toggleTheme": "تبديل السمة",
+    "caCertPathPlaceholder": "مسار شهادة CA (.pem، .crt)",
+    "clientCertPathPlaceholder": "مسار شهادة العميل (.pem، .crt، .pfx)",
+    "clientKeyPathPlaceholder": "مسار المفتاح الخاص بالعميل (.pem، .key)",
+    "passphrasePlaceholder": "عبارة المرور (اختياري)",
+    "apiEndpoint": "نقطة نهاية API",
+    "apiEndpointDesc": "أي نقطة نهاية متوافقة مع OpenAI (OpenAI، Ollama، LM Studio وغيرها)",
+    "apiKey": "مفتاح API",
+    "model": "النموذج",
+    "systemPackageUpdate": "التحديث التلقائي غير متاح عند التثبيت عبر حزم النظام (.deb/.rpm).",
+    "paletteDesc": "لوحة الألوان النشطة للسمة الحالية. مفيدة لمنشئي السمات ومطوري الإضافات.",
+    "shortcutConflicts": "بعض الاختصارات متعارضة. سيُنفَّذ إجراء واحد فقط لكل تركيبة مفاتيح.",
+    "pressNewShortcut": "اضغط الاختصار الجديد…",
+    "rebind": "إعادة الربط",
+    "zenNote": "مفتاح Esc يخرج دائمًا من وضع Zen (غير قابل للتخصيص)",
+    "resetDefaults": "استعادة الافتراضيات"
   },
   "runner": {
     "title": "مشغّل المجموعة",
@@ -294,7 +347,10 @@
     "passed": "ناجح",
     "failed": "فاشل",
     "skipped": "تم تخطيه",
-    "duration": "المدة"
+    "duration": "المدة",
+    "noResults": "لا توجد نتائج بعد",
+    "runCollection": "تشغيل المجموعة",
+    "stopOnError": "الإيقاف عند الخطأ"
   },
   "import": {
     "title": "استيراد مجموعة",
@@ -383,7 +439,10 @@
     "value": "القيمة",
     "saved": "تم الحفظ",
     "savedTo": "تم حفظ «{{name}}»",
-    "saveFailed": "فشل الحفظ: {{reason}}"
+    "saveFailed": "فشل الحفظ: {{reason}}",
+    "removeRow": "حذف الصف",
+    "dismiss": "إغلاق",
+    "dismissHint": "إغلاق التلميح"
   },
   "errors": {
     "connectionRefused": "تم رفض الاتصال — هل الخادم قيد التشغيل؟",
@@ -435,7 +494,14 @@
     "requestBody": "محتوى الطلب (JSON)",
     "responseBody": "الاستجابة",
     "loadProtoToStart": "حمّل ملف .proto للبدء",
-    "selectMethodToSend": "اختر طريقة وأرسل طلباً"
+    "selectMethodToSend": "اختر طريقة وأرسل طلباً",
+    "selectService": "اختر خدمة",
+    "filterMethods": "تصفية الطرق…",
+    "messagesCount": "{{count}} رسالة",
+    "responseMetadata": "بيانات وصفية للاستجابة",
+    "sending": "جارٍ إرسال طلب gRPC…",
+    "streamComplete": "انتهى البث",
+    "streaming": "جارٍ الاستقبال…"
   },
   "graphql": {
     "query": "استعلام GraphQL",
@@ -445,9 +511,16 @@
     "fetchSchema": "جلب المخطط (استبطان)",
     "fetchingSchema": "جارٍ الجلب...",
     "schema": "المخطط",
-    "schemaTypes": "أنواع المخطط"
+    "schemaTypes": "أنواع المخطط",
+    "clearMessages": "مسح الرسائل",
+    "autoScroll": "تمرير تلقائي",
+    "listening": "جارٍ الاستماع…",
+    "stop": "إيقاف",
+    "subscription": "اشتراك",
+    "subscribe": "اشتراك"
   },
   "mock": {
+    "selectCollection": "اختر مجموعة",
     "title": "خوادم Mock",
     "start": "بدء خادم Mock",
     "stop": "إيقاف",
@@ -470,6 +543,7 @@
     "newMockServer": "خادم Mock جديد"
   },
   "monitor": {
+    "selectCollection": "اختر مجموعة",
     "title": "المراقبات",
     "create": "إنشاء مراقبة",
     "schedule": "الجدول",
@@ -478,7 +552,13 @@
     "enabled": "مفعّل",
     "disabled": "معطّل",
     "createDesc": "جدولة عمليات تشغيل المجموعة التلقائية",
-    "newMonitor": "مراقبة جديدة"
+    "newMonitor": "مراقبة جديدة",
+    "schedule": "الجدولة",
+    "environmentOptional": "البيئة (اختياري)",
+    "webhookOptional": "عنوان Webhook (اختياري)",
+    "noneConfigured": "لا توجد مراقبات مُهيّأة",
+    "notifyOnFailure": "إشعار عند الفشل",
+    "selectToView": "اختر مراقبة لعرض النتائج"
   },
   "docs": {
     "title": "وثائق API",
@@ -517,6 +597,63 @@
     "readOnly": "فتح للقراءة فقط",
     "upgradeHint": "ستعيد الترقية كتابة ملفات المجموعة. قم بعمل commit لتغييراتك أولاً."
   },
+  "mqtt": {
+    "brokerHost": "مضيف الوسيط",
+    "connect": "اتصال",
+    "connecting": "جارٍ الاتصال…",
+    "disconnect": "قطع الاتصال",
+    "statusConnected": "متصل",
+    "statusConnecting": "جارٍ الاتصال",
+    "statusDisconnected": "غير متصل",
+    "connectionSettings": "إعدادات الاتصال",
+    "clientId": "معرّف العميل",
+    "authentication": "المصادقة",
+    "username": "اسم المستخدم",
+    "password": "كلمة المرور",
+    "subscribe": "اشتراك",
+    "topicPlaceholder": "الموضوع (مثل sensor/#)",
+    "qos": "QoS",
+    "publish": "نشر",
+    "topic": "الموضوع",
+    "retain": "الاحتفاظ",
+    "payloadPlaceholder": "محتوى الرسالة",
+    "messagesCount": "الرسائل: {{count}}",
+    "sentCount": "المُرسلة: {{count}}",
+    "receivedCount": "المستلمة: {{count}}",
+    "topicsCount": "المواضيع: {{count}}",
+    "filterPlaceholder": "تصفية حسب الموضوع…",
+    "autoScroll": "تمرير تلقائي",
+    "clearLog": "مسح السجل",
+    "emptyConnected": "لا توجد رسائل بعد — اشترك في موضوع",
+    "emptyDisconnected": "اتصل بوسيط للبدء",
+    "qosValue": "QoS {{qos}}",
+    "retained": "محفوظة"
+  },
+  "socketio": {
+    "connect": "اتصال",
+    "connecting": "جارٍ الاتصال…",
+    "disconnect": "قطع الاتصال",
+    "statusConnected": "متصل",
+    "statusConnecting": "جارٍ الاتصال",
+    "statusDisconnected": "غير متصل",
+    "headers": "Headers",
+    "headerKey": "Header",
+    "headerValue": "Value",
+    "serverInfo": "معلومات الخادم",
+    "emitEvent": "إرسال حدث",
+    "eventPlaceholder": "اسم الحدث (مثل message، chat)",
+    "argsPlaceholder": "الوسائط (JSON) مثل \"hello\" أو {\"msg\": \"hi\"} أو [\"a\", 1]",
+    "emit": "إرسال",
+    "eventsCount": "الأحداث: {{count}}",
+    "emittedCount": "المُرسلة: {{count}}",
+    "receivedCount": "المستلمة: {{count}}",
+    "namespaceValue": "مساحة الأسماء: {{namespace}}",
+    "filterPlaceholder": "تصفية الأحداث…",
+    "autoScroll": "تمرير تلقائي",
+    "clearLog": "مسح السجل",
+    "emptyConnected": "لا توجد أحداث بعد — أرسل أو استمع",
+    "emptyDisconnected": "اتصل للبدء"
+  },
   "websocket": {
     "connect": "اتصال",
     "disconnect": "قطع الاتصال",
@@ -524,7 +661,8 @@
     "connected": "متصل",
     "disconnected": "غير متصل",
     "messages": "الرسائل",
-    "connectToStart": "اتصل لبدء البث"
+    "connectToStart": "اتصل لبدء البث",
+    "clearLog": "مسح السجل"
   },
   "sse": {
     "connect": "اتصال",
@@ -532,9 +670,47 @@
     "events": "الأحداث",
     "connected": "متصل",
     "disconnected": "غير متصل",
-    "connectToStart": "اتصل لبدء البث"
+    "connectToStart": "اتصل لبدء البث",
+    "filterPlaceholder": "تصفية حسب نوع الحدث…"
   },
   "ai": {
+    "optional": "اختياري",
+    "settings": "الإعدادات",
+    "clearChat": "مسح المحادثة",
+    "setupTitle": "مساعد الذكاء الاصطناعي — ميزة اختيارية",
+    "setupDesc": "هذه ميزة اختيارية تتطلب مفتاح API خاصًا بك (BYOK). لا يتضمن ReqMate خدمة ذكاء اصطناعي ولا يوفرها — أنت تجلب مزوّدك.",
+    "setupStepsTitle": "للبدء:",
+    "setupStep1": "احصل على مفتاح API من مزوّد الذكاء الاصطناعي الذي تفضّله",
+    "setupStep2": "افتح الإعدادات → الذكاء الاصطناعي وأدخل نقطة النهاية والمفتاح والنموذج",
+    "setupStep3": "ابدأ المحادثة أو توليد الطلبات",
+    "setupSupports": "يدعم أي واجهة متوافقة مع OpenAI: OpenAI وOllama وLM Studio وغيرها.",
+    "openSettings": "فتح الإعدادات",
+    "setupNote": "تعمل بقية ميزات ReqMate دون إعداد الذكاء الاصطناعي.",
+    "banner": "هذه الميزة الاختيارية تتصل بمزوّد الذكاء الاصطناعي الخاص بك. لا يتضمن ReqMate خدمة ذكاء اصطناعي.",
+    "bannerErrors": "الأخطاء أدناه تعني أن مفتاح API أو نقطة النهاية تحتاج إلى مراجعة في",
+    "settingsAi": "الإعدادات → الذكاء الاصطناعي",
+    "emptyHint": "اسأل عن أي شيء يخص واجهات API، أو ولّد طلبات، أو أنشئ اختبارات.",
+    "thinking": "جارٍ التفكير…",
+    "generateTests": "توليد الاختبارات",
+    "inputPlaceholder": "صف طلب API…",
+    "errorOwnKey": "هذه الميزة الاختيارية تستخدم مفتاح API الخاص بك.",
+    "checkSettings": "تحقق من الإعدادات → الذكاء الاصطناعي",
+    "runIt": "تشغيل",
+    "runMyself": "سأشغّله بنفسي",
+    "applyToTab": "تطبيق على التبويب الحالي",
+    "applyTests": "تطبيق الاختبارات",
+    "debugEndpoint": "نقطة النهاية",
+    "debugModel": "النموذج",
+    "debugDuration": "المدة",
+    "debugPrompt": "الموجّه",
+    "msgUnreachable": "تعذّر الوصول إلى مزوّد الذكاء الاصطناعي",
+    "msgGenerateTestsRequest": "توليد اختبارات للاستجابة الحالية",
+    "msgTestsGenerated": "تم توليد اختبارات لاستجابتك:",
+    "msgGenerateTestsFailed": "تعذّر توليد الاختبارات — تحقق من إعدادات مزوّد الذكاء الاصطناعي",
+    "msgRequestApplied": "تم تطبيق الطلب! هل أرسله؟",
+    "msgRunDone": "تم! راجع لوحة الاستجابة للنتائج ونتائج الاختبارات.",
+    "msgRunDismissed": "لا مشكلة، يمكنك إرساله متى شئت.",
+    "msgTestsApplied": "تم تطبيق الاختبارات! هل أرسل الطلب لتشغيلها؟",
     "title": "مساعد AI",
     "comingSoon": "AI Assistant",
     "comingSoonDesc": "Generate API requests from natural language and auto-generate tests from responses. Configure your AI provider in Settings."
@@ -583,9 +759,57 @@
     "collection": "حذف المجموعة \"{{name}}\"؟ سيتم نقل المجموعة بالكامل إلى سلة المحذوفات."
   },
   "audit": {
-    "title": "سجلات التدقيق"
+    "title": "سجلات التدقيق",
+    "requestSent": "تم إرسال الطلب",
+    "collectionOpened": "تم فتح المجموعة",
+    "environmentChanged": "تم تغيير البيئة",
+    "requestSaved": "تم حفظ الطلب",
+    "requestDeleted": "تم حذف الطلب",
+    "settingsChanged": "تم تغيير الإعدادات",
+    "justNow": "الآن",
+    "minutesAgo": "قبل {{count}} دقيقة",
+    "hoursAgo": "قبل {{count}} ساعة",
+    "daysAgo": "قبل {{count}} يوم",
+    "events": "{{count}} حدث",
+    "clearLogs": "مسح سجل التدقيق",
+    "empty": "لا توجد أحداث تدقيق بعد",
+    "emptyHint": "تُسجَّل الإجراءات أثناء استخدام التطبيق",
+    "loadingMore": "جارٍ تحميل المزيد…"
   },
+  "git": {
+    "title": "Git",
+    "noCollections": "افتح مجموعة لاستخدام Git",
+    "notARepo": "هذه المجموعة ليست مستودع Git",
+    "initRepo": "تهيئة مستودع Git",
+    "selectCollection": "اختر مجموعة",
+    "collection": "المجموعة",
+    "refresh": "تحديث",
+    "ahead": "{{count}} متقدم",
+    "behind": "{{count}} متأخر",
+    "pull": "سحب",
+    "push": "دفع",
+    "staged": "مُجهّز ({{count}})",
+    "changes": "التغييرات ({{count}})",
+    "stageAll": "تجهيز الكل",
+    "unstageAll": "إلغاء تجهيز الكل",
+    "stage": "تجهيز",
+    "unstage": "إلغاء التجهيز",
+    "clean": "شجرة العمل نظيفة",
+    "commitPlaceholder": "رسالة الالتزام...",
+    "commit": "التزام ({{count}})",
+    "history": "السجل ({{count}})",
+    "noCommits": "لا توجد التزامات بعد"
+  },
+
+  "terminal": {
+    "restart": "إعادة تشغيل الطرفية",
+    "failedToCreate": "تعذّر إنشاء الطرفية: {{error}}",
+    "processExited": "[تم إنهاء العملية]",
+    "loading": "جارٍ تحميل الطرفية…"
+  },
+
   "proxy": {
+    "captured": "تم الالتقاط {{count}}",
     "title": "التقاط الوكيل",
     "running": "يعمل",
     "stopped": "متوقف",

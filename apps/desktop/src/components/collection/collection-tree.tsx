@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
 import type { CollectionNode, CollectionDefaults, HttpMethod } from "@reqmate/types";
@@ -28,8 +28,10 @@ import * as Dialog from "@radix-ui/react-dialog";
 import { CookieJarDialog } from "@/components/collection/cookie-jar-dialog";
 import { exportCollectionToFile } from "@/lib/export-collection";
 import { saveFolderOrder } from "@/lib/tauri-api";
+import { reorderSiblingKeys } from "@/lib/collection-order";
 import {
   DndContext,
+  MeasuringStrategy,
   closestCenter,
   PointerSensor,
   useSensor,
@@ -69,16 +71,6 @@ interface FlatNode {
 }
 
 // ── Utility functions ──
-
-/** Get the order key for a node (file stem for requests, folder name for folders) */
-function getOrderKey(node: CollectionNode): string {
-  const path = node.path;
-  const name = path.substring(path.lastIndexOf("/") + 1);
-  if (node.type === "request") {
-    return name.replace(/\.(yaml|yml)$/, "");
-  }
-  return name;
-}
 
 /** Fuzzy subsequence match with scoring.
  * Returns a score > 0 if query is a fuzzy match for text, 0 otherwise.
@@ -201,6 +193,39 @@ export function CollectionTree({
     return result;
   }, [nodes, expandedPaths, collectionPath, collectionName, searchQuery]);
 
+  /**
+   * Children of `parentPath` in the full tree (ignoring collapse / search
+   * filtering). Ordering rewrites must cover every sibling — the backend
+   * replaces the whole order list, so anything left out falls back to
+   * alphabetical and the list silently reshuffles.
+   */
+  const childrenOf = useCallback(
+    (parentPath: string): CollectionNode[] | null => {
+      const root =
+        nodes.length === 1 &&
+        nodes[0].type !== "request" &&
+        nodes[0].path === collectionPath
+          ? nodes[0].children
+          : nodes;
+
+      const walk = (
+        children: CollectionNode[],
+        path: string,
+      ): CollectionNode[] | null => {
+        if (path === parentPath) return children;
+        for (const child of children) {
+          if (child.type === "request") continue;
+          const found = walk(child.children, child.path);
+          if (found) return found;
+        }
+        return null;
+      };
+
+      return walk(root, collectionPath);
+    },
+    [nodes, collectionPath],
+  );
+
   const virtualizer = useVirtualizer({
     count: flatNodes.length,
     getScrollElement: () => scrollRef.current,
@@ -213,27 +238,25 @@ export function CollectionTree({
       const { active, over } = event;
       if (!over || active.id === over.id) return;
 
+      // While filtering, the visible list is a subset, so the resulting order
+      // would not describe the folder on disk. Skip instead of corrupting it.
+      if (searchQuery) return;
+
       const activeFlat = flatNodes.find((f) => f.node.path === active.id);
-      const overFlat = flatNodes.find((f) => f.node.path === over.id);
-      if (!activeFlat || !overFlat) return;
+      if (!activeFlat) return;
 
-      // Only allow reordering within the same parent
-      if (activeFlat.parentDir !== overFlat.parentDir) return;
+      const siblings = childrenOf(activeFlat.parentDir);
+      if (!siblings) return;
 
-      // Get all siblings at the same parent
-      const siblings = flatNodes.filter(
-        (f) => f.parentDir === activeFlat.parentDir && f.depth === activeFlat.depth,
+      // Folders are always listed before requests (backend keeps the groups
+      // apart), so a folder↔request drop has no representable position.
+      const order = reorderSiblingKeys(
+        siblings,
+        active.id as string,
+        over.id as string,
       );
+      if (!order) return;
 
-      const fromIdx = siblings.findIndex((f) => f.node.path === active.id);
-      const toIdx = siblings.findIndex((f) => f.node.path === over.id);
-      if (fromIdx === -1 || toIdx === -1) return;
-
-      const reordered = [...siblings];
-      const [moved] = reordered.splice(fromIdx, 1);
-      reordered.splice(toIdx, 0, moved);
-
-      const order = reordered.map((f) => getOrderKey(f.node));
       try {
         await saveFolderOrder(activeFlat.parentDir, order);
         await refreshCollection(collectionPath);
@@ -243,7 +266,7 @@ export function CollectionTree({
         );
       }
     },
-    [flatNodes, refreshCollection, collectionPath],
+    [flatNodes, childrenOf, refreshCollection, collectionPath, searchQuery],
   );
 
   if (flatNodes.length === 0) return null;
@@ -254,6 +277,9 @@ export function CollectionTree({
     <DndContext
       sensors={sensors}
       collisionDetection={closestCenter}
+      // Virtualized rows mount/unmount while scrolling, so droppable rects
+      // must be re-measured continuously for downward drags to track targets.
+      measuring={{ droppable: { strategy: MeasuringStrategy.Always } }}
       onDragEnd={handleDragEnd}
     >
       <SortableContext
@@ -277,11 +303,10 @@ export function CollectionTree({
                     flat={flat}
                     style={{
                       position: "absolute",
-                      top: 0,
+                      top: `${virtualRow.start}px`,
                       left: 0,
                       width: "100%",
                       height: `${virtualRow.size}px`,
-                      transform: `translateY(${virtualRow.start}px)`,
                     }}
                   />
                 );
@@ -304,11 +329,10 @@ export function CollectionTree({
                   flat={flat}
                   style={{
                     position: "absolute",
-                    top: 0,
+                    top: `${virtualRow.start}px`,
                     left: 0,
                     width: "100%",
                     height: `${virtualRow.size}px`,
-                    transform: `translateY(${virtualRow.start}px)`,
                   }}
                 />
               );
@@ -332,11 +356,16 @@ function VirtualRow({ flat, style }: { flat: FlatNode; style: React.CSSPropertie
     isDragging,
   } = useSortable({ id: flat.node.path });
 
+  // `style` owns the virtual position (top/height); `transform` belongs to
+  // dnd-kit alone. Mixing both into one transform made every shifted row jump
+  // to the top of the list, which is why dragging looked like rows stacking
+  // on top of each other.
   const dndStyle: React.CSSProperties = {
     ...style,
-    transform: CSS.Transform.toString(transform) || style.transform as string,
+    transform: CSS.Transform.toString(transform),
     transition,
     opacity: isDragging ? 0.5 : 1,
+    zIndex: isDragging ? 1 : undefined,
   };
 
   return (
@@ -542,6 +571,8 @@ function TreeNodeRow({
               onChange={(e) => setRenameValue(e.target.value)}
               onBlur={submitRename}
               onKeyDown={(e) => {
+                // Typing a space must not reach the row's expand shortcut.
+                e.stopPropagation();
                 if (e.key === "Enter") submitRename();
                 if (e.key === "Escape") setRenaming(false);
               }}
@@ -596,7 +627,7 @@ function TreeNodeRow({
           open={deleteConfirm}
           onOpenChange={setDeleteConfirm}
           title={t("confirmDelete.title")}
-          message={`${t("confirmDelete.message", `Delete "${node.name}"?`)}`}
+          message={t("confirmDelete.request", { name: node.name })}
           onConfirm={confirmDelete}
         />
       </>
@@ -610,7 +641,11 @@ function TreeNodeRow({
         role="button"
         tabIndex={0}
         onClick={() => toggleExpand(node.path)}
-        onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") toggleExpand(node.path); }}
+        onKeyDown={(e) => {
+          // Enter/Space typed while renaming belongs to the input, not the row.
+          if (e.target !== e.currentTarget) return;
+          if (e.key === "Enter" || e.key === " ") toggleExpand(node.path);
+        }}
         onContextMenu={handleContextMenu}
         className="group flex w-full cursor-pointer items-center gap-1.5 rounded-md px-2 py-[5px] text-left text-[12.5px] transition-colors hover:bg-[color-mix(in_srgb,var(--color-text-primary)_6%,transparent)]"
         style={{ paddingLeft: `${depth * 16 + 8}px` }}
@@ -641,6 +676,8 @@ function TreeNodeRow({
             onChange={(e) => setRenameValue(e.target.value)}
             onBlur={submitRename}
             onKeyDown={(e) => {
+              // Typing a space must not reach the row's expand shortcut.
+              e.stopPropagation();
               if (e.key === "Enter") submitRename();
               if (e.key === "Escape") setRenaming(false);
             }}
@@ -681,9 +718,16 @@ function TreeNodeRow({
                   <Pencil className="h-3 w-3" />
                 </button>
                 <button
-                  onClick={(e) => { e.stopPropagation(); handleDelete(); }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    // A collection must go through deleteCollection: it closes
+                    // the tabs, stops the watcher and drops it from the sidebar.
+                    // deleteItem would only trash the directory and leave a
+                    // phantom entry behind.
+                    setDeleteCollectionConfirm(true);
+                  }}
                   className="rounded p-0.5 text-[var(--color-text-muted)] hover:bg-red-500/20 hover:text-red-400"
-                  title={t("common.delete")}
+                  title={t("sidebar.deleteCollection")}
                 >
                   <Trash2 className="h-3 w-3" />
                 </button>
@@ -839,14 +883,14 @@ function TreeNodeRow({
         open={deleteConfirm}
         onOpenChange={setDeleteConfirm}
         title={t("confirmDelete.title")}
-        message={`${t("confirmDelete.message", `Delete "${node.name}"?`)}`}
+        message={t("confirmDelete.request", { name: node.name })}
         onConfirm={confirmDelete}
       />
       <ConfirmDialog
         open={deleteCollectionConfirm}
         onOpenChange={setDeleteCollectionConfirm}
         title={t("confirmDelete.title")}
-        message={`Delete collection "${node.name}"? This will move the entire collection to trash.`}
+        message={t("sidebar.deleteCollectionConfirm", { name: node.name })}
         onConfirm={confirmDeleteCollection}
       />
     </>
@@ -991,6 +1035,7 @@ function InputDialog({
   showProtocol?: boolean;
   onSubmit: (value: string, protocol?: Protocol) => void;
 }) {
+  const { t } = useTranslation();
   const [value, setValue] = useState("");
   const [protocol, setProtocol] = useState<Protocol>("http");
   const inputRef = useRef<HTMLInputElement>(null);
@@ -1059,14 +1104,14 @@ function InputDialog({
               onClick={() => onOpenChange(false)}
               className="rounded-lg px-4 py-1.5 text-sm text-[var(--color-text-muted)] hover:bg-[var(--color-surface)]"
             >
-              Cancel
+              {t("common.cancel")}
             </button>
             <button
               onClick={handleSubmit}
               disabled={!value.trim()}
               className="rounded-lg bg-[var(--color-accent)] px-4 py-1.5 text-sm font-medium text-white hover:bg-[var(--color-accent-hover)] disabled:opacity-50"
             >
-              Create
+              {t("common.create")}
             </button>
           </div>
         </Dialog.Content>
@@ -1092,6 +1137,7 @@ function ConfirmDialog({
   confirmLabel?: string;
   onConfirm: () => void;
 }) {
+  const { t } = useTranslation();
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
       <Dialog.Portal>
@@ -1106,7 +1152,7 @@ function ConfirmDialog({
               onClick={() => onOpenChange(false)}
               className="rounded-lg px-4 py-1.5 text-sm text-[var(--color-text-muted)] hover:bg-[var(--color-surface)]"
             >
-              Cancel
+              {t("common.cancel")}
             </button>
             <button
               onClick={() => {
@@ -1145,13 +1191,20 @@ function ContextMenu({
   const menuRef = useRef<HTMLDivElement>(null);
   const [position, setPosition] = useState({ left: x, top: y });
 
-  useEffect(() => {
-    if (menuRef.current) {
-      const rect = menuRef.current.getBoundingClientRect();
-      const newLeft = rect.right > window.innerWidth ? Math.max(0, x - rect.width) : x;
-      const newTop = rect.bottom > window.innerHeight ? Math.max(0, window.innerHeight - rect.height) : y;
-      setPosition({ left: newLeft, top: newTop });
-    }
+  // Measure before the first paint: clamping in a passive effect shows the menu
+  // at its raw cursor position for one frame, which is visible as a jump.
+  useLayoutEffect(() => {
+    if (!menuRef.current) return;
+    const rect = menuRef.current.getBoundingClientRect();
+    const left =
+      rect.right > window.innerWidth
+        ? Math.max(0, window.innerWidth - rect.width - 4)
+        : x;
+    const top =
+      rect.bottom > window.innerHeight
+        ? Math.max(0, window.innerHeight - rect.height - 4)
+        : y;
+    setPosition({ left, top });
   }, [x, y]);
 
   return createPortal(

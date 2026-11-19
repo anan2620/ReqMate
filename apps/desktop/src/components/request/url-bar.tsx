@@ -279,38 +279,42 @@ export const UrlBar = forwardRef<HTMLInputElement, UrlBarProps>(function UrlBar(
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
+      // Claim the key so the window-level shortcut doesn't send a second time.
+      e.preventDefault();
+      e.stopPropagation();
       send();
     }
   };
 
   return (
-    <div data-tour="url-bar" className="flex items-center gap-2.5 bg-[var(--color-card)] px-3 pb-2.5 pt-1">
+    <div data-tour="url-bar" className="flex items-center gap-2 bg-[var(--color-card)] px-3 pb-2 pt-1">
       {/* Command bar — method + URL in one focused surface */}
-      <div className="ring-focus flex min-w-0 flex-1 items-center gap-2 rounded-lg border border-[var(--color-border-strong)] bg-[var(--color-card)] px-2 py-1.5 transition-colors duration-150">
+      <div className="ring-focus flex h-9 min-w-0 flex-1 items-center gap-2 rounded-lg border border-[var(--color-border-strong)] bg-[var(--color-card)] px-1.5 transition-colors duration-150">
         {/* Method selector — show static badge for non-HTTP protocols */}
         {tab.protocol === "graphql" ? (
-          <span className="pill method-graphql px-2.5 py-1 text-[11px]">GQL</span>
+          <span className="pill method-graphql h-7 px-2.5 text-[11px]">GQL</span>
         ) : tab.protocol === "websocket" ? (
-          <span className="pill method-websocket px-2.5 py-1 text-[11px]">WS</span>
+          <span className="pill method-websocket h-7 px-2.5 text-[11px]">WS</span>
         ) : tab.protocol === "sse" ? (
-          <span className="pill method-sse px-2.5 py-1 text-[11px]">SSE</span>
+          <span className="pill method-sse h-7 px-2.5 text-[11px]">SSE</span>
         ) : tab.protocol === "grpc" ? (
-          <span className="pill method-grpc px-2.5 py-1 text-[11px]">gRPC</span>
+          <span className="pill method-grpc h-7 px-2.5 text-[11px]">gRPC</span>
         ) : (
           <Select
             variant="plain"
+            size="xs"
             value={tab.method}
             onChange={(value) => setMethod(value as HttpMethod)}
             options={METHODS.map((m) => ({ value: m, label: m }))}
-            className={`method-select method-${tab.method.toLowerCase()} shrink-0 px-2.5 py-1 text-[11px]`}
-            aria-label="HTTP method"
+            className={`method-select method-${tab.method.toLowerCase()} shrink-0`}
+            aria-label={t("request.httpMethod")}
           />
         )}
 
-        <span aria-hidden className="h-5 w-px shrink-0 bg-[var(--color-border-strong)]" />
+        <span aria-hidden className="h-4 w-px shrink-0 bg-[var(--color-border-strong)]" />
 
         {/* URL input with variable highlighting overlay */}
-        <div className="relative min-w-0 flex-1">
+        <div className="relative min-w-0 flex-1 self-stretch">
           <input
             ref={setRefs}
             type="text"
@@ -322,7 +326,7 @@ export const UrlBar = forwardRef<HTMLInputElement, UrlBarProps>(function UrlBar(
             disabled={urlDisabled}
             spellCheck={false}
             placeholder={t("request.urlPlaceholder")}
-            className={`w-full border-0 bg-transparent px-2 py-0.5 font-mono text-[13px] outline-none disabled:opacity-60 ${
+            className={`h-full w-full border-0 bg-transparent px-2 font-mono text-[13px] outline-none disabled:opacity-60 ${
               hasVariablesInUrl && !inputFocused
                 ? "text-transparent caret-[var(--color-text-primary)]"
                 : "text-[var(--color-text-primary)]"
@@ -368,12 +372,12 @@ export const UrlBar = forwardRef<HTMLInputElement, UrlBarProps>(function UrlBar(
             data-tour="send-btn"
             onClick={send}
             disabled={tab.loading || !tab.url.trim()}
-            className="btn-accent flex h-[38px] items-center gap-2 rounded-md px-4 text-[13px] font-semibold disabled:cursor-not-allowed disabled:opacity-40"
+            className="btn-accent flex h-9 items-center gap-2 rounded-md px-3.5 text-[12.5px] font-semibold disabled:cursor-not-allowed disabled:opacity-40"
           >
             {tab.loading ? (
               <Loader2 className="h-4 w-4 animate-spin" />
             ) : (
-              <Send className="h-3.5 w-3.5" />
+              <Send className="h-4 w-4" />
             )}
             {t("request.send")}
           </button>

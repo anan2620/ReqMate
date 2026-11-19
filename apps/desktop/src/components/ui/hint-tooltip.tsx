@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { X } from "lucide-react";
 import { useHint } from "@/hooks/use-hints";
 
@@ -9,6 +10,7 @@ interface HintTooltipProps {
 }
 
 export function HintTooltip({ hintId, message, position = "bottom", align = "left" }: HintTooltipProps) {
+  const { t } = useTranslation();
   const { visible, dismiss } = useHint(hintId);
 
   if (!visible) return null;
@@ -28,7 +30,7 @@ export function HintTooltip({ hintId, message, position = "bottom", align = "lef
           dismiss();
         }}
         className="shrink-0 rounded p-0.5 text-[var(--color-text-dimmed)] transition-colors hover:bg-[var(--color-card-hover)] hover:text-[var(--color-text-secondary)]"
-        aria-label="Dismiss hint"
+        aria-label={t("common.dismissHint")}
       >
         <X className="h-3 w-3" />
       </button>

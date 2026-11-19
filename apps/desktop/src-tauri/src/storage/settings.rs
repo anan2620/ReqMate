@@ -76,6 +76,26 @@ pub struct AppSettings {
     /// Persist request edits automatically instead of waiting for an explicit save
     #[serde(default = "default_true")]
     pub auto_save: bool,
+    /// Directory new collections are created in. Existing collections keep
+    /// their own path, so changing this never moves anything on disk.
+    #[serde(default = "default_collection_path_value")]
+    pub default_collection_path: String,
+}
+
+/// Root directory that holds collections by default (`~/ReqMate`).
+///
+/// Falls back to a relative `ReqMate` folder when the home directory cannot be
+/// resolved, so creating a collection still works in odd environments.
+pub fn default_collection_root() -> String {
+    dirs::home_dir()
+        .map(|home| home.join("ReqMate"))
+        .unwrap_or_else(|| std::path::PathBuf::from("ReqMate"))
+        .to_string_lossy()
+        .to_string()
+}
+
+fn default_collection_path_value() -> String {
+    default_collection_root()
 }
 
 fn default_theme() -> String {
@@ -147,6 +167,7 @@ impl Default for AppSettings {
             panel_ratio: default_panel_ratio(),
             layout: default_layout(),
             auto_save: true,
+            default_collection_path: default_collection_path_value(),
         }
     }
 }
@@ -407,6 +428,17 @@ mod tests {
         let loaded = load_settings(&path);
         assert_eq!(loaded.ai_api_key.as_deref(), Some("legacy-key"));
         assert_eq!(loaded.theme, "black");
+    }
+
+    #[test]
+    fn missing_default_collection_path_falls_back_to_home_root() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("settings.json");
+        std::fs::write(&path, r#"{"theme":"dark"}"#).unwrap();
+
+        let loaded = load_settings(&path);
+        assert!(!loaded.default_collection_path.is_empty());
+        assert_eq!(loaded.default_collection_path, default_collection_root());
     }
 
     #[test]

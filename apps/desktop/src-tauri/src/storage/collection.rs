@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use std::fs;
 use std::path::{Path, PathBuf};
 
@@ -42,6 +42,27 @@ pub fn load_collection_tree(collection_path: &Path) -> Result<CollectionNode, St
 
 /// Recursively scan a directory for request YAML files and subfolders.
 fn scan_directory(dir: &Path) -> Result<Vec<CollectionNode>, String> {
+    // Track canonical paths so a symlink pointing at an ancestor (a loop) does
+    // not recurse forever and blow the stack.
+    let mut visited = HashSet::new();
+    scan_directory_inner(dir, &mut visited)
+}
+
+fn scan_directory_inner(
+    dir: &Path,
+    visited: &mut HashSet<PathBuf>,
+) -> Result<Vec<CollectionNode>, String> {
+    // `canonicalize` fails on exotic paths; fall back to the literal path so a
+    // read error there can never wedge the scan.
+    let identity = fs::canonicalize(dir).unwrap_or_else(|_| dir.to_path_buf());
+    if !visited.insert(identity) {
+        tracing::warn!(
+            "Skipping {} — already visited (symlink loop?)",
+            dir.display()
+        );
+        return Ok(Vec::new());
+    }
+
     let mut folders = Vec::new();
     let mut requests = Vec::new();
 
@@ -74,7 +95,7 @@ fn scan_directory(dir: &Path) -> Result<Vec<CollectionNode>, String> {
         if path.is_dir() {
             let folder_name = file_name.clone();
 
-            let children = scan_directory(&path)?;
+            let children = scan_directory_inner(&path, visited)?;
             folders.push((
                 order_map.get(&file_name).copied().unwrap_or(usize::MAX),
                 CollectionNode::Folder {
@@ -180,6 +201,7 @@ pub fn create_request_file(
     filename: &str,
     request: &RequestFile,
 ) -> Result<PathBuf, String> {
+    let filename = sanitize_entry_name(filename)?;
     let file_path = dir.join(format!("{filename}.yaml"));
     if file_path.exists() {
         return Err(format!("File already exists: {}", file_path.display()));
@@ -190,7 +212,8 @@ pub fn create_request_file(
 
 /// Create a folder in a collection.
 pub fn create_folder(parent: &Path, name: &str) -> Result<PathBuf, String> {
-    let folder_path = parent.join(name);
+    let name = sanitize_entry_name(name)?;
+    let folder_path = parent.join(&name);
     if folder_path.exists() {
         return Err(format!("Folder already exists: {}", folder_path.display()));
     }
@@ -243,25 +266,65 @@ fn copy_dir_all(src: &Path, dst: &Path) -> Result<(), String> {
 }
 
 /// Rename a file or folder.
-pub fn rename_item(path: &Path, new_name: &str) -> Result<PathBuf, String> {
-    let parent = path.parent().ok_or("Cannot get parent directory")?;
-
-    // Sanitize the name for use as a filename:
-    // replace characters illegal on Windows and problematic on other OSes
-    let safe_name: String = new_name
+/// Turn a user-supplied name into a single safe path segment.
+///
+/// Replaces characters that are illegal on Windows or that would let the name
+/// escape its parent (`/`, `\`), strips control characters, and rejects names
+/// that are empty or resolve to `.` / `..`. Requests and folders both use this,
+/// so `../evil` can no longer be written outside the collection.
+fn sanitize_entry_name(raw: &str) -> Result<String, String> {
+    let cleaned: String = raw
         .chars()
         .map(|c| match c {
             '<' | '>' | ':' | '"' | '/' | '\\' | '|' | '?' | '*' => '-',
             c if c.is_control() => '-',
             c => c,
         })
-        .collect::<String>()
-        .trim()
-        .to_string();
+        .collect();
 
-    if safe_name.is_empty() {
+    // Windows rejects trailing dots/spaces; trim them everywhere for parity.
+    let cleaned = cleaned.trim().trim_end_matches(['.', ' ']).trim();
+
+    if cleaned.is_empty() || cleaned == "." || cleaned == ".." {
         return Err("Name cannot be empty".to_string());
     }
+    if cleaned.len() > 200 {
+        return Err("Name is too long".to_string());
+    }
+    Ok(cleaned.to_string())
+}
+
+/// Replace an entry in the parent folder's ordering list, keeping its slot.
+fn rename_in_folder_order(parent: &Path, old_key: &str, new_key: &str) {
+    if old_key == new_key {
+        return;
+    }
+    let Some(mut config) = load_folder_config(parent) else {
+        return;
+    };
+    let mut changed = false;
+    for entry in config.order.iter_mut() {
+        if entry == old_key {
+            *entry = new_key.to_string();
+            changed = true;
+        }
+    }
+    if changed {
+        if let Ok(yaml) = serde_yaml::to_string(&config) {
+            let _ = atomic_write(&parent.join("_folder.yaml"), &yaml);
+        }
+    }
+}
+
+pub fn rename_item(path: &Path, new_name: &str) -> Result<PathBuf, String> {
+    let parent = path.parent().ok_or("Cannot get parent directory")?;
+
+    let safe_name = sanitize_entry_name(new_name)?;
+    let old_key = if path.is_dir() {
+        path.file_name().map(|n| n.to_string_lossy().to_string())
+    } else {
+        path.file_stem().map(|n| n.to_string_lossy().to_string())
+    };
 
     let new_path = if path.is_dir() {
         parent.join(&safe_name)
@@ -281,10 +344,17 @@ pub fn rename_item(path: &Path, new_name: &str) -> Result<PathBuf, String> {
 
     fs::rename(path, &new_path).map_err(|e| format!("Failed to rename: {e}"))?;
 
+    // Custom ordering in `_folder.yaml` is keyed by the file stem / folder
+    // name. Without this the renamed item loses its position and jumps to the
+    // end on the next load.
+    if let Some(old_key) = old_key {
+        rename_in_folder_order(parent, &old_key, &safe_name);
+    }
+
     // If it's a request YAML, also update the name field inside
     if new_path.is_file() {
         if let Ok(mut request) = read_request(&new_path) {
-            request.name = new_name.to_string();
+            request.name = safe_name.clone();
             let _ = write_request(&new_path, &request);
         }
     }
@@ -295,7 +365,7 @@ pub fn rename_item(path: &Path, new_name: &str) -> Result<PathBuf, String> {
         if config_path.exists() {
             if let Ok(content) = fs::read_to_string(&config_path) {
                 if let Ok(mut config) = serde_yaml::from_str::<CollectionConfig>(&content) {
-                    config.name = new_name.to_string();
+                    config.name = safe_name.clone();
                     if let Ok(yaml) = serde_yaml::to_string(&config) {
                         let _ = fs::write(&config_path, yaml);
                     }
@@ -352,4 +422,96 @@ fn atomic_write(path: &Path, content: &str) -> Result<(), String> {
         let _ = fs::remove_file(&tmp_path);
         format!("Failed to rename temp file: {e}")
     })
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn sanitize_keeps_ordinary_names() {
+        assert_eq!(sanitize_entry_name("Get Users").unwrap(), "Get Users");
+        assert_eq!(sanitize_entry_name("  中文请求  ").unwrap(), "中文请求");
+    }
+
+    #[test]
+    fn sanitize_strips_path_separators_and_traversal() {
+        // Both separators must be neutralised so the name stays one segment.
+        assert_eq!(sanitize_entry_name("a/b").unwrap(), "a-b");
+        assert_eq!(sanitize_entry_name("a\\b").unwrap(), "a-b");
+        assert_eq!(sanitize_entry_name("../evil").unwrap(), "..-evil");
+        assert_eq!(sanitize_entry_name("..").is_err(), true);
+        assert_eq!(sanitize_entry_name(".").is_err(), true);
+        assert!(sanitize_entry_name("   ").is_err());
+    }
+
+    #[test]
+    fn sanitize_drops_windows_illegal_characters() {
+        assert_eq!(sanitize_entry_name("a:b*c?").unwrap(), "a-b-c-");
+        assert_eq!(sanitize_entry_name("trailing.").unwrap(), "trailing");
+    }
+
+    #[test]
+    fn create_folder_refuses_to_escape_its_parent() {
+        let dir = tempfile::tempdir().unwrap();
+        let created = create_folder(dir.path(), "../escaped").unwrap();
+        assert_eq!(
+            created.parent().unwrap().canonicalize().unwrap(),
+            dir.path().canonicalize().unwrap()
+        );
+        assert!(!dir.path().parent().unwrap().join("escaped").exists());
+    }
+
+    #[test]
+    fn create_request_file_rejects_empty_names() {
+        let dir = tempfile::tempdir().unwrap();
+        let request = RequestFile {
+            name: "r".to_string(),
+            method: crate::models::request::HttpMethod::GET,
+            url: "https://api.test".to_string(),
+            protocol: None,
+            description: None,
+            headers: Default::default(),
+            auth: None,
+            body: None,
+            params: None,
+            assert: None,
+            tests: None,
+            pre_request_script: None,
+            post_response_script: None,
+            cookies: None,
+        };
+        assert!(create_request_file(dir.path(), "  ", &request).is_err());
+    }
+
+    #[test]
+    fn rename_keeps_its_slot_in_folder_order() {
+        let dir = tempfile::tempdir().unwrap();
+        save_folder_order(dir.path(), &["a".into(), "b".into(), "c".into()]).unwrap();
+
+        rename_in_folder_order(dir.path(), "b", "beta");
+
+        let config = load_folder_config(dir.path()).unwrap();
+        assert_eq!(config.order, vec!["a", "beta", "c"]);
+    }
+
+    #[test]
+    fn renaming_an_unordered_item_leaves_the_folder_file_alone() {
+        let dir = tempfile::tempdir().unwrap();
+        rename_in_folder_order(dir.path(), "missing", "other");
+        assert!(!dir.path().join("_folder.yaml").exists());
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn scan_directory_survives_symlink_loops() {
+        let dir = tempfile::tempdir().unwrap();
+        let root = dir.path();
+        std::fs::create_dir_all(root.join("sub")).unwrap();
+        // A symlink from sub/ back to the root would recurse forever.
+        std::os::unix::fs::symlink(root, root.join("sub").join("loop")).unwrap();
+
+        let nodes = scan_directory(root).unwrap();
+        assert_eq!(nodes.len(), 1, "only the real subfolder should appear");
+    }
 }

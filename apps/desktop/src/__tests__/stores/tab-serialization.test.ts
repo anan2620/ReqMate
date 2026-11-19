@@ -162,3 +162,91 @@ describe("request file ↔ tab conversion", () => {
     expect(body.variables).toBeUndefined();
   });
 });
+
+describe("request file round-trip fidelity", () => {
+  it("keeps urlencoded and form-data rows through a save/reload cycle", () => {
+    for (const type of ["urlencoded", "form-data"] as const) {
+      const tab = createEmptyTab({ name: "Form", url: "https://api.test/form" });
+      tab.body = {
+        type,
+        content: "",
+        formData: [
+          { id: "1", key: "name", value: "ada", enabled: true },
+          { id: "2", key: "role", value: "admin", enabled: false },
+        ],
+      };
+
+      const saved = tabToRequestFile(tab);
+      expect(saved.body?.formData?.map((kv) => [kv.key, kv.value])).toEqual([
+        ["name", "ada"],
+        ["role", "admin"],
+      ]);
+
+      const reloaded = requestFileToTab(
+        { ...saved, name: "Form" },
+        "/c/form.yaml",
+        "/c",
+      );
+      expect(reloaded.body.type).toBe(type);
+      expect(reloaded.body.formData.map((kv) => [kv.key, kv.value])).toEqual([
+        ["name", "ada"],
+        ["role", "admin"],
+      ]);
+    }
+  });
+
+  it("parses legacy urlencoded bodies that only have a content string", () => {
+    const tab = requestFileToTab(
+      {
+        name: "Legacy",
+        method: "POST",
+        url: "https://api.test/form",
+        headers: {},
+        body: { type: "urlencoded", content: "a=1&b=hello+world" },
+      },
+      "/c/legacy.yaml",
+      "/c",
+    );
+
+    expect(tab.body.formData.map((kv) => [kv.key, kv.value])).toEqual([
+      ["a", "1"],
+      ["b", "hello world"],
+    ]);
+  });
+
+  it("echoes description and cookies back on save instead of dropping them", () => {
+    const tab = requestFileToTab(
+      {
+        name: "User",
+        method: "GET",
+        url: "https://api.test/user",
+        headers: {},
+        description: "Fetches the current user",
+        cookies: { session: "abc" },
+      },
+      "/c/user.yaml",
+      "/c",
+    );
+
+    const saved = tabToRequestFile(tab);
+    expect(saved.description).toBe("Fetches the current user");
+    expect(saved.cookies).toEqual({ session: "abc" });
+  });
+
+  it("never writes an assert block from the serialiser (the editor text owns it)", () => {
+    const tab = requestFileToTab(
+      {
+        name: "Checked",
+        method: "GET",
+        url: "https://api.test/x",
+        headers: {},
+        assert: { status: 200 },
+      },
+      "/c/x.yaml",
+      "/c",
+    );
+
+    expect(tab.assertions).toContain("status");
+    expect(tabToRequestFile(tab).assert).toBeUndefined();
+  });
+});

@@ -105,6 +105,10 @@ impl HttpEngine {
                 current.headers.retain(|h| !is_sensitive_header(&h.key));
                 current.auth = None;
                 current.cookies = None;
+                // The cookies harvested from the previous origin must not be
+                // attached below either — otherwise the header we just stripped
+                // is rebuilt from `all_cookies` and sent to the new host.
+                all_cookies.clear();
             }
 
             current.url = next_url;

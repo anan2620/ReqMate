@@ -43,6 +43,32 @@ export function buildUrlWithParams(baseUrl: string, params: KeyValuePair[]): str
   return `${baseUrl}?${qs}`;
 }
 
+/** Split a `a=1&b=2` payload into editor rows (legacy urlencoded bodies). */
+function parseUrlencoded(bodyType: string, content: string): KeyValuePair[] {
+  if (bodyType !== "urlencoded" || !content.trim()) return [];
+  return content
+    .split("&")
+    .filter((part) => part.trim())
+    .map((part) => {
+      const eq = part.indexOf("=");
+      const rawKey = eq === -1 ? part : part.slice(0, eq);
+      const rawValue = eq === -1 ? "" : part.slice(eq + 1);
+      const decode = (v: string) => {
+        try {
+          return decodeURIComponent(v.replace(/\+/g, " "));
+        } catch {
+          return v;
+        }
+      };
+      return {
+        id: kvId(),
+        key: decode(rawKey),
+        value: decode(rawValue),
+        enabled: true,
+      };
+    });
+}
+
 /** Build an editable tab from an on-disk request file. */
 export function requestFileToTab(
   file: RequestFile,
@@ -84,7 +110,11 @@ export function requestFileToTab(
     ? {
         type: file.body.type as RequestBody["type"],
         content: file.body.content || "",
-        formData: [],
+        formData:
+          file.body.formData && file.body.formData.length > 0
+            ? file.body.formData
+            : // Older files (and imports) keep urlencoded payloads in `content`
+              parseUrlencoded(file.body.type, file.body.content ?? ""),
       }
     : { type: "none", content: "", formData: [] };
 
@@ -172,6 +202,10 @@ export function requestFileToTab(
     postResponseScript: file.postResponseScript ?? null,
     testScript: file.tests ?? null,
     assertions: assertionsStr,
+    fileMeta: {
+      description: file.description,
+      cookies: file.cookies,
+    },
     response: null,
     error: null,
     loading: false,
@@ -201,7 +235,7 @@ export function tabToRequestFile(tab: Tab): RequestFile {
 
   // For GraphQL tabs, serialize the query/variables into a JSON body
   // so it's detected as GraphQL when loaded back (requestFileToTab checks for body.content with "query")
-  let body: { type: string; content: string } | undefined;
+  let body: { type: string; content: string; formData?: KeyValuePair[] } | undefined;
   if (tab.protocol === "graphql" && tab.graphql) {
     const gqlBody: Record<string, unknown> = { query: tab.graphql.query };
     try {
@@ -215,7 +249,14 @@ export function tabToRequestFile(tab: Tab): RequestFile {
       headers["Content-Type"] = "application/json";
     }
   } else if (tab.body.type !== "none") {
-    body = { type: tab.body.type, content: tab.body.content };
+    // urlencoded / form-data keep their rows in `formData`; writing only
+    // `content` used to drop every field on save.
+    const formData = tab.body.formData.filter((kv) => kv.key.trim());
+    body = {
+      type: tab.body.type,
+      content: tab.body.content,
+      ...(formData.length > 0 ? { formData } : {}),
+    };
   }
 
   return {
@@ -223,10 +264,12 @@ export function tabToRequestFile(tab: Tab): RequestFile {
     method: tab.protocol === "graphql" ? "POST" : tab.method,
     url: tab.url, // URL already contains query params (synced)
     protocol: tab.protocol !== "http" ? tab.protocol : undefined,
+    description: tab.fileMeta?.description,
     headers,
     params,
     auth: tab.auth.type !== "none" ? tab.auth : undefined,
     body,
+    cookies: tab.fileMeta?.cookies,
     preRequestScript: tab.preRequestScript || undefined,
     postResponseScript: tab.postResponseScript || undefined,
     tests: tab.testScript || undefined,

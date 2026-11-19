@@ -29,13 +29,16 @@ export const useEnvironmentStore = create<EnvironmentState>((set, get) => ({
   loadEnvironments: async (collectionPath) => {
     try {
       const envs = await loadEnvironmentsApi(collectionPath);
+      // The previously selected environment belongs to another collection;
+      // carrying its name over makes every {{variable}} fail to resolve.
+      const previous = get().activeEnvironmentName;
+      const stillExists = previous && envs.some((e) => e.name === previous);
       set({
         environments: envs,
         activeCollectionPath: collectionPath,
-        // Auto-select first environment if none selected
-        activeEnvironmentName:
-          get().activeEnvironmentName ??
-          (envs.length > 0 ? envs[0].name : null),
+        activeEnvironmentName: stillExists
+          ? previous
+          : (envs.length > 0 ? envs[0].name : null),
       });
     } catch (err) {
       import("@/stores/toast-store").then(({ useToastStore }) =>

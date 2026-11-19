@@ -257,7 +257,7 @@ export interface RequestFile {
   description?: string;
   headers: Record<string, string>;
   auth?: AuthConfig;
-  body?: { type: string; content: string };
+  body?: { type: string; content: string; formData?: KeyValuePair[] };
   params?: Record<string, string>;
   preRequestScript?: string;
   postResponseScript?: string;
@@ -337,6 +337,11 @@ export interface AppSettings {
   layout: "horizontal" | "vertical" | "tabbed";
   /** Persist request edits automatically (debounced) instead of waiting for an explicit save */
   autoSave: boolean;
+  /**
+   * Directory new collections are created in. Existing collections keep their
+   * own path — changing this never moves anything.
+   */
+  defaultCollectionPath: string;
 }
 
 // ── Tab Protocol ──
@@ -609,7 +614,10 @@ export interface WindowState {
 
 export interface PersistedState {
   tabs: PersistedTab[];
+  /** Index into `tabs`. Kept for older builds; prefer `activeTabPath`. */
   activeTabIndex: number | null;
+  /** File path of the tab that was active — survives tabs failing to restore. */
+  activeTabPath?: string | null;
   windowState?: WindowState;
   collections?: string[];
 }
@@ -664,6 +672,15 @@ export interface Tab {
   // Undo/redo stacks (internal, not persisted)
   undoStack: TabSnapshot[];
   redoStack: TabSnapshot[];
+
+  /**
+   * Fields read from the request file that the editor does not expose yet.
+   * Echoed back verbatim on save so a round-trip never deletes them.
+   */
+  fileMeta?: {
+    description?: string;
+    cookies?: Record<string, string>;
+  };
 }
 
 /** Subset of Tab fields that we snapshot for undo/redo */

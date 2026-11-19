@@ -15,6 +15,8 @@
     "ok": "확인"
   },
   "sidebar": {
+    "folderNamePlaceholder": "폴더 이름",
+    "requestNamePlaceholder": "요청 이름",
     "collections": "컬렉션",
     "history": "기록",
     "environments": "환경",
@@ -36,9 +38,13 @@
     "import": "가져오기",
     "closeCollection": "컬렉션 닫기",
     "deleteCollection": "컬렉션 삭제",
+    "deleteCollectionConfirm": "컬렉션 \"{{name}}\"을(를) 삭제할까요? 컬렉션 전체가 휴지통으로 이동합니다.",
     "collectionName": "컬렉션 이름",
     "collectionNamePlaceholder": "내 API",
     "location": "위치",
+    "changeLocation": "변경",
+    "willCreate": "생성 위치: {{path}}",
+    "defaultLocationFallback": "내장 기본 위치 사용",
     "creating": "생성 중...",
     "exportPostman": "Postman으로 내보내기",
     "exportOpenapi": "OpenAPI로 내보내기",
@@ -54,7 +60,11 @@
     "addVariable": "변수 추가",
     "importEnvironment": "환경 가져오기 (Postman JSON)",
     "collectionDefaults": "컬렉션 기본값",
-    "collectionDefaultsDesc": "여기서 설정한 인증은 자체 인증이 없는 모든 요청에 상속됩니다."
+    "collectionDefaultsDesc": "여기서 설정한 인증은 자체 인증이 없는 모든 요청에 상속됩니다.",
+    "environmentNamePlaceholder": "예: 개발, 스테이징, 운영",
+    "scopeLocal": "로컬",
+    "scopeShared": "공유",
+    "scopePersonal": "개인"
   },
   "tabs": {
     "untitled": "제목 없는 요청",
@@ -73,7 +83,10 @@
     "httpRequest": "HTTP 요청",
     "importCurl": "cURL 가져오기",
     "saveAs": "다른 이름으로 저장…",
-    "saveOptions": "저장 옵션"
+    "saveOptions": "저장 옵션",
+    "scrollLeft": "탭 왼쪽으로 스크롤",
+    "scrollRight": "탭 오른쪽으로 스크롤",
+    "newTabShortcut": "새 탭 (Ctrl+T)"
   },
   "request": {
     "send": "전송",
@@ -107,7 +120,10 @@
     "requestName": "요청 이름",
     "requestNamePlaceholder": "내 요청",
     "filename": "파일 이름:",
-    "saveRequest": "요청 저장"
+    "noCollectionsToSave": "열린 컬렉션이 없습니다. 먼저 컬렉션을 여세요.",
+    "saveRequest": "요청 저장",
+    "httpMethod": "HTTP 메서드",
+    "importCurl": "cURL 가져오기"
   },
   "body": {
     "json": "JSON",
@@ -171,7 +187,8 @@
     "certificate": "IdP 인증서 (PEM)",
     "nameIdFormat": "NameID 형식",
     "samlToken": "SAML 어설션 토큰",
-    "apiKeyHeader": "헤더 이름"
+    "apiKeyHeader": "헤더 이름",
+    "keyNamePlaceholder": "키 이름(예: X-API-Key)"
   },
   "response": {
     "body": "본문",
@@ -199,7 +216,25 @@
       "redirect": "리다이렉트",
       "clientError": "클라이언트 오류",
       "serverError": "서버 오류"
-    }
+    },
+    "selectSnapshot": "스냅샷 선택…",
+    "assertions": "어설션",
+    "compareTitle": "응답 비교",
+    "diffEmpty": "\"비교용으로 저장\"으로 응답을 저장한 뒤 위에서 선택하세요.",
+    "headerCount": "헤더 {{count}}개",
+    "identical": "응답이 동일합니다.",
+    "left": "왼쪽",
+    "right": "오른쪽",
+    "responseSize": "응답 크기",
+    "responseTime": "응답 시간",
+    "speedAcceptable": "허용",
+    "speedFast": "빠름",
+    "speedSlow": "느림",
+    "speedVerySlow": "매우 느림",
+    "status": "상태",
+    "thresholds": "성능 임계값",
+    "transfer": "전송",
+    "transferSpeed": "전송 속도"
   },
   "environment": {
     "title": "환경",
@@ -279,9 +314,27 @@
     "saving": "저장",
     "autoSave": "요청 변경 사항 자동 저장",
     "autoSaveDesc": "입력이 멈춘 뒤 1초 후에 디스크에 저장합니다. 끄면 저장 버튼을 누를 때까지 변경 사항이 편집기에 남습니다.",
+    "defaultCollectionPath": "컬렉션 기본 저장 위치",
+    "defaultCollectionPathDesc": "새 컬렉션은 이 폴더에 만들어집니다. 변경해도 이미 있는 컬렉션의 위치는 그대로 유지됩니다.",
+    "defaultCollectionPathPlaceholder": "폴더 선택…",
     "aiAssistant": "AI 어시스턴트",
     "designTokens": "색상 팔레트",
-    "toggleTheme": "테마 전환"
+    "toggleTheme": "테마 전환",
+    "caCertPathPlaceholder": "CA 인증서 경로(.pem, .crt)",
+    "clientCertPathPlaceholder": "클라이언트 인증서 경로(.pem, .crt, .pfx)",
+    "clientKeyPathPlaceholder": "클라이언트 개인 키 경로(.pem, .key)",
+    "passphrasePlaceholder": "암호(선택)",
+    "apiEndpoint": "API 엔드포인트",
+    "apiEndpointDesc": "OpenAI 호환 엔드포인트(OpenAI, Ollama, LM Studio 등)",
+    "apiKey": "API 키",
+    "model": "모델",
+    "systemPackageUpdate": "시스템 패키지 설치(.deb/.rpm)에서는 자동 업데이트를 사용할 수 없습니다.",
+    "paletteDesc": "현재 테마의 색상 팔레트입니다. 테마 제작자와 플러그인 개발자에게 유용합니다.",
+    "shortcutConflicts": "일부 단축키가 충돌합니다. 같은 조합에서는 하나의 동작만 실행됩니다.",
+    "pressNewShortcut": "새 단축키를 누르세요…",
+    "rebind": "다시 지정",
+    "zenNote": "Esc는 항상 Zen 모드를 종료합니다(변경 불가)",
+    "resetDefaults": "기본값으로 재설정"
   },
   "runner": {
     "title": "컬렉션 러너",
@@ -294,7 +347,10 @@
     "passed": "통과",
     "failed": "실패",
     "skipped": "건너뜀",
-    "duration": "소요 시간"
+    "duration": "소요 시간",
+    "noResults": "아직 결과가 없습니다",
+    "runCollection": "컬렉션 실행",
+    "stopOnError": "오류 시 중지"
   },
   "import": {
     "title": "컬렉션 가져오기",
@@ -383,7 +439,10 @@
     "value": "값",
     "saved": "저장됨",
     "savedTo": "“{{name}}” 저장됨",
-    "saveFailed": "저장 실패: {{reason}}"
+    "saveFailed": "저장 실패: {{reason}}",
+    "removeRow": "행 삭제",
+    "dismiss": "닫기",
+    "dismissHint": "힌트 닫기"
   },
   "errors": {
     "connectionRefused": "연결이 거부되었습니다 — 서버가 실행 중인가요?",
@@ -435,7 +494,14 @@
     "requestBody": "요청 본문 (JSON)",
     "responseBody": "응답",
     "loadProtoToStart": ".proto 파일을 로드하여 시작하세요",
-    "selectMethodToSend": "메서드를 선택하고 요청을 전송하세요"
+    "selectMethodToSend": "메서드를 선택하고 요청을 전송하세요",
+    "selectService": "서비스 선택",
+    "filterMethods": "메서드 필터…",
+    "messagesCount": "메시지 {{count}}개",
+    "responseMetadata": "응답 메타데이터",
+    "sending": "gRPC 요청 보내는 중…",
+    "streamComplete": "스트림 완료",
+    "streaming": "수신 중…"
   },
   "graphql": {
     "query": "GraphQL 쿼리",
@@ -445,9 +511,16 @@
     "fetchSchema": "스키마 가져오기 (인트로스펙션)",
     "fetchingSchema": "가져오는 중...",
     "schema": "스키마",
-    "schemaTypes": "스키마 타입"
+    "schemaTypes": "스키마 타입",
+    "clearMessages": "메시지 지우기",
+    "autoScroll": "자동 스크롤",
+    "listening": "수신 중…",
+    "stop": "중지",
+    "subscription": "구독",
+    "subscribe": "구독"
   },
   "mock": {
+    "selectCollection": "컬렉션 선택",
     "title": "Mock 서버",
     "start": "Mock 서버 시작",
     "stop": "중지",
@@ -470,6 +543,7 @@
     "newMockServer": "새 Mock 서버"
   },
   "monitor": {
+    "selectCollection": "컬렉션 선택",
     "title": "모니터",
     "create": "모니터 만들기",
     "schedule": "일정",
@@ -478,7 +552,13 @@
     "enabled": "활성화됨",
     "disabled": "비활성화됨",
     "createDesc": "자동 컬렉션 실행을 예약하세요",
-    "newMonitor": "새 모니터"
+    "newMonitor": "새 모니터",
+    "schedule": "일정",
+    "environmentOptional": "환경(선택)",
+    "webhookOptional": "Webhook URL(선택)",
+    "noneConfigured": "구성된 모니터가 없습니다",
+    "notifyOnFailure": "실패 시 알림",
+    "selectToView": "모니터를 선택해 결과 보기"
   },
   "docs": {
     "title": "API 문서",
@@ -517,6 +597,63 @@
     "readOnly": "읽기 전용으로 열기",
     "upgradeHint": "업그레이드하면 컬렉션 파일이 다시 작성됩니다. 먼저 변경 사항을 커밋하세요."
   },
+  "mqtt": {
+    "brokerHost": "브로커 호스트",
+    "connect": "연결",
+    "connecting": "연결 중…",
+    "disconnect": "연결 해제",
+    "statusConnected": "연결됨",
+    "statusConnecting": "연결 중",
+    "statusDisconnected": "연결 안 됨",
+    "connectionSettings": "연결 설정",
+    "clientId": "클라이언트 ID",
+    "authentication": "인증",
+    "username": "사용자 이름",
+    "password": "비밀번호",
+    "subscribe": "구독",
+    "topicPlaceholder": "토픽(예: sensor/#)",
+    "qos": "QoS",
+    "publish": "발행",
+    "topic": "토픽",
+    "retain": "보존",
+    "payloadPlaceholder": "메시지 본문",
+    "messagesCount": "메시지: {{count}}",
+    "sentCount": "보냄: {{count}}",
+    "receivedCount": "받음: {{count}}",
+    "topicsCount": "토픽: {{count}}",
+    "filterPlaceholder": "토픽으로 필터…",
+    "autoScroll": "자동 스크롤",
+    "clearLog": "로그 지우기",
+    "emptyConnected": "아직 메시지가 없습니다 — 토픽을 구독하세요",
+    "emptyDisconnected": "시작하려면 브로커에 연결하세요",
+    "qosValue": "QoS {{qos}}",
+    "retained": "보존됨"
+  },
+  "socketio": {
+    "connect": "연결",
+    "connecting": "연결 중…",
+    "disconnect": "연결 해제",
+    "statusConnected": "연결됨",
+    "statusConnecting": "연결 중",
+    "statusDisconnected": "연결 안 됨",
+    "headers": "Headers",
+    "headerKey": "Header",
+    "headerValue": "Value",
+    "serverInfo": "서버 정보",
+    "emitEvent": "이벤트 보내기",
+    "eventPlaceholder": "이벤트 이름(예: message, chat)",
+    "argsPlaceholder": "인수(JSON) 예: \"hello\", {\"msg\": \"hi\"}, [\"a\", 1]",
+    "emit": "보내기",
+    "eventsCount": "이벤트: {{count}}",
+    "emittedCount": "보냄: {{count}}",
+    "receivedCount": "받음: {{count}}",
+    "namespaceValue": "네임스페이스: {{namespace}}",
+    "filterPlaceholder": "이벤트 필터…",
+    "autoScroll": "자동 스크롤",
+    "clearLog": "로그 지우기",
+    "emptyConnected": "아직 이벤트가 없습니다 — 보내거나 수신하세요",
+    "emptyDisconnected": "연결하면 시작됩니다"
+  },
   "websocket": {
     "connect": "연결",
     "disconnect": "연결 해제",
@@ -524,7 +661,8 @@
     "connected": "연결됨",
     "disconnected": "연결 해제됨",
     "messages": "메시지",
-    "connectToStart": "연결하여 스트리밍 시작"
+    "connectToStart": "연결하여 스트리밍 시작",
+    "clearLog": "로그 지우기"
   },
   "sse": {
     "connect": "연결",
@@ -532,9 +670,47 @@
     "events": "이벤트",
     "connected": "연결됨",
     "disconnected": "연결 해제됨",
-    "connectToStart": "연결하여 스트리밍 시작"
+    "connectToStart": "연결하여 스트리밍 시작",
+    "filterPlaceholder": "이벤트 유형으로 필터…"
   },
   "ai": {
+    "optional": "선택 사항",
+    "settings": "설정",
+    "clearChat": "대화 지우기",
+    "setupTitle": "AI 어시스턴트 — 선택 기능",
+    "setupDesc": "이 기능은 자신의 API 키가 필요한 선택 기능입니다(BYOK). ReqMate는 AI 서비스를 포함하거나 제공하지 않으며, 직접 연결합니다.",
+    "setupStepsTitle": "시작하려면:",
+    "setupStep1": "사용하는 AI 제공자에서 API 키를 발급받으세요",
+    "setupStep2": "설정 → AI에서 엔드포인트, 키, 모델을 입력하세요",
+    "setupStep3": "대화를 시작하거나 요청을 생성하세요",
+    "setupSupports": "OpenAI 호환 API를 모두 지원합니다: OpenAI, Ollama, LM Studio 등.",
+    "openSettings": "설정 열기",
+    "setupNote": "AI를 설정하지 않아도 ReqMate의 다른 기능은 모두 동작합니다.",
+    "banner": "이 선택 기능은 자신의 AI 제공자에 연결합니다. ReqMate는 AI 서비스를 포함하지 않습니다.",
+    "bannerErrors": "아래 오류가 보이면 다음에서 API 키나 엔드포인트를 확인하세요:",
+    "settingsAi": "설정 → AI",
+    "emptyHint": "API에 대해 무엇이든 물어보고, 요청을 생성하거나 테스트를 만들 수 있습니다.",
+    "thinking": "생각 중…",
+    "generateTests": "테스트 생성",
+    "inputPlaceholder": "API 요청을 설명하세요…",
+    "errorOwnKey": "이 선택 기능은 자신의 API 키를 사용합니다.",
+    "checkSettings": "설정 → AI 확인",
+    "runIt": "실행",
+    "runMyself": "직접 실행할게요",
+    "applyToTab": "현재 탭에 적용",
+    "applyTests": "테스트 적용",
+    "debugEndpoint": "엔드포인트",
+    "debugModel": "모델",
+    "debugDuration": "소요 시간",
+    "debugPrompt": "프롬프트",
+    "msgUnreachable": "AI 제공자에 연결할 수 없습니다",
+    "msgGenerateTestsRequest": "현재 응답에 대한 테스트 생성",
+    "msgTestsGenerated": "응답에 대한 테스트를 생성했습니다:",
+    "msgGenerateTestsFailed": "테스트를 생성할 수 없습니다 — AI 제공자 설정을 확인하세요",
+    "msgRequestApplied": "요청을 적용했습니다! 전송할까요?",
+    "msgRunDone": "완료했습니다! 결과와 테스트는 응답 패널에서 확인하세요.",
+    "msgRunDismissed": "괜찮습니다. 언제든 직접 전송할 수 있습니다.",
+    "msgTestsApplied": "테스트를 적용했습니다! 전송해서 실행할까요?",
     "title": "AI 어시스턴트",
     "comingSoon": "AI Assistant",
     "comingSoonDesc": "Generate API requests from natural language and auto-generate tests from responses. Configure your AI provider in Settings."
@@ -583,9 +759,57 @@
     "collection": "컬렉션 \"{{name}}\"을(를) 삭제하시겠습니까? 전체 컬렉션이 휴지통으로 이동됩니다."
   },
   "audit": {
-    "title": "감사 로그"
+    "title": "감사 로그",
+    "requestSent": "요청 전송",
+    "collectionOpened": "컬렉션 열기",
+    "environmentChanged": "환경 전환",
+    "requestSaved": "요청 저장",
+    "requestDeleted": "요청 삭제",
+    "settingsChanged": "설정 변경",
+    "justNow": "방금 전",
+    "minutesAgo": "{{count}}분 전",
+    "hoursAgo": "{{count}}시간 전",
+    "daysAgo": "{{count}}일 전",
+    "events": "이벤트 {{count}}개",
+    "clearLogs": "감사 로그 지우기",
+    "empty": "아직 감사 이벤트가 없습니다",
+    "emptyHint": "앱을 사용하면 작업이 기록됩니다",
+    "loadingMore": "더 불러오는 중…"
   },
+  "git": {
+    "title": "Git",
+    "noCollections": "Git을 사용하려면 컬렉션을 여세요",
+    "notARepo": "이 컬렉션은 Git 저장소가 아닙니다",
+    "initRepo": "Git 저장소 초기화",
+    "selectCollection": "컬렉션 선택",
+    "collection": "컬렉션",
+    "refresh": "새로 고침",
+    "ahead": "{{count}}개 앞섬",
+    "behind": "{{count}}개 뒤짐",
+    "pull": "풀",
+    "push": "푸시",
+    "staged": "스테이징됨 ({{count}})",
+    "changes": "변경 사항 ({{count}})",
+    "stageAll": "모두 스테이징",
+    "unstageAll": "모두 스테이징 해제",
+    "stage": "스테이징",
+    "unstage": "스테이징 해제",
+    "clean": "작업 트리가 깨끗합니다",
+    "commitPlaceholder": "커밋 메시지…",
+    "commit": "커밋 ({{count}})",
+    "history": "기록 ({{count}})",
+    "noCommits": "아직 커밋이 없습니다"
+  },
+
+  "terminal": {
+    "restart": "터미널 재시작",
+    "failedToCreate": "터미널을 만들 수 없습니다: {{error}}",
+    "processExited": "[프로세스 종료됨]",
+    "loading": "터미널 불러오는 중…"
+  },
+
   "proxy": {
+    "captured": "{{count}}개 캡처됨",
     "title": "프록시 캡처",
     "running": "실행 중",
     "stopped": "중지됨",

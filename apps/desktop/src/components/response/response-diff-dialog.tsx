@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import * as Dialog from "@radix-ui/react-dialog";
 import { X, ArrowLeftRight } from "lucide-react";
 import { useDiffStore, type SavedSnapshot } from "@/stores/diff-store";
@@ -14,6 +15,7 @@ function tryFormat(body: string): string {
 }
 
 export function ResponseDiffDialog() {
+  const { t } = useTranslation();
   const { isOpen, close, leftResponse, rightResponse, snapshots, setLeft, setRight } = useDiffStore();
   const [diffMode, setDiffMode] = useState<"body" | "headers">("body");
 
@@ -39,20 +41,20 @@ export function ResponseDiffDialog() {
           <div className="flex items-center justify-between border-b border-[var(--color-border)] px-4 py-3">
             <Dialog.Title className="flex items-center gap-2 text-sm font-semibold text-[var(--color-text-primary)]">
               <ArrowLeftRight className="h-4 w-4" />
-              Compare Responses
+              {t("response.compareTitle")}
             </Dialog.Title>
             <div className="flex items-center gap-2">
               <button
                 onClick={() => setDiffMode("body")}
                 className={`rounded px-2 py-1 text-xs ${diffMode === "body" ? "bg-blue-500/20 text-blue-400" : "text-[var(--color-text-muted)]"}`}
               >
-                Body
+                {t("response.body")}
               </button>
               <button
                 onClick={() => setDiffMode("headers")}
                 className={`rounded px-2 py-1 text-xs ${diffMode === "headers" ? "bg-blue-500/20 text-blue-400" : "text-[var(--color-text-muted)]"}`}
               >
-                Headers
+                {t("response.headers")}
               </button>
               <Dialog.Close className="rounded p-1 hover:bg-[var(--color-elevated)]">
                 <X className="h-4 w-4 text-[var(--color-text-muted)]" />
@@ -62,19 +64,19 @@ export function ResponseDiffDialog() {
 
           {/* Snapshot selectors */}
           <div className="flex gap-4 border-b border-[var(--color-border)] px-4 py-2">
-            <SnapshotSelector label="Left" snapshots={snapshots} onSelect={(s) => setLeft(s.response)} />
-            <SnapshotSelector label="Right" snapshots={snapshots} onSelect={(s) => setRight(s.response)} />
+            <SnapshotSelector label={t("response.left")} snapshots={snapshots} onSelect={(s) => setLeft(s.response)} />
+            <SnapshotSelector label={t("response.right")} snapshots={snapshots} onSelect={(s) => setRight(s.response)} />
           </div>
 
           {/* Diff content */}
           <div className="max-h-[55vh] overflow-auto">
             {!leftResponse || !rightResponse ? (
               <div className="flex items-center justify-center py-12 text-sm text-[var(--color-text-dimmed)]">
-                Save responses using "Save for Diff", then select them above to compare.
+                {t("response.diffEmpty")}
               </div>
             ) : !hasChanges ? (
               <div className="flex items-center justify-center py-12 text-sm text-green-500">
-                Responses are identical.
+                {t("response.identical")}
               </div>
             ) : (
               <div className="font-mono text-xs">
@@ -131,6 +133,7 @@ function SnapshotSelector({
   snapshots: SavedSnapshot[];
   onSelect: (snapshot: SavedSnapshot) => void;
 }) {
+  const { t } = useTranslation();
   const [value, setValue] = useState("");
   return (
     <div className="flex flex-1 items-center gap-2">
@@ -147,7 +150,7 @@ function SnapshotSelector({
             value: String(i),
             label: `${s.label} (${new Date(s.savedAt).toLocaleTimeString()})`,
           }))}
-          placeholder="Select snapshot..."
+          placeholder={t("response.selectSnapshot")}
           aria-label={label}
         />
       </div>

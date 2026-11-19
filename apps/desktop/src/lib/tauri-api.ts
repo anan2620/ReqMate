@@ -132,8 +132,17 @@ export async function readRequestFile(path: string): Promise<RequestFile> {
 export async function saveRequestFile(
   path: string,
   request: RequestFile,
+  /**
+   * Assertions editor text. Parsed to YAML on the Rust side; pass `undefined`
+   * to keep `request.assert` as-is and `""` to clear the block.
+   */
+  assertYaml?: string | null,
 ): Promise<void> {
-  return await invoke<void>("save_request_file", { path, request });
+  return await invoke<void>("save_request_file", {
+    path,
+    request,
+    assertYaml: assertYaml ?? null,
+  });
 }
 
 export async function createRequest(

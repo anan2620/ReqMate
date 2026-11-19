@@ -161,6 +161,8 @@
   --color-activity-bar: #e6e9ee;
   --color-card: #ffffff;
   --color-card-hover: #f3f5f8;
+  /* Input fill — one step lighter than --color-elevated so fields stay airy */
+  --color-input: #f7f8fa;
   --color-success: #0b8f62;
   --color-warning: #b8690a;
   --color-error: #cf3348;
@@ -185,12 +187,14 @@
   --color-border: #242a33;
   --color-border-strong: #38404c;
   --color-text-primary: #edf0f5;
-  --color-text-secondary: #a9b3c1;
-  --color-text-muted: #7d8898;
-  --color-text-dimmed: #5c6675;
+  --color-text-secondary: #bcc6d3;
+  --color-text-muted: #98a3b3;
+  --color-text-dimmed: #7d8898;
   --color-activity-bar: #0d1014;
   --color-card: #15181e;
   --color-card-hover: #1e232b;
+  /* Input fill — slightly lifted off the card so fields read as editable */
+  --color-input: #191d24;
   --color-success: #2fbd8b;
   --color-warning: #e0a13a;
   --color-error: #ef5b6b;
@@ -267,12 +271,14 @@
   --color-border: #1e2127;
   --color-border-strong: #2e333b;
   --color-text-primary: #edf0f5;
-  --color-text-secondary: #a9b3c1;
-  --color-text-muted: #7d8898;
-  --color-text-dimmed: #58616f;
+  --color-text-secondary: #bcc6d3;
+  --color-text-muted: #98a3b3;
+  --color-text-dimmed: #7d8898;
   --color-activity-bar: #000000;
   --color-card: #0c0e11;
   --color-card-hover: #16191d;
+  /* Input fill — slightly lifted off the card so fields read as editable */
+  --color-input: #111318;
   --color-success: #2fbd8b;
   --color-warning: #e0a13a;
   --color-error: #ef5b6b;
