@@ -18,8 +18,6 @@ use rcgen::{
     KeyUsagePurpose, PKCS_ECDSA_P256_SHA256,
 };
 use rustls::crypto::CryptoProvider;
-#[cfg(test)]
-use rustls::pki_types::CertificateDer;
 use rustls::pki_types::{PrivateKeyDer, PrivatePkcs8KeyDer};
 use rustls::server::{ClientHello, ResolvesServerCert};
 use rustls::sign::{CertifiedKey, SigningKey};

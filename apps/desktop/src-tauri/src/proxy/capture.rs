@@ -1,4 +1,4 @@
-use std::collections::{HashMap, VecDeque};
+use std::collections::{HashMap, HashSet, VecDeque};
 use std::net::SocketAddr;
 use std::sync::{Arc, Mutex};
 use std::time::{Duration, Instant};
@@ -41,6 +41,14 @@ const TLS_HANDSHAKE_TIMEOUT: Duration = Duration::from_secs(30);
 /// into memory. Debugging needs the first kilobytes, not a video file.
 const MAX_BUFFERED_RESPONSE: u64 = 8 * 1024 * 1024;
 
+/// Capture bodies shown for the three reasons a tunnel is not decrypted.
+const TUNNEL_NOTE_NO_CA: &str = "TLS tunnel (not intercepted) — generate and install the CA \
+     certificate to see HTTPS requests and responses.";
+const TUNNEL_NOTE_PASSTHROUGH: &str = "Passthrough domain — relayed without capture.";
+const TUNNEL_NOTE_DEGRADED: &str = "HTTPS capture skipped for this host — an earlier TLS \
+     handshake failed (certificate pinning, or the CA is not trusted) or the connection needed \
+     a protocol upgrade. It is relayed untouched so the request keeps working.";
+
 /// A captured HTTP request/response pair.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -81,6 +89,13 @@ pub(crate) struct ProxyState {
     /// `None` when the CA has not been generated yet: HTTPS then stays a blind
     /// tunnel instead of breaking every site with an untrusted certificate.
     mitm: Option<Arc<CertAuthority>>,
+    /// Hosts that must not be decrypted again in this session.
+    ///
+    /// Two cases end up here: the client rejected our certificate (pinning, or a
+    /// CA the user has not installed yet), and the connection needed a protocol
+    /// upgrade we cannot proxy. Both would fail on *every* connection otherwise,
+    /// so after one failure the host is relayed blindly — degraded, but working.
+    tunnel_only: Arc<Mutex<HashSet<String>>>,
 }
 
 pub struct ProxyCaptureManager {
@@ -178,6 +193,7 @@ impl ProxyCaptureManager {
             client,
             listen_port: actual_port,
             mitm,
+            tunnel_only: Arc::new(Mutex::new(HashSet::new())),
         });
         *self.mitm_active.lock().unwrap() = state.mitm.is_some();
 
@@ -387,7 +403,30 @@ async fn handle_connect(mut client: TcpStream, state: Arc<ProxyState>, peer: Soc
     // Passthrough domains are explicitly excluded from capture, so there is
     // nothing to decrypt — relay their bytes untouched.
     if host_is_passthrough(&state, &host) {
-        relay_tunnel(client, &authority, &state, start, false).await;
+        relay_tunnel(
+            client,
+            &authority,
+            &state,
+            start,
+            false,
+            TUNNEL_NOTE_PASSTHROUGH,
+        )
+        .await;
+        return;
+    }
+
+    // Already known to be uninterceptable: keep the request working rather than
+    // presenting a certificate this client will reject again.
+    if is_tunnel_only(&state, &host) {
+        relay_tunnel(
+            client,
+            &authority,
+            &state,
+            start,
+            false,
+            TUNNEL_NOTE_DEGRADED,
+        )
+        .await;
         return;
     }
 
@@ -403,8 +442,10 @@ async fn handle_connect(mut client: TcpStream, state: Arc<ProxyState>, peer: Soc
             match intercept(client, &host, port, mitm, Arc::clone(&state), peer).await {
                 Ok(()) => return,
                 Err(err) => {
-                    // Almost always "the CA is not trusted yet": the client
-                    // aborted the handshake right after its warning page.
+                    // Almost always "the CA is not trusted yet", or a client that
+                    // pins certificates. Either way, stop intercepting this host
+                    // so it does not fail on every single connection.
+                    mark_tunnel_only(&state, &host);
                     record_and_emit(
                         &state,
                         CapturedRequest {
@@ -430,11 +471,11 @@ async fn handle_connect(mut client: TcpStream, state: Arc<ProxyState>, peer: Soc
         }
 
         // A CONNECT to something that is not TLS (e.g. a plain port): relay.
-        relay_tunnel(client, &authority, &state, start, true).await;
+        relay_tunnel(client, &authority, &state, start, true, TUNNEL_NOTE_NO_CA).await;
         return;
     }
 
-    relay_tunnel(client, &authority, &state, start, false).await;
+    relay_tunnel(client, &authority, &state, start, false, TUNNEL_NOTE_NO_CA).await;
 }
 
 /// Terminate TLS for one tunnel and serve the decrypted HTTP/1.1.
@@ -473,6 +514,7 @@ async fn relay_tunnel(
     state: &ProxyState,
     start: Instant,
     announced: bool,
+    note: &str,
 ) {
     use tokio::io::AsyncWriteExt;
 
@@ -493,11 +535,7 @@ async fn relay_tunnel(
                     request_body: None,
                     status: Some(200),
                     response_headers: HashMap::new(),
-                    response_body: Some(
-                        "TLS tunnel (not intercepted) — generate and install the CA certificate \
-                         to see HTTPS requests and responses."
-                            .to_string(),
-                    ),
+                    response_body: Some(note.to_string()),
                     time_ms: start.elapsed().as_millis() as u64,
                     timestamp: chrono::Utc::now().to_rfc3339(),
                 },
@@ -529,6 +567,21 @@ async fn relay_tunnel(
             }
         }
     }
+}
+
+/// Stop trying to decrypt this host for the rest of the session.
+fn mark_tunnel_only(state: &ProxyState, host: &str) {
+    if let Ok(mut hosts) = state.tunnel_only.lock() {
+        hosts.insert(host.to_ascii_lowercase());
+    }
+}
+
+fn is_tunnel_only(state: &ProxyState, host: &str) -> bool {
+    state
+        .tunnel_only
+        .lock()
+        .map(|hosts| hosts.contains(&host.to_ascii_lowercase()))
+        .unwrap_or(false)
 }
 
 /// True when the next bytes are a TLS handshake record (0x16 = handshake).
@@ -733,7 +786,12 @@ async fn handle_http(
             if status == 101 {
                 // An upgraded connection belongs to the two peers; hyper cannot
                 // hand the socket back to us, so a WebSocket would hang forever.
-                let message = "WebSocket upgrade is not supported while HTTPS capture is on —                                turn the proxy off for this connection.";
+                // Remember the host so its next connection is relayed blindly.
+                if let Some(ctx) = &ctx {
+                    mark_tunnel_only(&state, &ctx.host);
+                }
+                let message = "WebSocket upgrade is not supported while HTTPS capture is on — \
+                               the next connection to this host is relayed without capture.";
                 record_and_emit(
                     &state,
                     CapturedRequest {
@@ -1066,6 +1124,7 @@ mod tests {
                 .unwrap(),
             listen_port: addr.port(),
             mitm,
+            tunnel_only: Arc::new(Mutex::new(HashSet::new())),
         });
         let serve_state = Arc::clone(&state);
         let (tx, rx) = tokio::sync::oneshot::channel::<()>();
@@ -1381,7 +1440,7 @@ mod tests {
     #[tokio::test]
     async fn https_keep_alive_serves_several_requests() {
         use rustls::pki_types::ServerName;
-        use tokio::io::{AsyncReadExt as _, AsyncWriteExt as _};
+        use tokio::io::AsyncWriteExt as _;
         use tokio_rustls::TlsConnector;
 
         let (authority, ca_cert_der) = test_authority();
@@ -1447,10 +1506,91 @@ mod tests {
         assert!(captures[1].url.ends_with("/two"));
     }
 
+    /// A host whose TLS handshake failed must not be retried forever: the next
+    /// connection is relayed untouched, so the request still goes through.
+    #[tokio::test]
+    async fn failed_handshake_downgrades_the_host_to_a_tunnel() {
+        use tokio::io::{AsyncReadExt, AsyncWriteExt as _};
+
+        let echo = TcpListener::bind("127.0.0.1:0").await.unwrap();
+        let echo_addr = echo.local_addr().unwrap();
+        tokio::spawn(async move {
+            while let Ok((mut sock, _)) = echo.accept().await {
+                tokio::spawn(async move {
+                    let mut buf = [0u8; 32];
+                    if let Ok(n) = tokio::io::AsyncReadExt::read(&mut sock, &mut buf).await {
+                        let _ = tokio::io::AsyncWriteExt::write_all(&mut sock, &buf[..n]).await;
+                    }
+                });
+            }
+        });
+
+        let (authority, _ca_der) = test_authority();
+        let (proxy_addr, state) = spawn_proxy_inner(Some(authority)).await;
+
+        // A TLS-looking prefix that is not a valid ClientHello: the handshake
+        // fails exactly like a client rejecting our certificate.
+        let mut first = TcpStream::connect(proxy_addr).await.unwrap();
+        let connect = format!(
+            "CONNECT localhost:{} HTTP/1.1\r\nHost: localhost\r\n\r\n",
+            echo_addr.port()
+        );
+        tokio::io::AsyncWriteExt::write_all(&mut first, connect.as_bytes())
+            .await
+            .unwrap();
+        assert!(read_head(&mut first).await.starts_with("HTTP/1.1 200"));
+        tokio::io::AsyncWriteExt::write_all(&mut first, b"\x16\x03\x01\x00\x02hi")
+            .await
+            .unwrap();
+        let _ = first.shutdown().await;
+
+        // Wait for the proxy to give up on this host.
+        for _ in 0..100 {
+            if !state.captures.lock().unwrap().is_empty() {
+                break;
+            }
+            tokio::time::sleep(Duration::from_millis(20)).await;
+        }
+        assert_eq!(state.captures.lock().unwrap().len(), 1);
+
+        // Same host again: relayed blindly, and the bytes come back.
+        let mut second = TcpStream::connect(proxy_addr).await.unwrap();
+        tokio::io::AsyncWriteExt::write_all(&mut second, connect.as_bytes())
+            .await
+            .unwrap();
+        assert!(read_head(&mut second).await.starts_with("HTTP/1.1 200"));
+        tokio::io::AsyncWriteExt::write_all(&mut second, b"ping")
+            .await
+            .unwrap();
+        let mut echoed = [0u8; 4];
+        tokio::time::timeout(
+            Duration::from_secs(5),
+            AsyncReadExt::read_exact(&mut second, &mut echoed),
+        )
+        .await
+        .expect("downgraded host must still relay")
+        .unwrap();
+        assert_eq!(&echoed, b"ping");
+
+        let captures = state.captures.lock().unwrap();
+        assert_eq!(captures.len(), 2);
+        assert_eq!(captures[1].method, "CONNECT");
+        assert_eq!(captures[1].status, Some(200));
+        assert!(
+            captures[1]
+                .response_body
+                .as_deref()
+                .unwrap_or_default()
+                .contains("skipped"),
+            "got: {:?}",
+            captures[1].response_body
+        );
+    }
+
     /// A download bigger than the capture window must be relayed, not buffered.
     #[tokio::test]
     async fn large_responses_are_streamed_instead_of_buffered() {
-        use tokio::io::{AsyncReadExt as _, AsyncWriteExt as _};
+        use tokio::io::AsyncWriteExt as _;
 
         let upstream = TcpListener::bind("127.0.0.1:0").await.unwrap();
         let upstream_addr = upstream.local_addr().unwrap();

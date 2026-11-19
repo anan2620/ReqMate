@@ -801,6 +801,11 @@ export async function proxyGetCaCert(): Promise<string> {
   return await invoke<string>("proxy_get_ca_cert", {});
 }
 
+/** Install the generated CA into the OS/user trust store. */
+export async function proxyTrustCa(): Promise<void> {
+  return await invoke<void>("proxy_trust_ca", {});
+}
+
 export async function proxyCaExists(): Promise<boolean> {
   return await invoke<boolean>("proxy_ca_exists", {});
 }

@@ -68,6 +68,14 @@ pub async fn proxy_get_ca_cert() -> Result<String, String> {
         .map_err(|e| format!("Task join error: {e}"))?
 }
 
+/// Install the generated CA into the user's trust store.
+#[tauri::command]
+pub async fn proxy_trust_ca() -> Result<(), String> {
+    tokio::task::spawn_blocking(ca::trust_ca)
+        .await
+        .map_err(|e| format!("Task join error: {e}"))?
+}
+
 /// Check if a CA certificate has been generated.
 #[tauri::command]
 pub async fn proxy_ca_exists() -> Result<bool, String> {

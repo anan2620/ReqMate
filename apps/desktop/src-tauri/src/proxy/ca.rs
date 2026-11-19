@@ -104,3 +104,70 @@ pub fn read_ca_cert_pem() -> Result<String, String> {
     fs::read_to_string(&path)
         .map_err(|e| format!("CA certificate not found. Generate it first: {e}"))
 }
+
+/// Add the CA to the current user's trust store.
+///
+/// This is the step that makes interception invisible: without it every HTTPS
+/// site shows a certificate warning after the proxy mints a leaf. Nothing is
+/// installed silently — macOS asks for administrator approval, Windows writes to
+/// the per-user store.
+pub fn trust_ca() -> Result<(), String> {
+    if !ca_exists() {
+        return Err("Generate the CA certificate first".to_string());
+    }
+    let cert = ca_cert_path();
+    let path = cert.to_string_lossy().to_string();
+    // The path goes through a shell on macOS; ours never contains quotes, but a
+    // home directory theoretically could, so refuse instead of escaping badly.
+    if path.contains('\'') || path.contains('"') || path.contains('\\') {
+        return Err(format!("Unsupported certificate path: {path}"));
+    }
+
+    #[cfg(target_os = "macos")]
+    {
+        // `-d` targets the system store; `with administrator privileges` makes
+        // osascript show the native password prompt.
+        let script = format!(
+            "do shell script \"/usr/bin/security add-trusted-cert -d -r trustRoot \
+             -k /Library/Keychains/System.keychain '{path}'\" with administrator privileges"
+        );
+        let output = std::process::Command::new("osascript")
+            .arg("-e")
+            .arg(script)
+            .output()
+            .map_err(|e| format!("Failed to run security: {e}"))?;
+        if !output.status.success() {
+            let stderr = String::from_utf8_lossy(&output.stderr);
+            let message = stderr.trim();
+            return Err(if message.is_empty() {
+                "Installing the CA was cancelled".to_string()
+            } else {
+                message.to_string()
+            });
+        }
+        tracing::info!("CA certificate installed in the system trust store");
+        Ok(())
+    }
+
+    #[cfg(target_os = "windows")]
+    {
+        // The per-user root store needs no elevation.
+        let output = std::process::Command::new("certutil")
+            .args(["-addstore", "-user", "Root"])
+            .arg(&path)
+            .output()
+            .map_err(|e| format!("Failed to run certutil: {e}"))?;
+        if !output.status.success() {
+            return Err(String::from_utf8_lossy(&output.stderr).trim().to_string());
+        }
+        Ok(())
+    }
+
+    #[cfg(all(unix, not(target_os = "macos")))]
+    {
+        Err(format!(
+            "Import {path} into your trust store, e.g. copy it to \
+             /usr/local/share/ca-certificates and run update-ca-certificates"
+        ))
+    }
+}

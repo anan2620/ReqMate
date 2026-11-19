@@ -58,6 +58,7 @@ use commands::plugins::{install_plugin, list_plugins, toggle_plugin, uninstall_p
 use commands::proxy::{
     proxy_ca_exists, proxy_clear_captures, proxy_generate_ca, proxy_get_ca_cert,
     proxy_get_captures, proxy_set_passthrough, proxy_start, proxy_status, proxy_stop,
+    proxy_trust_ca,
 };
 use commands::runner::run_collection_command;
 use commands::scheduler::{
@@ -375,6 +376,7 @@ pub fn run() {
             proxy_set_passthrough,
             proxy_generate_ca,
             proxy_get_ca_cert,
+            proxy_trust_ca,
             proxy_ca_exists,
             // Plugin commands
             list_plugins,

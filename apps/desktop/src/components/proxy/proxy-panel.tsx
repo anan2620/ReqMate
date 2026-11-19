@@ -11,6 +11,7 @@ import {
   proxyGenerateCa,
   proxyCaExists,
   proxyGetCaCert,
+  proxyTrustCa,
   type CapturedRequest,
 } from "@/lib/tauri-api";
 import { copyText } from "@/lib/clipboard";
@@ -42,6 +43,9 @@ export function ProxySidePanel() {
   // round-trip alone is enough to lose it (clipboard writes then reject with
   // NotAllowedError).
   const [caPem, setCaPem] = useState<string | null>(null);
+  const [caTrusted, setCaTrusted] = useState(false);
+  // The OS shows an approval dialog, which can outlive a double click.
+  const [trusting, setTrusting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -102,6 +106,33 @@ export function ProxySidePanel() {
       setTimeout(() => setCaCopied(false), 2000);
     } catch (err) {
       setError(String(err));
+    }
+  };
+
+  const handleTrustCa = async () => {
+    setError(null);
+    setTrusting(true);
+    try {
+      await proxyTrustCa();
+      setCaTrusted(true);
+      // Hosts that failed their handshake are relayed blindly for this session;
+      // restarting clears that list so they are decrypted from now on.
+      if (status.running) {
+        const activePort = status.port;
+        await proxyStop();
+        setStatus(await proxyStart(activePort));
+      }
+      // Hosts that failed their handshake are relayed blindly for this session;
+      // restarting clears that list so they are decrypted from now on.
+      if (status.running) {
+        const activePort = status.port;
+        await proxyStop();
+        setStatus(await proxyStart(activePort));
+      }
+    } catch (err) {
+      setError(String(err));
+    } finally {
+      setTrusting(false);
     }
   };
 
@@ -176,6 +207,9 @@ export function ProxySidePanel() {
             {t("proxy.mitmOn")}
           </p>
         )}
+        {status.running && !status.mitm && (
+          <p className="mt-1 text-[10px] text-amber-500">{t("proxy.mitmOff")}</p>
+        )}
       </div>
 
       {/* Error */}
@@ -201,10 +235,19 @@ export function ProxySidePanel() {
           <div className="flex gap-2">
             <button
               onClick={handleCopyCaCert}
-              className="flex flex-1 items-center justify-center gap-1.5 rounded bg-[var(--color-surface)] px-2 py-1.5 text-xs text-[var(--color-text-secondary)] hover:bg-[var(--color-border)]"
+              className="flex flex-1 items-center justify-center gap-1.5 whitespace-nowrap rounded bg-[var(--color-surface)] px-1.5 py-1.5 text-[11px] text-[var(--color-text-secondary)] hover:bg-[var(--color-border)]"
             >
               {caCopied ? <Check className="h-3 w-3 text-green-500" /> : <Copy className="h-3 w-3" />}
               {caCopied ? t("proxy.copied") : t("proxy.copyPem")}
+            </button>
+            <button
+              onClick={handleTrustCa}
+              disabled={trusting}
+              title={t("proxy.trustCa")}
+              className="flex flex-1 items-center justify-center gap-1.5 whitespace-nowrap rounded bg-[var(--color-surface)] px-1.5 py-1.5 text-[11px] text-[var(--color-text-secondary)] hover:bg-[var(--color-border)] disabled:opacity-50"
+            >
+              <ShieldCheck className="h-3 w-3" />
+              {t("proxy.trustCa")}
             </button>
           </div>
         ) : (
@@ -215,6 +258,12 @@ export function ProxySidePanel() {
             <Download className="h-3 w-3" />
             {t("proxy.generateCa")}
           </button>
+        )}
+        {caTrusted && (
+          <p className="mt-1.5 flex items-center gap-1 text-[10px] text-green-500">
+            <Check className="h-3 w-3 shrink-0" />
+            {t("proxy.trusted")}
+          </p>
         )}
         <p className="mt-1.5 text-[10px] text-[var(--color-text-dimmed)]">
           {t("proxy.caHint")}
