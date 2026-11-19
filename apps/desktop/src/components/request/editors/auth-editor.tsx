@@ -4,6 +4,12 @@ import { oauthClearToken, oauthGetTokenStatus, oauthStartFlow } from "@/lib/taur
 import type { AuthConfig, OAuth2GrantType, OAuthTokenStatus } from "@reqmate/types";
 import { Select } from "@/components/ui/select";
 
+/** Starter payload for a JWT bearer token — flush-left so it reads like JSON. */
+const DEFAULT_JWT_PAYLOAD = `{
+  "sub": "1234567890",
+  "iat": 0
+}`;
+
 const INPUT_CLASS =
   "w-full rounded border border-[var(--color-border)] bg-[var(--color-card)] px-3 py-1.5 text-sm text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none";
 
@@ -70,7 +76,7 @@ export function AuthEditor({
                 type: "jwt-bearer",
                 secret: "",
                 algorithm: "HS256",
-                payload: '{\n  "sub": "1234567890",\n  "iat": 0\n}',
+                payload: DEFAULT_JWT_PAYLOAD,
                 headerPrefix: "Bearer",
               });
               break;
@@ -260,7 +266,7 @@ export function AuthEditor({
           <textarea
             value={auth.payload}
             onChange={(e) => onChange({ ...auth, payload: e.target.value })}
-            placeholder='{"sub": "user", "iat": 0}'
+            placeholder={`{"sub": "user", "iat": 0}`}
             rows={5}
             className={INPUT_CLASS + " resize-y font-mono"}
           />

@@ -37,7 +37,7 @@ export function GrpcView() {
   const [streamMessages, setStreamMessages] = useState<StreamMessage[]>([]);
   const [streaming, setStreaming] = useState(false);
   const [autoScroll, setAutoScroll] = useState(true);
-  const [clientMessages, setClientMessages] = useState<string[]>(['{}']);
+  const [clientMessages, setClientMessages] = useState<string[]>(["{}"]);
   const [methodFilter, setMethodFilter] = useState("");
   const [showMetadata, setShowMetadata] = useState(false);
   const [showResponseMeta, setShowResponseMeta] = useState(false);
@@ -331,7 +331,7 @@ export function GrpcView() {
                           setClientMessages(updated);
                         }}
                         className="w-full resize-none rounded bg-[var(--color-elevated)] p-2 font-mono text-xs text-[var(--color-text-primary)] outline-none focus:ring-1 focus:ring-[var(--color-accent)]"
-                        placeholder='{ "field": "value" }'
+                        placeholder={`{ "field": "value" }`}
                         rows={3}
                         spellCheck={false}
                       />
@@ -349,7 +349,7 @@ export function GrpcView() {
                   value={grpc.requestJson}
                   onChange={(e) => updateGrpc({ requestJson: e.target.value })}
                   className="min-h-0 w-full flex-1 resize-none rounded bg-[var(--color-elevated)] p-3 font-mono text-sm text-[var(--color-text-primary)] outline-none focus:ring-1 focus:ring-[var(--color-accent)]"
-                  placeholder='{ "field": "value" }'
+                  placeholder={`{ "field": "value" }`}
                   spellCheck={false}
                 />
               </>

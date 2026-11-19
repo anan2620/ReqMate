@@ -296,7 +296,7 @@ export function GraphQLView() {
                     onChange={(v) => setGraphQLVariables(v)}
                     language="json"
                     height="100%"
-                    placeholder='{ "id": "123" }'
+                    placeholder={`{ "id": "123" }`}
                   />
                 </div>
               </div>

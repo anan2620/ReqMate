@@ -125,7 +125,7 @@ describe("request file ↔ tab conversion", () => {
       url: "https://api.test/graphql",
       graphql: {
         query: "{ me { id } }",
-        variables: '{"a":1}',
+        variables: `{"a":1}`,
         operationName: "Me",
         schemaJson: null,
       },

@@ -6,6 +6,11 @@ import type { BodyType, RequestBody } from "@reqmate/types";
 
 const BODY_TYPE_IDS: BodyType[] = ["none", "json", "xml", "raw", "urlencoded", "form-data"];
 
+/** Sample shown in the empty JSON body. Kept flush-left so it reads like JSON. */
+const JSON_BODY_PLACEHOLDER = `{
+  "key": "value"
+}`;
+
 const BODY_TYPE_LABEL_KEYS: Record<BodyType, string> = {
   none: "body.none",
   json: "body.json",
@@ -51,7 +56,7 @@ export function BodyEditor({
           onChange={(v) => onChange({ ...body, content: v })}
           language={body.type === "json" ? "json" : body.type === "xml" ? "xml" : "plaintext"}
           height="220px"
-          placeholder={body.type === "json" ? '{\n  "key": "value"\n}' : ""}
+          placeholder={body.type === "json" ? JSON_BODY_PLACEHOLDER : ""}
         />
       )}
 

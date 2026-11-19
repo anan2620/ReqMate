@@ -94,7 +94,7 @@ export function TestsEditor({
           onChange={(v) => onTestScriptChange(v || null)}
           language="javascript"
           height="150px"
-          placeholder='req.test("status is 200", function() { ... });'
+          placeholder={`req.test("status is 200", function() { ... });`}
         />
       </div>
     </div>

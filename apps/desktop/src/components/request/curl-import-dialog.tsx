@@ -9,6 +9,16 @@ import type { HttpMethod, KeyValuePair, BodyType } from "@reqmate/types";
 let kvCounter = 0;
 const kvId = () => `kv_${Date.now()}_${++kvCounter}`;
 
+/**
+ * Sample shown in the empty cURL box. Continuation lines stay unindented on
+ * purpose — the string ends up verbatim in the textarea placeholder.
+ */
+const CURL_PLACEHOLDER = `Paste your cURL command here...
+
+curl -X POST https://api.example.com/users \\
+  -H 'Content-Type: application/json' \\
+  -d '{"name": "John"}'`;
+
 interface CurlImportDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -91,7 +101,7 @@ export function CurlImportDialog({ open, onOpenChange }: CurlImportDialogProps) 
             <textarea
               value={curlInput}
               onChange={(e) => setCurlInput(e.target.value)}
-              placeholder={'Paste your cURL command here...\n\ncurl -X POST https://api.example.com/users \\\n  -H \'Content-Type: application/json\' \\\n  -d \'{"name": "John"}\''}
+              placeholder={CURL_PLACEHOLDER}
               className="h-48 w-full resize-y rounded border border-[var(--color-border)] bg-[var(--color-card)] p-3 font-mono text-sm text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none"
               spellCheck={false}
             />

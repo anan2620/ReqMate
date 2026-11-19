@@ -6,7 +6,7 @@ export function exportAsJson(summary: RunSummary): string {
 
 export function exportAsJUnit(summary: RunSummary): string {
   const lines: string[] = [];
-  lines.push('<?xml version="1.0" encoding="UTF-8"?>');
+  lines.push(`<?xml version="1.0" encoding="UTF-8"?>`);
   lines.push(
     `<testsuites tests="${summary.totalRequests}" failures="${summary.totalFailed}" time="${(summary.totalTimeMs / 1000).toFixed(3)}">`,
   );
