@@ -70,18 +70,18 @@ export function WebSocketView() {
           <button
             onClick={handleConnect}
             disabled={status === "connecting" || !tab.url.trim()}
-            className={`flex h-9 items-center gap-1.5 rounded-lg px-3.5 text-[12.5px] font-semibold disabled:opacity-50 ${
+            className={`flex h-8 items-center gap-1.5 rounded-lg px-3.5 text-[12.5px] font-semibold disabled:opacity-50 ${
               status === "connected" ? "btn-danger" : "btn-accent"
             }`}
           >
             {status === "connected" ? (
               <>
-                <Unplug className="h-4 w-4" />
+                <Unplug className="h-3.5 w-3.5" />
                 {t("websocket.disconnect")}
               </>
             ) : (
               <>
-                <Plug className="h-4 w-4" />
+                <Plug className="h-3.5 w-3.5" />
                 {status === "connecting" ? t("socketio.connecting") : t("websocket.connect")}
               </>
             )}

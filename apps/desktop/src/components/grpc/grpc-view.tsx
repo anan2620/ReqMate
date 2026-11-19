@@ -204,12 +204,12 @@ export function GrpcView() {
           <button
             onClick={handleSend}
             disabled={grpc.loading || !grpc.selectedMethod}
-            className="flex h-9 items-center gap-2 rounded-lg bg-[var(--color-accent)] px-4 text-[12.5px] font-semibold text-white transition-all hover:bg-[var(--color-accent-hover)] disabled:cursor-not-allowed disabled:opacity-50 active:scale-[0.98]"
+            className="flex h-8 items-center gap-2 rounded-lg bg-[var(--color-accent)] px-4 text-[12.5px] font-semibold text-white transition-all hover:bg-[var(--color-accent-hover)] disabled:cursor-not-allowed disabled:opacity-50 active:scale-[0.98]"
           >
             {grpc.loading ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
+              <Loader2 className="h-3.5 w-3.5 animate-spin" />
             ) : (
-              <Send className="h-4 w-4" />
+              <Send className="h-3.5 w-3.5" />
             )}
             {t("request.send")}
           </button>

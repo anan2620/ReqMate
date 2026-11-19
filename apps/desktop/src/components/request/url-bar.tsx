@@ -372,7 +372,7 @@ export const UrlBar = forwardRef<HTMLInputElement, UrlBarProps>(function UrlBar(
           <button
             onClick={cancel}
             title={t("request.cancel")}
-            className="flex h-9 items-center gap-2 rounded-md border border-[var(--color-border-strong)] bg-[var(--color-elevated)] px-3.5 text-[12.5px] font-semibold text-[var(--color-text-secondary)] transition-colors hover:bg-[var(--color-card-hover)] hover:text-[var(--color-text-primary)]"
+            className="flex h-8 items-center gap-2 rounded-md border border-[var(--color-border-strong)] bg-[var(--color-elevated)] px-3.5 text-[12.5px] font-semibold text-[var(--color-text-secondary)] transition-colors hover:bg-[var(--color-card-hover)] hover:text-[var(--color-text-primary)]"
           >
             <Square className="h-3 w-3 fill-current" />
             {t("request.cancel")}
@@ -384,9 +384,9 @@ export const UrlBar = forwardRef<HTMLInputElement, UrlBarProps>(function UrlBar(
               data-tour="send-btn"
               onClick={send}
               disabled={!tab.url.trim()}
-              className="btn-accent flex h-9 items-center gap-2 rounded-md px-3.5 text-[12.5px] font-semibold disabled:cursor-not-allowed disabled:opacity-40"
+              className="btn-accent flex h-8 items-center gap-2 rounded-md px-3.5 text-[12.5px] font-semibold disabled:cursor-not-allowed disabled:opacity-40"
             >
-              <Send className="h-4 w-4" />
+              <Send className="h-3.5 w-3.5" />
               {t("request.send")}
             </button>
             <HintTooltip hintId="send-shortcut" message="Tip: Press Ctrl+Enter to send requests quickly" align="right" />
