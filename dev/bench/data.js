@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1794993597757,
+  "lastUpdate": 1795051843672,
   "repoUrl": "https://github.com/anan2620/ReqMate",
   "entries": {
     "ReqMate Benchmarks": [
@@ -439,6 +439,226 @@ window.BENCHMARK_DATA = {
             "name": "scripting/modify_request",
             "value": 979801,
             "range": "± 5792",
+            "unit": "ns/iter"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "aya@webside.de5.net",
+            "name": "hua"
+          },
+          "committer": {
+            "email": "aya@webside.de5.net",
+            "name": "hua"
+          },
+          "distinct": true,
+          "id": "79659c40f4d72f4a3a4e0e25efc03dcf3c84869a",
+          "message": "chore(gitignore): 清理误提交的 cargo 缓存目录残留\n\n- 删除 src-tauri/targetCjiXdY/CACHEDIR.TAG（cargo 缓存目录标记，无实际产物）\n- 忽略规则改为 apps/desktop/src-tauri/target*/ 以覆盖带随机后缀的临时 target 目录",
+          "timestamp": "2026-11-19T09:19:24+08:00",
+          "tree_id": "acc530c1c925be2e0324fe0831e7111b17b78147",
+          "url": "https://github.com/anan2620/ReqMate/commit/79659c40f4d72f4a3a4e0e25efc03dcf3c84869a"
+        },
+        "date": 1795051843082,
+        "tool": "cargo",
+        "benches": [
+          {
+            "name": "assertions/single_status_eq",
+            "value": 886,
+            "range": "± 13",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "assertions/response_time_lt",
+            "value": 872,
+            "range": "± 5",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "assertions/nested_body_path",
+            "value": 3790,
+            "range": "± 66",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "assertions/array_index_access",
+            "value": 3603,
+            "range": "± 34",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "assertions/regex_match",
+            "value": 124269,
+            "range": "± 1602",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "assertions/multiple_assertions/5",
+            "value": 13742,
+            "range": "± 53",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "assertions/multiple_assertions/10",
+            "value": 33444,
+            "range": "± 598",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "assertions/multiple_assertions/20",
+            "value": 62981,
+            "range": "± 437",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "collection_loading/load_tree/100",
+            "value": 1888045,
+            "range": "± 8500",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "collection_loading/load_tree/500",
+            "value": 9452183,
+            "range": "± 169433",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "collection_loading/load_tree/1000",
+            "value": 19196416,
+            "range": "± 60793",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "read_request/single_yaml_parse",
+            "value": 18695,
+            "range": "± 60",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "read_request/complex_yaml_parse",
+            "value": 41937,
+            "range": "± 221",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "curl_parsing/simple_get",
+            "value": 223,
+            "range": "± 4",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "curl_parsing/post_with_json",
+            "value": 847,
+            "range": "± 4",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "curl_parsing/complex_with_auth_headers",
+            "value": 3061,
+            "range": "± 118",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "curl_parsing/many_headers_10",
+            "value": 2226,
+            "range": "± 39",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "interpolation/simple_1var",
+            "value": 369,
+            "range": "± 2",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "interpolation/medium_5vars",
+            "value": 1252,
+            "range": "± 7",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "interpolation/heavy_50vars",
+            "value": 11701,
+            "range": "± 157",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "interpolation/no_vars_passthrough",
+            "value": 84,
+            "range": "± 1",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "interpolation/dynamic_uuid",
+            "value": 942,
+            "range": "± 9",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "interpolation/dynamic_timestamp",
+            "value": 362,
+            "range": "± 3",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "interpolation/dynamic_randomString",
+            "value": 419,
+            "range": "± 3",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "interpolate_map/headers/5",
+            "value": 2266,
+            "range": "± 11",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "interpolate_map/headers/20",
+            "value": 9540,
+            "range": "± 58",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "interpolate_map/headers/50",
+            "value": 23926,
+            "range": "± 213",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "scripting/empty_script_overhead",
+            "value": 677576,
+            "range": "± 7550",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "scripting/env_set_single",
+            "value": 693069,
+            "range": "± 9883",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "scripting/env_set_10_vars",
+            "value": 720765,
+            "range": "± 11313",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "scripting/single_test_assertion",
+            "value": 741304,
+            "range": "± 4655",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "scripting/multiple_tests_with_json",
+            "value": 839208,
+            "range": "± 11867",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "scripting/modify_request",
+            "value": 706930,
+            "range": "± 3369",
             "unit": "ns/iter"
           }
         ]
