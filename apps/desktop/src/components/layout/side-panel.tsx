@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { useCollectionStore } from "@/stores/collection-store";
 import { CollectionTree } from "@/components/collection/collection-tree";
+import { nodeMatchesSearch } from "@/lib/collection-search";
 import { EnvironmentSelector } from "@/components/environment/environment-selector";
 import { HistoryPanel } from "@/components/history/history-panel";
 import { FolderOpen, FolderPlus, Plus, Search, Trash2, X, Upload, FolderX, ChevronDown, ChevronRight, Folder, Globe, Pencil, Settings } from "lucide-react";
@@ -123,6 +124,11 @@ function CollectionsPanel({ onOpenImport }: { onOpenImport?: () => void }) {
     (s) => s.settings.defaultCollectionPath,
   );
 
+  const trimmedQuery = searchQuery.trim();
+  const visibleCollections = trimmedQuery
+    ? collections.filter((c) => nodeMatchesSearch(c, trimmedQuery))
+    : collections;
+
   const handleOpenFolder = async () => {
     try {
       const selected = await open({
@@ -207,7 +213,13 @@ function CollectionsPanel({ onOpenImport }: { onOpenImport?: () => void }) {
           </div>
         ) : (
           <div className="space-y-0.5">
-            {collections.map((collection) => (
+            {trimmedQuery && visibleCollections.length === 0 && (
+              <div className="flex flex-col items-center gap-1 px-2 py-8 text-center">
+                <Search className="h-4 w-4 text-[var(--color-text-dimmed)]" />
+                <p className="text-xs text-[var(--color-text-muted)]">{t("sidebar.noResults")}</p>
+              </div>
+            )}
+            {visibleCollections.map((collection) => (
               <CollectionHeader
                 key={collection.path}
                 collection={collection}
@@ -459,7 +471,10 @@ function CollectionHeader({
 }) {
   const { t } = useTranslation();
   const { expandedPaths, toggleExpand, renameItem } = useCollectionStore();
-  const isExpanded = expandedPaths.has(collection.path);
+  // While searching the collection opens automatically so hits are never hidden
+  // behind a collapsed row; the click-to-toggle state is kept for normal use.
+  const searching = searchQuery.trim().length > 0;
+  const isExpanded = searching || expandedPaths.has(collection.path);
   const [renaming, setRenaming] = useState(false);
   const [renameValue, setRenameValue] = useState("");
 
@@ -483,7 +498,10 @@ function CollectionHeader({
   return (
     <div>
       <button
-        onClick={() => toggleExpand(collection.path)}
+        onClick={() => {
+          // Collapsing during a search would hide the hits we just revealed.
+          if (!searching) toggleExpand(collection.path);
+        }}
         onContextMenu={onContextMenu}
         className="group flex w-full items-center gap-1.5 rounded-md px-2 py-[5px] text-left text-[12.5px] transition-colors hover:bg-[color-mix(in_srgb,var(--color-text-primary)_6%,transparent)]"
       >
