@@ -13,6 +13,7 @@ import {
   proxyGetCaCert,
   type CapturedRequest,
 } from "@/lib/tauri-api";
+import { copyText } from "@/lib/clipboard";
 import {
   Play,
   Square,
@@ -29,20 +30,30 @@ import {
 
 export function ProxySidePanel() {
   const { t } = useTranslation();
-  const { status, setStatus } = useProxyStore();
+  const status = useProxyStore((s) => s.status);
+  const setStatus = useProxyStore((s) => s.setStatus);
   const [port, setPort] = useState("8888");
   const [loading, setLoading] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [passthrough, setPassthrough] = useState("");
   const [caExists, setCaExists] = useState(false);
   const [caCopied, setCaCopied] = useState(false);
+  // Pre-loaded PEM: copying must happen inside the click gesture, and the IPC
+  // round-trip alone is enough to lose it (clipboard writes then reject with
+  // NotAllowedError).
+  const [caPem, setCaPem] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     proxyGetStatus()
       .then((s) => s && setStatus(s))
       .catch(() => {});
-    proxyCaExists().then(setCaExists).catch(() => {});
+    proxyCaExists()
+      .then((exists) => {
+        setCaExists(exists);
+        if (exists) proxyGetCaCert().then(setCaPem).catch(() => {});
+      })
+      .catch(() => {});
   }, [setStatus]);
 
   const handleToggle = async () => {
@@ -66,6 +77,14 @@ export function ProxySidePanel() {
     try {
       await proxyGenerateCa();
       setCaExists(true);
+      setCaPem(await proxyGetCaCert());
+      // A running proxy picked its interceptor up at start — restart it so the
+      // new CA actually takes effect instead of silently staying a tunnel.
+      if (status.running) {
+        const activePort = status.port;
+        await proxyStop();
+        setStatus(await proxyStart(activePort));
+      }
     } catch (err) {
       setError(String(err));
     }
@@ -73,8 +92,12 @@ export function ProxySidePanel() {
 
   const handleCopyCaCert = async () => {
     try {
-      const pem = await proxyGetCaCert();
-      await navigator.clipboard.writeText(pem);
+      const pem = caPem ?? (await proxyGetCaCert());
+      if (!caPem) setCaPem(pem);
+      if (!(await copyText(pem))) {
+        setError(t("proxy.copyFailed"));
+        return;
+      }
       setCaCopied(true);
       setTimeout(() => setCaCopied(false), 2000);
     } catch (err) {
@@ -98,35 +121,29 @@ export function ProxySidePanel() {
     <div className="flex flex-col gap-3 p-3">
       {/* Status */}
       <div className="rounded-lg border border-[var(--color-border)] bg-[var(--color-elevated)] p-3">
-        <div className="flex items-center justify-between mb-2">
-          <div className="flex items-center gap-2">
-            <span
-              className={`h-2.5 w-2.5 rounded-full ${
-                status.running ? "bg-green-500 animate-pulse" : "bg-gray-500"
-              }`}
-            />
-            <span className="text-sm font-medium text-[var(--color-text-primary)]">
-              {status.running ? t("proxy.running") : t("proxy.stopped")}
-            </span>
-          </div>
-          {status.running && (
-            <span className="text-xs text-[var(--color-text-muted)]">
-              :{status.port}
-            </span>
-          )}
+        <div className="mb-2 flex items-center gap-2">
+          <span
+            className={`h-2.5 w-2.5 rounded-full ${
+              status.running ? "bg-green-500 animate-pulse" : "bg-gray-500"
+            }`}
+          />
+          <span className="text-sm font-medium text-[var(--color-text-primary)]">
+            {status.running ? t("proxy.running") : t("proxy.stopped")}
+          </span>
         </div>
 
         <div className="flex items-center justify-between gap-2">
-          {!status.running && (
-            <input
-              type="text"
-              value={port}
-              onChange={(e) => setPort(e.target.value)}
-              placeholder="8888"
-              aria-label={t("proxy.port")}
-              className="h-7 w-[64px] rounded-md bg-[var(--color-surface)] px-2 text-xs text-[var(--color-text-primary)] outline-none transition-colors focus:ring-1 focus:ring-[var(--color-accent)]"
-            />
-          )}
+          {/* The port keeps its slot while running — it used to jump to the
+              corner, which read like a stray label rather than the setting. */}
+          <input
+            type="text"
+            value={status.running ? String(status.port) : port}
+            onChange={(e) => setPort(e.target.value)}
+            readOnly={status.running}
+            placeholder="8888"
+            aria-label={t("proxy.port")}
+            className="h-7 w-[68px] rounded-md bg-[var(--color-surface)] px-2 text-xs text-[var(--color-text-primary)] outline-none transition-colors read-only:text-[var(--color-text-muted)] focus:ring-1 focus:ring-[var(--color-accent)]"
+          />
           <button
             onClick={handleToggle}
             disabled={loading}
@@ -151,6 +168,12 @@ export function ProxySidePanel() {
         {status.running && (
           <p className="mt-2 text-[10px] text-[var(--color-text-dimmed)]">
             {t("proxy.proxyHint", { port: status.port })}
+          </p>
+        )}
+        {status.running && status.mitm && (
+          <p className="mt-1 flex items-center gap-1 text-[10px] text-green-500">
+            <ShieldCheck className="h-3 w-3 shrink-0" />
+            {t("proxy.mitmOn")}
           </p>
         )}
       </div>
@@ -237,18 +260,40 @@ export function ProxySidePanel() {
 
 export function ProxyCaptureViewer() {
   const { t } = useTranslation();
-  const { captures, selectedId, filter, setCaptures, clearCaptures, selectCapture, setFilter, addCapture, status } = useProxyStore();
+  const captures = useProxyStore((s) => s.captures);
+  const selectedId = useProxyStore((s) => s.selectedId);
+  const filter = useProxyStore((s) => s.filter);
+  const isRunning = useProxyStore((s) => s.status.running);
+  const setCaptures = useProxyStore((s) => s.setCaptures);
+  const clearCaptures = useProxyStore((s) => s.clearCaptures);
+  const selectCapture = useProxyStore((s) => s.selectCapture);
+  const setFilter = useProxyStore((s) => s.setFilter);
+  const appendCaptures = useProxyStore((s) => s.appendCaptures);
 
-  // Listen for live captures
+  // Listen for live captures.
+  //
+  // Events are buffered and flushed on a timer: a page load fires dozens of
+  // captures at once, and updating the store per event meant one React render
+  // (and one 500-row list diff) per request — that is what froze the window.
   useEffect(() => {
     let cancelled = false;
     let unlisten: (() => void) | null = null;
+    let timer: ReturnType<typeof setTimeout> | null = null;
+    const buffer: CapturedRequest[] = [];
+
+    const flush = () => {
+      timer = null;
+      if (buffer.length === 0) return;
+      appendCaptures(buffer.splice(0, buffer.length));
+    };
 
     const setup = async () => {
       try {
         const { listen } = await import("@tauri-apps/api/event");
         unlisten = await listen<CapturedRequest>("proxy:capture", (event) => {
-          if (!cancelled) addCapture(event.payload);
+          if (cancelled) return;
+          buffer.push(event.payload);
+          if (timer === null) timer = setTimeout(flush, 60);
         });
       } catch {
         // Not in Tauri env
@@ -258,9 +303,10 @@ export function ProxyCaptureViewer() {
 
     return () => {
       cancelled = true;
+      if (timer !== null) clearTimeout(timer);
       unlisten?.();
     };
-  }, [addCapture]);
+  }, [appendCaptures]);
 
   // Load existing captures on mount
   useEffect(() => {
@@ -322,7 +368,7 @@ export function ProxyCaptureViewer() {
         <div className="w-1/2 overflow-auto border-r border-[var(--color-border)]">
           {filtered.length === 0 ? (
             <div className="flex items-center justify-center py-8 text-xs text-[var(--color-text-dimmed)]">
-              {status.running ? t("proxy.waiting") : t("proxy.startHint")}
+              {isRunning ? t("proxy.waiting") : t("proxy.startHint")}
             </div>
           ) : (
             filtered.map((cap) => (

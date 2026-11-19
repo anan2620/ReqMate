@@ -765,6 +765,8 @@ export interface ProxyStatus {
   running: boolean;
   port: number;
   captureCount: number;
+  /** True when HTTPS is decrypted (CA available); false for a blind tunnel. */
+  mitm: boolean;
 }
 
 export async function proxyStart(port: number): Promise<ProxyStatus> {

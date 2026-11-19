@@ -26,15 +26,13 @@ pub fn ca_exists() -> bool {
     ca_cert_path().exists() && ca_key_path().exists()
 }
 
-/// Generate a new self-signed CA certificate for HTTPS interception.
-/// Returns the paths to (cert, key) files.
-pub fn generate_ca() -> Result<(PathBuf, PathBuf), String> {
-    let dir = proxy_dir();
-    fs::create_dir_all(&dir).map_err(|e| format!("Failed to create proxy directory: {e}"))?;
-
-    let key_pair = KeyPair::generate_for(&PKCS_ECDSA_P256_SHA256)
-        .map_err(|e| format!("Failed to generate key pair: {e}"))?;
-
+/// Parameters of the local CA.
+///
+/// Shared by generation and by the interceptor: when minting a certificate for
+/// a host, rcgen only reads the issuer's subject and key identifier from these
+/// fields, so rebuilding them from the same definition keeps every leaf chained
+/// to the CA that is actually installed in the browser.
+pub(crate) fn ca_params() -> CertificateParams {
     let mut params = CertificateParams::default();
     params.is_ca = IsCa::Ca(BasicConstraints::Unconstrained);
     params
@@ -46,6 +44,19 @@ pub fn generate_ca() -> Result<(PathBuf, PathBuf), String> {
     // Valid for 10 years
     params.not_before = time::OffsetDateTime::now_utc();
     params.not_after = time::OffsetDateTime::now_utc() + time::Duration::days(3650);
+    params
+}
+
+/// Generate a new self-signed CA certificate for HTTPS interception.
+/// Returns the paths to (cert, key) files.
+pub fn generate_ca() -> Result<(PathBuf, PathBuf), String> {
+    let dir = proxy_dir();
+    fs::create_dir_all(&dir).map_err(|e| format!("Failed to create proxy directory: {e}"))?;
+
+    let key_pair = KeyPair::generate_for(&PKCS_ECDSA_P256_SHA256)
+        .map_err(|e| format!("Failed to generate key pair: {e}"))?;
+
+    let params = ca_params();
 
     let cert = params
         .self_signed(&key_pair)
@@ -79,6 +90,12 @@ pub fn ensure_ca() -> Result<(PathBuf, PathBuf), String> {
     } else {
         generate_ca()
     }
+}
+
+/// Read the CA private key PEM. Only the interceptor needs it.
+pub(crate) fn read_ca_key_pem() -> Result<String, String> {
+    fs::read_to_string(ca_key_path())
+        .map_err(|e| format!("CA key not readable. Generate the CA first: {e}"))
 }
 
 /// Read the CA certificate PEM content (for user to install in their browser/OS).

@@ -4,6 +4,7 @@ import { Copy, Check } from "lucide-react";
 import { useActiveTab } from "@/stores/tab-store";
 import { useEnvironmentStore } from "@/stores/environment-store";
 import { generateCurl, generateJsFetch, generatePythonRequests } from "@/lib/code-generators";
+import { copyText } from "@/lib/clipboard";
 import type { Tab } from "@reqmate/types";
 
 type Language = "curl" | "javascript" | "python";
@@ -105,7 +106,7 @@ export function CodeGenerationPanel() {
   }, [tab, language, resolvedVars]);
 
   const handleCopy = async () => {
-    await navigator.clipboard.writeText(code);
+    if (!(await copyText(code))) return;
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };

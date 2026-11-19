@@ -61,6 +61,7 @@ prost = "0.13"
 prost-types = "0.13"
 prost-reflect = { version = "0.14", features = ["serde"] }
 protox = "0.7"
+hyper = { version = "1", features = ["http1", "server"] }
 hyper-util = "0.1"
 http-body = "1"
 tower = "0.5"
@@ -72,6 +73,9 @@ des = "0.8"
 walkdir = "2"
 rumqttc = "0.24"
 rcgen = "0.13"
+# HTTPS interception: mint per-host certificates on the fly and terminate TLS.
+rustls = { version = "0.23", default-features = false, features = ["ring", "logging", "std", "tls12"] }
+tokio-rustls = { version = "0.26", default-features = false, features = ["ring", "logging", "tls12"] }
 time = "0.3"
 portable-pty = "0.8"
 wasmi = "2.0.0"

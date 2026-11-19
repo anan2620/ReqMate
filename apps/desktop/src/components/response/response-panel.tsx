@@ -9,6 +9,7 @@ import { CodeGenerationPanel } from "./code-generation-panel";
 import { TestResultsPanel } from "./test-results-panel";
 import { save } from "@tauri-apps/plugin-dialog";
 import { writeTextFile } from "@tauri-apps/plugin-fs";
+import { copyText } from "@/lib/clipboard";
 import { readFullResponse } from "@/lib/tauri-api";
 import type { ConsoleEntry } from "@reqmate/types";
 import { TimingPanel } from "./timing-panel";
@@ -227,10 +228,10 @@ function ResponseBodyActions({ body }: { body: string }) {
 
   const handleCopy = async () => {
     try {
-      await navigator.clipboard.writeText(body);
+      if (!(await copyText(body))) throw new Error("clipboard unavailable");
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
-    } catch (err) {
+    } catch {
       import("@/stores/toast-store").then(({ useToastStore }) =>
         useToastStore.getState().showError("Failed to copy to clipboard"),
       );

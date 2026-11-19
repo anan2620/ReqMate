@@ -15,6 +15,7 @@ import {
   Trash2,
 } from "lucide-react";
 import { useActiveTab, useTabStore } from "@/stores/tab-store";
+import { copyText } from "@/lib/clipboard";
 import { useSettingsStore } from "@/stores/settings-store";
 import {
   aiChat,
@@ -241,8 +242,8 @@ export function AiAssistantDialog({ open, onOpenChange }: AiAssistantDialogProps
     });
   };
 
-  const handleCopy = (text: string, id: string) => {
-    navigator.clipboard.writeText(text);
+  const handleCopy = async (text: string, id: string) => {
+    if (!(await copyText(text))) return;
     setCopiedId(id);
     setTimeout(() => setCopiedId(null), 2000);
   };
