@@ -4,8 +4,12 @@ use crate::commands::history::AppState;
 use crate::scheduler::monitor::MonitorManager;
 use crate::scheduler::{MonitorConfig, MonitorResult, MonitorStatus};
 
+// Must stay async: the monitor loop is spawned with `tokio::spawn`, which
+// panics when no Tokio runtime is in scope. Sync commands run on the main
+// thread inside the IPC handler, where there is no runtime context — and a
+// panic there unwinds through the WebKit callback and aborts the app.
 #[tauri::command]
-pub fn create_monitor(
+pub async fn create_monitor(
     config: MonitorConfig,
     app: AppHandle,
     state: State<'_, AppState>,

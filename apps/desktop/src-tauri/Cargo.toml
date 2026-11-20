@@ -86,6 +86,9 @@ ring = "0.17.14"
 criterion = { version = "0.5", features = ["html_reports"] }
 tempfile = "3"
 wat = "1.263.0"
+# `test` gives us the mock runtime, so the IPC panic guard can be exercised
+# end to end without launching a window.
+tauri = { version = "2", features = ["test"] }
 
 [features]
 custom-protocol = ["tauri/custom-protocol"]

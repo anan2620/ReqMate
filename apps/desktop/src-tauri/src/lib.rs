@@ -4,6 +4,7 @@ mod exporter;
 mod grpc;
 pub mod http;
 mod importer;
+mod ipc_guard;
 mod mock;
 pub mod models;
 mod mqtt;
@@ -258,7 +259,9 @@ pub fn run() {
             }
             Ok(())
         })
-        .invoke_handler(tauri::generate_handler![
+        // Panics in sync commands are caught and rejected as promise errors
+        // instead of aborting the process inside the WebKit IPC callback.
+        .invoke_handler(ipc_guard::guard_panics(tauri::generate_handler![
             greet,
             send_request,
             send_request_with_scripts,
@@ -411,7 +414,7 @@ pub fn run() {
             git_diff,
             git_log,
             git_init,
-        ])
+        ]))
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

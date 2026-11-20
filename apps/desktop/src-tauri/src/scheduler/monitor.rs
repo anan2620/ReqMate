@@ -66,7 +66,11 @@ impl MonitorManager {
         let task_config = config.clone();
         let task_id = monitor_id.clone();
 
-        tokio::spawn(async move {
+        // Spawn on Tauri's global runtime instead of `tokio::spawn`: the latter
+        // requires a runtime in the current context and panics otherwise, which
+        // would abort the whole app when `create` is reached from a thread that
+        // has none.
+        tauri::async_runtime::spawn(async move {
             run_monitor_loop(
                 task_id,
                 task_config,
@@ -316,5 +320,32 @@ async fn run_monitor_loop(
             status = %status_str,
             "Monitor run complete"
         );
+    }
+}
+
+#[cfg(test)]
+mod spawn_context_tests {
+    use std::time::Duration;
+
+    // The crash this guards against: `tokio::spawn` panics when no runtime is
+    // in the current context, and that panic aborts the app because it crosses
+    // the WebKit callback boundary.
+    #[test]
+    fn tokio_spawn_without_runtime_panics() {
+        let result = std::panic::catch_unwind(|| tokio::spawn(async {}));
+        assert!(result.is_err(), "tokio::spawn should not be context-free");
+    }
+
+    #[test]
+    fn global_runtime_spawn_works_off_runtime_thread() {
+        let (tx, rx) = std::sync::mpsc::channel();
+        std::thread::spawn(move || {
+            tauri::async_runtime::spawn(async move {
+                let _ = tx.send(());
+            });
+        })
+        .join()
+        .expect("spawn thread must not panic");
+        assert!(rx.recv_timeout(Duration::from_secs(10)).is_ok());
     }
 }
