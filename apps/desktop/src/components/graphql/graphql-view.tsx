@@ -5,6 +5,7 @@ import { useTabStore, useActiveTab } from "@/stores/tab-store";
 import { useSettingsStore } from "@/stores/settings-store";
 import { PanelTabSwitch } from "@/components/ui/panel-tab-switch";
 import { KeyValueEditor } from "@/components/request/key-value-editor";
+import { COMMON_REQUEST_HEADERS } from "@/lib/http-headers";
 import { ResponsePanel } from "@/components/response/response-panel";
 import { CodeEditor } from "@/components/ui/code-editor";
 import {
@@ -309,6 +310,7 @@ export function GraphQLView() {
                   onChange={setHeaders}
                   keyPlaceholder={t("request.header")}
                   valuePlaceholder={t("request.value")}
+                  keySuggestions={COMMON_REQUEST_HEADERS}
                 />
               </div>
             )}

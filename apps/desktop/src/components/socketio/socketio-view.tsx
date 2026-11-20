@@ -5,6 +5,7 @@ import { useActiveTab } from "@/stores/tab-store";
 import { useTabStore } from "@/stores/tab-store";
 import { useSocketIo, type SioEvent } from "@/hooks/use-socketio";
 import { KeyValueEditor } from "@/components/request/key-value-editor";
+import { COMMON_REQUEST_HEADERS } from "@/lib/http-headers";
 import {
   Send,
   Plug,
@@ -159,6 +160,7 @@ export function SocketIoView() {
               onChange={setHeaders}
               keyPlaceholder={t("socketio.headerKey")}
               valuePlaceholder={t("socketio.headerValue")}
+              keySuggestions={COMMON_REQUEST_HEADERS}
             />
           </div>
         )}

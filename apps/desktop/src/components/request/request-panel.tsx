@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useTabStore, useActiveTab } from "@/stores/tab-store";
 import { KeyValueEditor } from "./key-value-editor";
+import { COMMON_REQUEST_HEADERS } from "@/lib/http-headers";
 import { HintTooltip } from "@/components/ui/hint-tooltip";
 import { AuthEditor } from "./editors/auth-editor";
 import { BodyEditor } from "./editors/body-editor";
@@ -117,6 +118,7 @@ export function RequestPanel() {
             onChange={setHeaders}
             keyPlaceholder="Header"
             valuePlaceholder={t("request.value")}
+            keySuggestions={COMMON_REQUEST_HEADERS}
           />
         )}
 

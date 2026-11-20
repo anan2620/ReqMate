@@ -1,15 +1,24 @@
 import { useTranslation } from "react-i18next";
 import type { KeyValuePair } from "@reqmate/types";
 import { Plus, Trash2 } from "lucide-react";
+import { Combobox } from "@/components/ui/combobox";
 
 let kvCounter = 0;
 const kvId = () => `kv_${Date.now()}_${++kvCounter}`;
+
+const FIELD_CLASS =
+  "field-soft min-w-0 rounded-md border border-transparent bg-[var(--color-surface)] px-2.5 py-1.5 text-[12.5px] text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none transition-colors focus:border-[var(--color-accent)] focus:bg-[var(--color-card)]";
 
 interface KeyValueEditorProps {
   pairs: KeyValuePair[];
   onChange: (pairs: KeyValuePair[]) => void;
   keyPlaceholder?: string;
   valuePlaceholder?: string;
+  /**
+   * When provided, the key cell offers these presets in a dropdown while still
+   * accepting free text. Used by header editors; query/body rows leave it unset.
+   */
+  keySuggestions?: readonly string[];
 }
 
 export function KeyValueEditor({
@@ -17,6 +26,7 @@ export function KeyValueEditor({
   onChange,
   keyPlaceholder = "Key",
   valuePlaceholder = "Value",
+  keySuggestions,
 }: KeyValueEditorProps) {
   const { t } = useTranslation();
   const update = (index: number, field: keyof KeyValuePair, value: string | boolean) => {
@@ -60,19 +70,30 @@ export function KeyValueEditor({
             onChange={(e) => update(index, "enabled", e.target.checked)}
             className="h-3.5 w-3.5 shrink-0 cursor-pointer rounded accent-[var(--color-accent)]"
           />
-          <input
-            type="text"
-            value={pair.key}
-            onChange={(e) => update(index, "key", e.target.value)}
-            placeholder={keyPlaceholder}
-            className="field-soft min-w-0 rounded-md border border-transparent bg-[var(--color-surface)] px-2.5 py-1.5 text-[12.5px] text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none transition-colors focus:border-[var(--color-accent)] focus:bg-[var(--color-card)]"
-          />
+          {keySuggestions ? (
+            <Combobox
+              value={pair.key}
+              onChange={(next) => update(index, "key", next)}
+              options={keySuggestions}
+              placeholder={keyPlaceholder}
+              ariaLabel={keyPlaceholder}
+              inputClassName={FIELD_CLASS}
+            />
+          ) : (
+            <input
+              type="text"
+              value={pair.key}
+              onChange={(e) => update(index, "key", e.target.value)}
+              placeholder={keyPlaceholder}
+              className={FIELD_CLASS}
+            />
+          )}
           <input
             type="text"
             value={pair.value}
             onChange={(e) => update(index, "value", e.target.value)}
             placeholder={valuePlaceholder}
-            className="field-soft min-w-0 rounded-md border border-transparent bg-[var(--color-surface)] px-2.5 py-1.5 text-[12.5px] text-[var(--color-text-primary)] placeholder-[var(--color-text-dimmed)] outline-none transition-colors focus:border-[var(--color-accent)] focus:bg-[var(--color-card)]"
+            className={FIELD_CLASS}
           />
           <button
             onClick={() => removeRow(index)}

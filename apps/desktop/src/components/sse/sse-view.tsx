@@ -4,6 +4,7 @@ import { useActiveTab } from "@/stores/tab-store";
 import { useTabStore } from "@/stores/tab-store";
 import { useSSE } from "@/hooks/use-sse";
 import { KeyValueEditor } from "@/components/request/key-value-editor";
+import { COMMON_REQUEST_HEADERS } from "@/lib/http-headers";
 import { Plug, Unplug, Trash2, ChevronDown, ChevronRight } from "lucide-react";
 import { Breadcrumb } from "@/components/layout/breadcrumb";
 import { UrlBar } from "@/components/request/url-bar";
@@ -108,6 +109,7 @@ export function SSEView() {
               onChange={setHeaders}
               keyPlaceholder={t("socketio.headerKey")}
               valuePlaceholder={t("socketio.headerValue")}
+              keySuggestions={COMMON_REQUEST_HEADERS}
             />
           </div>
         )}
