@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1795078565938,
+  "lastUpdate": 1795158883158,
   "repoUrl": "https://github.com/anan2620/ReqMate",
   "entries": {
     "ReqMate Benchmarks": [
@@ -879,6 +879,226 @@ window.BENCHMARK_DATA = {
             "name": "scripting/modify_request",
             "value": 902379,
             "range": "± 13836",
+            "unit": "ns/iter"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "aya@webside.de5.net",
+            "name": "hua"
+          },
+          "committer": {
+            "email": "aya@webside.de5.net",
+            "name": "hua"
+          },
+          "distinct": true,
+          "id": "695a51b877993893250276d63143de291f5f4462",
+          "message": "feat(desktop): suggest common keys while editing request headers\n\nThe header key field is now a combobox: it offers presets but still takes\nany custom header.\n\n- `Combobox` (input + Radix Popover): the list is portalled so it is not\n  clipped by the scrolling editor panel, filtering is case-insensitive\n  with prefix matches first, and picking works with the mouse, arrow keys\n  + Enter, or Escape to dismiss\n- `COMMON_REQUEST_HEADERS`: Authorization, Cookie, Content-Type,\n  Content-Range, Content-Encoding and Content-Length, plus other common\n  request headers\n- wired into the HTTP, WebSocket, SSE, Socket.IO and GraphQL header\n  editors; query and body rows keep the plain input\n- tests for the filter ordering and for the combobox interactions",
+          "timestamp": "2026-11-20T15:01:43+08:00",
+          "tree_id": "eb2af8e3d8d398a03cb12e1bbd79f1cf7b0caf06",
+          "url": "https://github.com/anan2620/ReqMate/commit/695a51b877993893250276d63143de291f5f4462"
+        },
+        "date": 1795158882503,
+        "tool": "cargo",
+        "benches": [
+          {
+            "name": "assertions/single_status_eq",
+            "value": 690,
+            "range": "± 50",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "assertions/response_time_lt",
+            "value": 724,
+            "range": "± 51",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "assertions/nested_body_path",
+            "value": 3292,
+            "range": "± 120",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "assertions/array_index_access",
+            "value": 3095,
+            "range": "± 79",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "assertions/regex_match",
+            "value": 81327,
+            "range": "± 1491",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "assertions/multiple_assertions/5",
+            "value": 11614,
+            "range": "± 251",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "assertions/multiple_assertions/10",
+            "value": 28171,
+            "range": "± 2730",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "assertions/multiple_assertions/20",
+            "value": 54964,
+            "range": "± 1697",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "collection_loading/load_tree/100",
+            "value": 1430098,
+            "range": "± 26530",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "collection_loading/load_tree/500",
+            "value": 7160290,
+            "range": "± 710706",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "collection_loading/load_tree/1000",
+            "value": 14691911,
+            "range": "± 570299",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "read_request/single_yaml_parse",
+            "value": 13534,
+            "range": "± 300",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "read_request/complex_yaml_parse",
+            "value": 29185,
+            "range": "± 559",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "curl_parsing/simple_get",
+            "value": 154,
+            "range": "± 3",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "curl_parsing/post_with_json",
+            "value": 632,
+            "range": "± 16",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "curl_parsing/complex_with_auth_headers",
+            "value": 2518,
+            "range": "± 42",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "curl_parsing/many_headers_10",
+            "value": 2015,
+            "range": "± 16",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "interpolation/simple_1var",
+            "value": 248,
+            "range": "± 7",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "interpolation/medium_5vars",
+            "value": 861,
+            "range": "± 14",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "interpolation/heavy_50vars",
+            "value": 7894,
+            "range": "± 140",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "interpolation/no_vars_passthrough",
+            "value": 64,
+            "range": "± 0",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "interpolation/dynamic_uuid",
+            "value": 694,
+            "range": "± 9",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "interpolation/dynamic_timestamp",
+            "value": 268,
+            "range": "± 5",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "interpolation/dynamic_randomString",
+            "value": 301,
+            "range": "± 5",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "interpolate_map/headers/5",
+            "value": 1698,
+            "range": "± 43",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "interpolate_map/headers/20",
+            "value": 7680,
+            "range": "± 168",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "interpolate_map/headers/50",
+            "value": 18405,
+            "range": "± 507",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "scripting/empty_script_overhead",
+            "value": 511813,
+            "range": "± 17961",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "scripting/env_set_single",
+            "value": 519951,
+            "range": "± 7147",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "scripting/env_set_10_vars",
+            "value": 527247,
+            "range": "± 10465",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "scripting/single_test_assertion",
+            "value": 527517,
+            "range": "± 10301",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "scripting/multiple_tests_with_json",
+            "value": 611916,
+            "range": "± 47778",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "scripting/modify_request",
+            "value": 515973,
+            "range": "± 42657",
             "unit": "ns/iter"
           }
         ]
