@@ -20,10 +20,7 @@ pub fn config_file_path(collection_path: &Path) -> PathBuf {
 pub fn load_collection_tree(collection_path: &Path) -> Result<CollectionNode, String> {
     let config_path = config_file_path(collection_path);
     if !config_path.exists() {
-        return Err(format!(
-            "Not a valid collection: {} (missing {CONFIG_DIR}/{CONFIG_FILE})",
-            collection_path.display()
-        ));
+        return Err(not_a_collection_message(collection_path));
     }
 
     let config_content = fs::read_to_string(&config_path)
@@ -396,10 +393,104 @@ pub fn save_folder_order(dir: &Path, order: &[String]) -> Result<(), String> {
 
 /// Load the collection config from .reqmate/reqmate.yaml.
 pub fn load_collection_config(collection_path: &Path) -> Result<CollectionConfig, String> {
-    let config_path = collection_path.join(".reqmate").join("reqmate.yaml");
+    let config_path = config_file_path(collection_path);
+    if !config_path.exists() {
+        return Err(not_a_collection_message(collection_path));
+    }
     let content = fs::read_to_string(&config_path)
         .map_err(|e| format!("Failed to read collection config: {e}"))?;
     serde_yaml::from_str(&content).map_err(|e| format!("Invalid collection config YAML: {e}"))
+}
+
+fn not_a_collection_message(collection_path: &Path) -> String {
+    format!(
+        "Not a ReqMate collection: {} (missing {CONFIG_DIR}/{CONFIG_FILE})",
+        collection_path.display()
+    )
+}
+
+/// YAML files that live next to requests but are not requests themselves.
+const RESERVED_YAML: [&str; 2] = ["_folder.yaml", "_collection.yaml"];
+
+/// Whether `dir` holds at least one YAML file that parses as a request.
+fn looks_like_request_dir(dir: &Path) -> bool {
+    let Ok(entries) = fs::read_dir(dir) else {
+        return false;
+    };
+
+    for entry in entries.flatten() {
+        let path = entry.path();
+        if !path.is_file() {
+            continue;
+        }
+        match path.extension().and_then(|e| e.to_str()) {
+            Some("yaml") | Some("yml") => {}
+            _ => continue,
+        }
+        let file_name = path
+            .file_name()
+            .and_then(|n| n.to_str())
+            .unwrap_or_default();
+        if RESERVED_YAML.contains(&file_name) {
+            continue;
+        }
+        if let Ok(content) = fs::read_to_string(&path) {
+            if serde_yaml::from_str::<RequestFile>(&content).is_ok() {
+                return true;
+            }
+        }
+    }
+
+    false
+}
+
+/// Creates `.reqmate` metadata for a folder that clearly holds requests but has
+/// lost (or never had) its config — e.g. after a sync tool dropped hidden
+/// directories, or when a collection folder was copied by hand.
+///
+/// Returns `true` when metadata was written. Folders without request files are
+/// left untouched so opening an arbitrary directory still fails loudly.
+pub fn ensure_collection_metadata(collection_path: &Path) -> Result<bool, String> {
+    if config_file_path(collection_path).exists() || !looks_like_request_dir(collection_path) {
+        return Ok(false);
+    }
+
+    let name = collection_path
+        .file_name()
+        .and_then(|n| n.to_str())
+        .unwrap_or("Collection")
+        .to_string();
+
+    let reqmate_dir = collection_path.join(CONFIG_DIR);
+    let env_dir = reqmate_dir.join("environments");
+    fs::create_dir_all(&env_dir)
+        .map_err(|e| format!("Failed to create {}: {e}", reqmate_dir.display()))?;
+
+    let config = CollectionConfig {
+        name,
+        version: crate::storage::migration::CURRENT_VERSION,
+        defaults: Default::default(),
+    };
+    let yaml = serde_yaml::to_string(&config)
+        .map_err(|e| format!("Failed to serialize collection config: {e}"))?;
+    fs::write(config_file_path(collection_path), yaml)
+        .map_err(|e| format!("Failed to write collection config: {e}"))?;
+
+    let default_env = env_dir.join("default.yaml");
+    if !default_env.exists() {
+        fs::write(
+            &default_env,
+            "name: Default\nvariables:\n  baseUrl: http://localhost:3000\n",
+        )
+        .map_err(|e| format!("Failed to write default environment: {e}"))?;
+    }
+
+    let gitignore = reqmate_dir.join(".gitignore");
+    if !gitignore.exists() {
+        fs::write(&gitignore, ".env\n").map_err(|e| format!("Failed to write .gitignore: {e}"))?;
+    }
+
+    Ok(true)
 }
 
 /// Save the collection config to .reqmate/reqmate.yaml (atomic write).
@@ -427,6 +518,52 @@ fn atomic_write(path: &Path, content: &str) -> Result<(), String> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    fn write_request(dir: &Path, file: &str, name: &str) {
+        let yaml = format!("name: {name}\nmethod: GET\nurl: https://api.test/users\n");
+        fs::write(dir.join(file), yaml).unwrap();
+    }
+
+    #[test]
+    fn missing_metadata_is_rebuilt_for_a_folder_of_requests() {
+        let dir = tempfile::tempdir().unwrap();
+        write_request(dir.path(), "get-users.yaml", "Get users");
+
+        assert!(ensure_collection_metadata(dir.path()).unwrap());
+
+        let config = load_collection_config(dir.path()).unwrap();
+        assert_eq!(
+            config.name,
+            dir.path().file_name().unwrap().to_str().unwrap()
+        );
+
+        let tree = load_collection_tree(dir.path()).unwrap();
+        match tree {
+            CollectionNode::Collection { children, .. } => assert_eq!(children.len(), 1),
+            other => panic!("unexpected node: {other:?}"),
+        }
+    }
+
+    #[test]
+    fn folders_without_requests_are_not_turned_into_collections() {
+        let dir = tempfile::tempdir().unwrap();
+        fs::write(dir.path().join("notes.yaml"), "hello: world\n").unwrap();
+
+        assert!(!ensure_collection_metadata(dir.path()).unwrap());
+        assert!(load_collection_tree(dir.path()).is_err());
+        assert!(load_collection_config(dir.path()).is_err());
+    }
+
+    #[test]
+    fn existing_metadata_is_left_untouched() {
+        let dir = tempfile::tempdir().unwrap();
+        write_request(dir.path(), "a.yaml", "A");
+        fs::create_dir_all(dir.path().join(CONFIG_DIR)).unwrap();
+        fs::write(config_file_path(dir.path()), "name: Custom\nversion: 1\n").unwrap();
+
+        assert!(!ensure_collection_metadata(dir.path()).unwrap());
+        assert_eq!(load_collection_config(dir.path()).unwrap().name, "Custom");
+    }
 
     #[test]
     fn sanitize_keeps_ordinary_names() {

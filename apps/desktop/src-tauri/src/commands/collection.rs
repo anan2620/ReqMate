@@ -39,6 +39,15 @@ pub async fn open_collection(path: String) -> Result<CollectionNode, String> {
     tracing::info!(path = %path, "Opening collection");
     tokio::task::spawn_blocking(move || {
         let collection_path = Path::new(&path);
+        // A folder of requests whose `.reqmate` metadata went missing (sync
+        // tools dropping hidden directories, a hand-copied collection, …) is
+        // repaired instead of refused.
+        if collection::ensure_collection_metadata(collection_path)? {
+            tracing::warn!(
+                path = %path,
+                "Collection metadata was missing — created .reqmate/reqmate.yaml"
+            );
+        }
         collection::load_collection_tree(collection_path)
     })
     .await

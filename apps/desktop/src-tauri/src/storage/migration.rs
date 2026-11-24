@@ -19,6 +19,17 @@ pub struct VersionStatus {
 /// Check a collection's format version against the current app version.
 pub fn check_version(collection_path: &Path) -> Result<VersionStatus, String> {
     let config_path = crate::storage::collection::config_file_path(collection_path);
+    if !config_path.exists() {
+        // No metadata yet: nothing to migrate. `open_collection` initialises a
+        // config for folders that clearly hold requests, and reports a clear
+        // error for everything else.
+        return Ok(VersionStatus {
+            collection_version: CURRENT_VERSION,
+            current_version: CURRENT_VERSION,
+            needs_migration: false,
+            is_newer: false,
+        });
+    }
     let content = fs::read_to_string(&config_path)
         .map_err(|e| format!("Failed to read collection config: {e}"))?;
 
