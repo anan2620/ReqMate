@@ -9,6 +9,8 @@ import {
   gitPull as doPull,
   gitLog as fetchLog,
   gitInit as doInit,
+  gitRemoveConfig as doRemoveConfig,
+  gitSetRemote as doSetRemote,
 } from "@/lib/tauri-api";
 
 interface GitState {
@@ -27,6 +29,8 @@ interface GitState {
   push: () => Promise<void>;
   pull: () => Promise<void>;
   init: () => Promise<void>;
+  removeConfig: () => Promise<void>;
+  setRemote: (url: string) => Promise<void>;
 }
 
 export const useGitStore = create<GitState>((set, get) => ({
@@ -145,5 +149,36 @@ export const useGitStore = create<GitState>((set, get) => ({
       set({ error: String(err) });
     }
     set({ loading: false });
+  },
+
+  setRemote: async (url) => {
+    const { collectionPath } = get();
+    if (!collectionPath) return;
+    set({ loading: true, error: null });
+    try {
+      await doSetRemote(collectionPath, url);
+      await get().loadStatus();
+    } catch (err) {
+      set({ error: String(err) });
+      throw err;
+    } finally {
+      set({ loading: false });
+    }
+  },
+
+  removeConfig: async () => {
+    const { collectionPath } = get();
+    if (!collectionPath) return;
+    set({ loading: true, error: null });
+    try {
+      await doRemoveConfig(collectionPath);
+      await get().loadStatus();
+      await get().loadLog();
+    } catch (err) {
+      set({ error: String(err) });
+      throw err;
+    } finally {
+      set({ loading: false });
+    }
   },
 }));

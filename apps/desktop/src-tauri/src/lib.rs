@@ -36,7 +36,8 @@ use commands::environment::{
     get_resolved_variables, load_environments, load_root_dotenv, save_environment,
 };
 use commands::git::{
-    git_commit, git_diff, git_init, git_log, git_pull, git_push, git_stage, git_status, git_unstage,
+    git_commit, git_diff, git_init, git_log, git_pull, git_push, git_remove_config, git_set_remote,
+    git_stage, git_status, git_unstage,
 };
 use commands::greet;
 use commands::grpc::{
@@ -414,6 +415,8 @@ pub fn run() {
             git_diff,
             git_log,
             git_init,
+            git_remove_config,
+            git_set_remote,
         ]))
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

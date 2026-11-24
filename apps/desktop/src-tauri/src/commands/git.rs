@@ -19,6 +19,7 @@ pub struct GitStatus {
     pub is_clean: bool,
     pub ahead: i32,
     pub behind: i32,
+    pub remote: Option<String>,
     pub changes: Vec<GitChange>,
 }
 
@@ -57,9 +58,16 @@ pub async fn git_status(collection_path: String) -> Result<GitStatus, String> {
             is_clean: true,
             ahead: 0,
             behind: 0,
+            remote: None,
             changes: vec![],
         });
     }
+
+    // Remote of the default remote, shown in the Git config section
+    let remote = run_git(path, &["remote", "get-url", "origin"])
+        .ok()
+        .map(|s| s.trim().to_string())
+        .filter(|s| !s.is_empty());
 
     // Check if there are any commits
     let has_commits = run_git(path, &["rev-parse", "HEAD"]).is_ok();
@@ -116,6 +124,7 @@ pub async fn git_status(collection_path: String) -> Result<GitStatus, String> {
         is_clean: changes.is_empty(),
         ahead,
         behind,
+        remote,
         changes,
     })
 }
@@ -152,7 +161,48 @@ pub async fn git_commit(collection_path: String, message: String) -> Result<Stri
 #[tauri::command]
 pub async fn git_push(collection_path: String) -> Result<String, String> {
     let dir = Path::new(&collection_path);
-    run_git(dir, &["push"])
+
+    // Freshly initialised repos have no upstream yet — bind it on first push so
+    // configuring a remote is enough to get the branch published.
+    let has_upstream = run_git(
+        dir,
+        &[
+            "rev-parse",
+            "--abbrev-ref",
+            "--symbolic-full-name",
+            "@{upstream}",
+        ],
+    )
+    .is_ok();
+    let has_origin = run_git(dir, &["remote", "get-url", "origin"]).is_ok();
+
+    if !has_upstream && has_origin {
+        run_git(dir, &["push", "-u", "origin", "HEAD"])
+    } else {
+        run_git(dir, &["push"])
+    }
+}
+
+/// Points `origin` at the given URL, adding the remote when it does not exist.
+#[tauri::command]
+pub async fn git_set_remote(collection_path: String, url: String) -> Result<(), String> {
+    let dir = Path::new(&collection_path);
+    if !dir.join(".git").exists() {
+        return Err("Not a git repository".to_string());
+    }
+
+    let url = url.trim();
+    if url.is_empty() {
+        return Err("Remote URL is empty".to_string());
+    }
+
+    if run_git(dir, &["remote", "get-url", "origin"]).is_ok() {
+        run_git(dir, &["remote", "set-url", "origin", url])?;
+    } else {
+        run_git(dir, &["remote", "add", "origin", url])?;
+    }
+
+    Ok(())
 }
 
 #[tauri::command]
@@ -206,6 +256,27 @@ pub async fn git_log(
 pub async fn git_init(collection_path: String) -> Result<String, String> {
     let dir = Path::new(&collection_path);
     run_git(dir, &["init"])
+}
+
+/// Removes the Git configuration of a collection by deleting its `.git`
+/// entry. Files inside the collection are left untouched — only the local
+/// repository (and with it the commit history) is dropped.
+#[tauri::command]
+pub async fn git_remove_config(collection_path: String) -> Result<(), String> {
+    let git_entry = Path::new(&collection_path).join(".git");
+
+    if !git_entry.exists() && !git_entry.is_symlink() {
+        return Ok(());
+    }
+
+    let result = if git_entry.is_dir() {
+        std::fs::remove_dir_all(&git_entry)
+    } else {
+        // Worktrees keep `.git` as a pointer file
+        std::fs::remove_file(&git_entry)
+    };
+
+    result.map_err(|e| format!("Failed to remove git config: {e}"))
 }
 
 fn get_ahead_behind(dir: &Path) -> (i32, i32) {

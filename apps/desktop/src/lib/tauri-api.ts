@@ -894,6 +894,8 @@ export interface GitStatus {
   isClean: boolean;
   ahead: number;
   behind: number;
+  /** Remote URL of `origin`, when one is configured */
+  remote?: string | null;
   changes: GitChange[];
 }
 
@@ -938,6 +940,16 @@ export async function gitLog(collectionPath: string, limit?: number): Promise<Gi
 
 export async function gitInit(collectionPath: string): Promise<string> {
   return await invoke<string>("git_init", { collectionPath });
+}
+
+/** Drops the local Git configuration (`.git`) of a collection; files are kept. */
+export async function gitRemoveConfig(collectionPath: string): Promise<void> {
+  return await invoke<void>("git_remove_config", { collectionPath });
+}
+
+/** Adds or updates the `origin` remote of a collection. */
+export async function gitSetRemote(collectionPath: string, url: string): Promise<void> {
+  return await invoke<void>("git_set_remote", { collectionPath, url });
 }
 
 // ── Audit Logs ──
