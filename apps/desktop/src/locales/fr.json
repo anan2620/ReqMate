@@ -540,7 +540,8 @@
     "waitingForRequests": "En attente de requêtes sur localhost:",
     "selectServer": "Sélectionnez un serveur pour voir les détails",
     "createDesc": "Créez des serveurs mock locaux à partir de vos collections",
-    "newMockServer": "Nouveau Serveur Mock"
+    "newMockServer": "Nouveau Serveur Mock",
+    "runningServers": "Serveurs actifs"
   },
   "monitor": {
     "selectCollection": "Sélectionner une collection",
@@ -558,7 +559,18 @@
     "webhookOptional": "URL de webhook (facultatif)",
     "noneConfigured": "Aucun moniteur configuré",
     "notifyOnFailure": "Notifier en cas d'échec",
-    "selectToView": "Sélectionnez un moniteur pour voir les résultats"
+    "selectToView": "Sélectionnez un moniteur pour voir les résultats",
+    "collection": "Collection",
+    "namePlaceholder": "Nom du moniteur",
+    "results": "Résultats",
+    "noResults": "Aucun résultat pour l'instant — en attente de la première exécution",
+    "runs": "{{count}} exécutions",
+    "time": "Heure",
+    "status": "Statut",
+    "requests": "Requêtes",
+    "passed": "Réussis",
+    "failed": "Échoués",
+    "duration": "Durée"
   },
   "docs": {
     "title": "Documentation API",
@@ -798,7 +810,19 @@
     "commitPlaceholder": "Message de commit...",
     "commit": "Commit ({{count}})",
     "history": "Historique ({{count}})",
-    "noCommits": "Aucun commit pour l'instant"
+    "noCommits": "Aucun commit pour l'instant",
+    "openFolder": "Ouvrir un autre dossier…",
+    "config": "Configuration Git",
+    "repository": "Dépôt",
+    "remote": "Distant",
+    "noRemote": "Non configuré",
+    "branchLabel": "Branche",
+    "removeConfig": "Supprimer la configuration Git",
+    "removeConfigConfirm": "Supprime le répertoire .git de « {{name}} ». Les fichiers de la collection sont conservés, mais l'historique des commits est perdu.",
+    "configRemoved": "Configuration Git supprimée",
+    "setRemote": "Définir l'URL distante",
+    "remoteSaved": "URL distante enregistrée",
+    "remoteDialogDesc": "Saisissez une URL HTTPS ou SSH. L'enregistrement pointe origin vers cette URL."
   },
 
   "terminal": {

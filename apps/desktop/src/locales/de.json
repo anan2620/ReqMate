@@ -540,7 +540,8 @@
     "waitingForRequests": "Warte auf Anfragen an localhost:",
     "selectServer": "Wähle einen Server für Details",
     "createDesc": "Erstelle lokale Mock-Server aus deinen Sammlungen",
-    "newMockServer": "Neuer Mock-Server"
+    "newMockServer": "Neuer Mock-Server",
+    "runningServers": "Laufende Server"
   },
   "monitor": {
     "selectCollection": "Sammlung auswählen",
@@ -558,7 +559,18 @@
     "webhookOptional": "Webhook-URL (optional)",
     "noneConfigured": "Keine Monitore konfiguriert",
     "notifyOnFailure": "Bei Fehler benachrichtigen",
-    "selectToView": "Wähle einen Monitor, um Ergebnisse zu sehen"
+    "selectToView": "Wähle einen Monitor, um Ergebnisse zu sehen",
+    "collection": "Sammlung",
+    "namePlaceholder": "Name des Monitors",
+    "results": "Ergebnisse",
+    "noResults": "Noch keine Ergebnisse — warte auf den ersten Lauf",
+    "runs": "{{count}} Läufe",
+    "time": "Zeit",
+    "status": "Status",
+    "requests": "Anfragen",
+    "passed": "Bestanden",
+    "failed": "Fehlgeschlagen",
+    "duration": "Dauer"
   },
   "docs": {
     "title": "API-Dokumentation",
@@ -798,7 +810,19 @@
     "commitPlaceholder": "Commit-Nachricht...",
     "commit": "Commit ({{count}})",
     "history": "Verlauf ({{count}})",
-    "noCommits": "Noch keine Commits"
+    "noCommits": "Noch keine Commits",
+    "openFolder": "Anderen Ordner öffnen…",
+    "config": "Git-Konfiguration",
+    "repository": "Repository",
+    "remote": "Remote",
+    "noRemote": "Nicht konfiguriert",
+    "branchLabel": "Branch",
+    "removeConfig": "Git-Konfiguration löschen",
+    "removeConfigConfirm": "Löscht das .git-Verzeichnis von „{{name}}“. Die Dateien der Sammlung bleiben erhalten, die Commit-Historie geht verloren.",
+    "configRemoved": "Git-Konfiguration gelöscht",
+    "setRemote": "Remote-URL festlegen",
+    "remoteSaved": "Remote-URL gespeichert",
+    "remoteDialogDesc": "HTTPS- oder SSH-URL eingeben. Beim Speichern zeigt origin auf diese URL."
   },
 
   "terminal": {

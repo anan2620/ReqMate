@@ -18,6 +18,8 @@ export type ActivityView = "collections" | "environments" | "history" | "git" | 
 
 interface ActivityBarProps {
   activeView: ActivityView;
+  /** Tool surface currently replacing the editor area, if any */
+  surface?: "mock" | "monitor" | null;
   onViewChange: (view: ActivityView) => void;
   onOpenSettings: () => void;
   onOpenAi: () => void;
@@ -41,12 +43,21 @@ const BOTTOM_ITEMS: { id: ActivityView; icon: typeof Server; labelKey: string }[
 
 export function ActivityBar({
   activeView,
+  surface,
   onViewChange,
   onOpenSettings,
   onOpenAi,
   onToggleTerminal,
 }: ActivityBarProps) {
   const { t } = useTranslation();
+  // Mock/health are full-surface tools: while one owns the work area it is the
+  // only highlighted entry, and the sidebar view it replaced stays dark.
+  const isActive = (id: ActivityView) => {
+    if (surface) return id === surface;
+    if (id === "mock" || id === "monitor") return false;
+    return activeView === id;
+  };
+
   return (
     <div className="relative flex w-[54px] shrink-0 flex-col items-center border-r border-[var(--color-border)] bg-[var(--color-activity-bar)] pb-3 pt-3.5">
       {/* Logo */}
@@ -69,7 +80,7 @@ export function ActivityBar({
             key={item.id}
             icon={item.icon}
             label={t(item.labelKey)}
-            active={activeView === item.id}
+            active={isActive(item.id)}
             onClick={() => onViewChange(item.id)}
           />
         ))}
@@ -84,7 +95,7 @@ export function ActivityBar({
             key={item.id}
             icon={item.icon}
             label={t(item.labelKey)}
-            active={activeView === item.id}
+            active={isActive(item.id)}
             onClick={() => onViewChange(item.id)}
           />
         ))}

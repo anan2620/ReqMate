@@ -4,21 +4,21 @@ import type { MockServerStatus, MockRequestLog } from "@reqmate/types";
 interface MockStore {
   servers: MockServerStatus[];
   logs: Record<string, MockRequestLog[]>; // keyed by server_id
-  dialogOpen: boolean;
+  /** Collection the right-hand mock panel is scoped to, when opened from a collection. */
+  pendingCollectionPath: string | null;
 
   setServers: (servers: MockServerStatus[]) => void;
   addServer: (server: MockServerStatus) => void;
   removeServer: (serverId: string) => void;
   addLog: (serverId: string, log: MockRequestLog) => void;
   clearLogs: (serverId: string) => void;
-  openDialog: () => void;
-  closeDialog: () => void;
+  setPendingCollectionPath: (path: string | null) => void;
 }
 
 export const useMockStore = create<MockStore>((set) => ({
   servers: [],
   logs: {},
-  dialogOpen: false,
+  pendingCollectionPath: null,
 
   setServers: (servers) => set({ servers }),
 
@@ -44,6 +44,5 @@ export const useMockStore = create<MockStore>((set) => ({
   clearLogs: (serverId) =>
     set((s) => ({ logs: { ...s.logs, [serverId]: [] } })),
 
-  openDialog: () => set({ dialogOpen: true }),
-  closeDialog: () => set({ dialogOpen: false }),
+  setPendingCollectionPath: (path) => set({ pendingCollectionPath: path }),
 }));

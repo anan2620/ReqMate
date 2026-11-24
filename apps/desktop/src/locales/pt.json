@@ -540,7 +540,8 @@
     "waitingForRequests": "Aguardando requisições em localhost:",
     "selectServer": "Selecione um servidor para ver detalhes",
     "createDesc": "Crie servidores mock locais a partir das suas coleções",
-    "newMockServer": "Novo Servidor Mock"
+    "newMockServer": "Novo Servidor Mock",
+    "runningServers": "Servidores em execução"
   },
   "monitor": {
     "selectCollection": "Selecionar coleção",
@@ -558,7 +559,18 @@
     "webhookOptional": "URL de webhook (opcional)",
     "noneConfigured": "Nenhum monitor configurado",
     "notifyOnFailure": "Notificar em caso de falha",
-    "selectToView": "Selecione um monitor para ver os resultados"
+    "selectToView": "Selecione um monitor para ver os resultados",
+    "collection": "Coleção",
+    "namePlaceholder": "Nome do monitor",
+    "results": "Resultados",
+    "noResults": "Nenhum resultado ainda — aguardando a primeira execução",
+    "runs": "{{count}} execuções",
+    "time": "Hora",
+    "status": "Status",
+    "requests": "Requisições",
+    "passed": "Aprovados",
+    "failed": "Falhas",
+    "duration": "Duração"
   },
   "docs": {
     "title": "Documentação API",
@@ -798,7 +810,19 @@
     "commitPlaceholder": "Mensagem do commit...",
     "commit": "Commit ({{count}})",
     "history": "Histórico ({{count}})",
-    "noCommits": "Nenhum commit ainda"
+    "noCommits": "Nenhum commit ainda",
+    "openFolder": "Abrir outra pasta…",
+    "config": "Configuração do Git",
+    "repository": "Repositório",
+    "remote": "Remoto",
+    "noRemote": "Não configurado",
+    "branchLabel": "Branch",
+    "removeConfig": "Excluir configuração do Git",
+    "removeConfigConfirm": "Exclui o diretório .git de \"{{name}}\". Os arquivos da coleção são mantidos, mas o histórico de commits é removido.",
+    "configRemoved": "Configuração do Git excluída",
+    "setRemote": "Definir URL remota",
+    "remoteSaved": "URL remota salva",
+    "remoteDialogDesc": "Informe uma URL HTTPS ou SSH. Ao salvar, o origin apontará para ela."
   },
 
   "terminal": {

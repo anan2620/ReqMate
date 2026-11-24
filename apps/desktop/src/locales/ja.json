@@ -540,7 +540,8 @@
     "waitingForRequests": "localhost でリクエストを待機中：",
     "selectServer": "サーバーを選択して詳細を表示",
     "createDesc": "コレクションからローカル Mock サーバーを作成",
-    "newMockServer": "新しい Mock サーバー"
+    "newMockServer": "新しい Mock サーバー",
+    "runningServers": "実行中のサーバー"
   },
   "monitor": {
     "selectCollection": "コレクションを選択",
@@ -558,7 +559,18 @@
     "webhookOptional": "Webhook URL（任意）",
     "noneConfigured": "モニターが設定されていません",
     "notifyOnFailure": "失敗時に通知",
-    "selectToView": "モニターを選択して結果を表示"
+    "selectToView": "モニターを選択して結果を表示",
+    "collection": "コレクション",
+    "namePlaceholder": "モニター名",
+    "results": "結果",
+    "noResults": "結果はまだありません — 最初の実行を待っています",
+    "runs": "{{count}} 回実行",
+    "time": "時刻",
+    "status": "ステータス",
+    "requests": "リクエスト",
+    "passed": "成功",
+    "failed": "失敗",
+    "duration": "所要時間"
   },
   "docs": {
     "title": "API ドキュメント",
@@ -798,7 +810,19 @@
     "commitPlaceholder": "コミットメッセージ…",
     "commit": "コミット ({{count}})",
     "history": "履歴 ({{count}})",
-    "noCommits": "コミットはまだありません"
+    "noCommits": "コミットはまだありません",
+    "openFolder": "別のフォルダーを開く…",
+    "config": "Git 設定",
+    "repository": "リポジトリ",
+    "remote": "リモート",
+    "noRemote": "未設定",
+    "branchLabel": "ブランチ",
+    "removeConfig": "Git 設定を削除",
+    "removeConfigConfirm": "「{{name}}」の .git ディレクトリを削除します。コレクションのファイルは残りますが、コミット履歴は失われます。",
+    "configRemoved": "Git 設定を削除しました",
+    "setRemote": "リモート URL を設定",
+    "remoteSaved": "リモート URL を保存しました",
+    "remoteDialogDesc": "HTTPS または SSH の URL を入力します。保存すると origin がこの URL を指します。"
   },
 
   "terminal": {

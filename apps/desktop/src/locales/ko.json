@@ -540,7 +540,8 @@
     "waitingForRequests": "localhost에서 요청 대기 중:",
     "selectServer": "서버를 선택하여 상세 정보 보기",
     "createDesc": "컬렉션에서 로컬 Mock 서버를 만드세요",
-    "newMockServer": "새 Mock 서버"
+    "newMockServer": "새 Mock 서버",
+    "runningServers": "실행 중인 서버"
   },
   "monitor": {
     "selectCollection": "컬렉션 선택",
@@ -558,7 +559,18 @@
     "webhookOptional": "Webhook URL(선택)",
     "noneConfigured": "구성된 모니터가 없습니다",
     "notifyOnFailure": "실패 시 알림",
-    "selectToView": "모니터를 선택해 결과 보기"
+    "selectToView": "모니터를 선택해 결과 보기",
+    "collection": "컬렉션",
+    "namePlaceholder": "모니터 이름",
+    "results": "결과",
+    "noResults": "아직 결과가 없습니다 — 첫 실행을 기다리는 중",
+    "runs": "{{count}}회 실행",
+    "time": "시간",
+    "status": "상태",
+    "requests": "요청 수",
+    "passed": "통과",
+    "failed": "실패",
+    "duration": "소요 시간"
   },
   "docs": {
     "title": "API 문서",
@@ -798,7 +810,19 @@
     "commitPlaceholder": "커밋 메시지…",
     "commit": "커밋 ({{count}})",
     "history": "기록 ({{count}})",
-    "noCommits": "아직 커밋이 없습니다"
+    "noCommits": "아직 커밋이 없습니다",
+    "openFolder": "다른 폴더 열기…",
+    "config": "Git 설정",
+    "repository": "저장소",
+    "remote": "원격",
+    "noRemote": "설정되지 않음",
+    "branchLabel": "브랜치",
+    "removeConfig": "Git 설정 삭제",
+    "removeConfigConfirm": "「{{name}}」의 .git 디렉터리를 삭제합니다. 컬렉션 파일은 유지되지만 커밋 기록은 사라집니다.",
+    "configRemoved": "Git 설정을 삭제했습니다",
+    "setRemote": "원격 URL 설정",
+    "remoteSaved": "원격 URL을 저장했습니다",
+    "remoteDialogDesc": "HTTPS 또는 SSH URL을 입력하세요. 저장하면 origin이 이 URL을 가리킵니다."
   },
 
   "terminal": {

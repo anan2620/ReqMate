@@ -18,8 +18,7 @@ import { useCollectionStore } from "@/stores/collection-store";
 import { useEnvironmentStore } from "@/stores/environment-store";
 import { useConsoleStore } from "@/stores/console-store";
 import { useDiffStore } from "@/stores/diff-store";
-import { useMockStore } from "@/stores/mock-store";
-import { useMonitorStore } from "@/stores/monitor-store";
+import { useRightPanelStore } from "@/stores/right-panel-store";
 import { useDocsStore } from "@/stores/docs-store";
 import { exportCollectionToFile } from "@/lib/export-collection";
 import type { CollectionNode, ExportFormat } from "@reqmate/types";
@@ -153,7 +152,7 @@ export function CommandPalette({
       label: t("commandPalette.mockServers"),
       category: t("commandPalette.general"),
       icon: Radio,
-      action: () => { useMockStore.getState().openDialog(); onOpenChange(false); },
+      action: () => { useRightPanelStore.getState().open("mock"); onOpenChange(false); },
     });
 
     cmds.push({
@@ -161,7 +160,7 @@ export function CommandPalette({
       label: t("commandPalette.scheduledMonitors"),
       category: t("commandPalette.general"),
       icon: Play,
-      action: () => { useMonitorStore.getState().openDialog(); onOpenChange(false); },
+      action: () => { useRightPanelStore.getState().open("monitor"); onOpenChange(false); },
     });
 
     if (collections.length > 0) {

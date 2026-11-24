@@ -22,16 +22,12 @@ import { DocsPanel } from "@/components/docs/docs-panel";
 interface SidePanelProps {
   activeView: ActivityView;
   envSelectorRef?: React.RefObject<HTMLButtonElement | null>;
-  onOpenMock?: () => void;
-  onOpenMonitor?: () => void;
   onOpenImport?: () => void;
 }
 
 export function SidePanel({
   activeView,
   envSelectorRef,
-  onOpenMock,
-  onOpenMonitor,
   onOpenImport,
 }: SidePanelProps) {
   const { t } = useTranslation();
@@ -71,8 +67,6 @@ export function SidePanel({
         {activeView === "collections" && <CollectionsPanel onOpenImport={onOpenImport} />}
         {activeView === "environments" && <EnvironmentsPanel envSelectorRef={envSelectorRef} />}
         {activeView === "history" && <HistoryPanel />}
-        {activeView === "mock" && <ToolPanel description={t("mock.createDesc")} actionLabel={t("mock.newMockServer")} onAction={onOpenMock} />}
-        {activeView === "monitor" && <ToolPanel description={t("monitor.createDesc")} actionLabel={t("monitor.newMonitor")} onAction={onOpenMonitor} />}
         {activeView === "docs" && <DocsPanel />}
         {activeView === "proxy" && <ProxySidePanelView />}
         {activeView === "git" && <GitPanelView />}
@@ -1128,27 +1122,5 @@ function NewEnvironmentDialog({
         </Dialog.Content>
       </Dialog.Portal>
     </Dialog.Root>
-  );
-}
-
-function ToolPanel({
-  description,
-  actionLabel,
-  onAction,
-}: {
-  description: string;
-  actionLabel: string;
-  onAction?: () => void;
-}) {
-  return (
-    <div className="flex flex-col items-center gap-3 px-4 py-8 text-center">
-      <p className="text-sm text-[var(--color-text-secondary)]">{description}</p>
-      <button
-        onClick={onAction}
-        className="rounded-lg bg-[var(--color-accent)] px-4 py-2 text-xs font-medium text-white transition-all hover:brightness-110 active:scale-[0.98]"
-      >
-        {actionLabel}
-      </button>
-    </div>
   );
 }

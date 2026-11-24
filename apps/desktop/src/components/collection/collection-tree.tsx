@@ -5,6 +5,7 @@ import type { CollectionNode, CollectionDefaults, HttpMethod } from "@reqmate/ty
 import { useCollectionStore } from "@/stores/collection-store";
 import { useTabStore } from "@/stores/tab-store";
 import { useMockStore } from "@/stores/mock-store";
+import { useRightPanelStore } from "@/stores/right-panel-store";
 import { useDocsStore } from "@/stores/docs-store";
 import {
   ChevronRight,
@@ -759,7 +760,8 @@ function TreeNodeRow({
                     icon: Radio,
                     onClick: () => {
                       closeContextMenu();
-                      useMockStore.getState().openDialog();
+                      useMockStore.getState().setPendingCollectionPath(node.path);
+                      useRightPanelStore.getState().open("mock");
                     },
                   },
                   {

@@ -540,7 +540,8 @@
     "waitingForRequests": "Esperando solicitudes en localhost:",
     "selectServer": "Selecciona un servidor para ver detalles",
     "createDesc": "Crea servidores mock locales desde tus colecciones",
-    "newMockServer": "Nuevo Servidor Mock"
+    "newMockServer": "Nuevo Servidor Mock",
+    "runningServers": "Servidores en ejecución"
   },
   "monitor": {
     "selectCollection": "Seleccionar colección",
@@ -558,7 +559,18 @@
     "webhookOptional": "URL de webhook (opcional)",
     "noneConfigured": "No hay monitores configurados",
     "notifyOnFailure": "Notificar si falla",
-    "selectToView": "Selecciona un monitor para ver resultados"
+    "selectToView": "Selecciona un monitor para ver resultados",
+    "collection": "Colección",
+    "namePlaceholder": "Nombre del monitor",
+    "results": "Resultados",
+    "noResults": "Aún no hay resultados — esperando la primera ejecución",
+    "runs": "{{count}} ejecuciones",
+    "time": "Hora",
+    "status": "Estado",
+    "requests": "Solicitudes",
+    "passed": "Correctos",
+    "failed": "Fallidos",
+    "duration": "Duración"
   },
   "docs": {
     "title": "Documentación API",
@@ -798,7 +810,19 @@
     "commitPlaceholder": "Mensaje del commit...",
     "commit": "Commit ({{count}})",
     "history": "Historial ({{count}})",
-    "noCommits": "Aún no hay commits"
+    "noCommits": "Aún no hay commits",
+    "openFolder": "Abrir otra carpeta…",
+    "config": "Configuración de Git",
+    "repository": "Repositorio",
+    "remote": "Remoto",
+    "noRemote": "Sin configurar",
+    "branchLabel": "Rama",
+    "removeConfig": "Eliminar configuración de Git",
+    "removeConfigConfirm": "Elimina el directorio .git de «{{name}}». Los archivos de la colección se conservan, pero se pierde el historial de commits.",
+    "configRemoved": "Configuración de Git eliminada",
+    "setRemote": "Establecer URL remota",
+    "remoteSaved": "URL remota guardada",
+    "remoteDialogDesc": "Introduce una URL HTTPS o SSH. Al guardar, origin apuntará a ella."
   },
 
   "terminal": {

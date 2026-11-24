@@ -540,7 +540,8 @@
     "waitingForRequests": "等待 localhost 上的请求：",
     "selectServer": "选择服务器查看详情",
     "createDesc": "从集合创建本地 Mock 服务器",
-    "newMockServer": "新建 Mock 服务器"
+    "newMockServer": "新建 Mock 服务器",
+    "runningServers": "运行中的服务器"
   },
   "monitor": {
     "selectCollection": "选择集合",
@@ -558,7 +559,18 @@
     "webhookOptional": "Webhook 地址（可选）",
     "noneConfigured": "还没有监控任务",
     "notifyOnFailure": "失败时通知",
-    "selectToView": "选择一个监控任务查看结果"
+    "selectToView": "选择一个监控任务查看结果",
+    "collection": "集合",
+    "namePlaceholder": "监控名称",
+    "results": "运行结果",
+    "noResults": "暂无结果，等待首次运行",
+    "runs": "{{count}} 次运行",
+    "time": "时间",
+    "status": "状态",
+    "requests": "请求数",
+    "passed": "通过",
+    "failed": "失败",
+    "duration": "耗时"
   },
   "docs": {
     "title": "API 文档",
@@ -798,7 +810,19 @@
     "commitPlaceholder": "提交信息…",
     "commit": "提交 ({{count}})",
     "history": "历史记录 ({{count}})",
-    "noCommits": "暂无提交"
+    "noCommits": "暂无提交",
+    "openFolder": "打开其他文件夹…",
+    "config": "Git 配置",
+    "repository": "仓库路径",
+    "remote": "远程地址",
+    "noRemote": "未配置",
+    "branchLabel": "分支",
+    "removeConfig": "删除 Git 配置",
+    "removeConfigConfirm": "将删除「{{name}}」的 .git 目录。集合中的接口文件不会被删除，但提交历史会被移除。",
+    "configRemoved": "已删除 Git 配置",
+    "setRemote": "设置远程地址",
+    "remoteSaved": "已保存远程地址",
+    "remoteDialogDesc": "填写 HTTPS 或 SSH 地址，保存后写入 origin 远程。"
   },
 
   "terminal": {

@@ -5,6 +5,7 @@ import { useEnvironmentStore } from "@/stores/environment-store";
 import { useCollectionStore } from "@/stores/collection-store";
 import { useMockStore } from "@/stores/mock-store";
 import { useMonitorStore } from "@/stores/monitor-store";
+import { useRightPanelStore } from "@/stores/right-panel-store";
 import { useSettingsStore } from "@/stores/settings-store";
 import { useConsoleStore } from "@/stores/console-store";
 import {
@@ -86,16 +87,24 @@ export function StatusBar() {
           </span>
         )}
         {runningMocks > 0 && (
-          <span className="flex items-center gap-1.5 rounded-md px-1.5 py-1 text-[var(--color-success)]">
+          <button
+            onClick={() => useRightPanelStore.getState().open("mock")}
+            title={t("mock.title")}
+            className="flex items-center gap-1.5 rounded-md px-1.5 py-1 text-[var(--color-success)] transition-colors hover:bg-[color-mix(in_srgb,var(--color-text-primary)_6%,transparent)]"
+          >
             <Server className="h-3.5 w-3.5" />
             {runningMocks} mock{runningMocks !== 1 ? "s" : ""}
-          </span>
+          </button>
         )}
         {activeMonitors > 0 && (
-          <span className="flex items-center gap-1.5 rounded-md px-1.5 py-1 text-[var(--color-success)]">
+          <button
+            onClick={() => useRightPanelStore.getState().open("monitor")}
+            title={t("monitor.title")}
+            className="flex items-center gap-1.5 rounded-md px-1.5 py-1 text-[var(--color-success)] transition-colors hover:bg-[color-mix(in_srgb,var(--color-text-primary)_6%,transparent)]"
+          >
             <Activity className="h-3.5 w-3.5" />
             {activeMonitors} monitor{activeMonitors !== 1 ? "s" : ""}
-          </span>
+          </button>
         )}
       </div>
 

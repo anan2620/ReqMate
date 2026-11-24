@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback, useRef, lazy, Suspense } from "react";
 import { ActivityBar, type ActivityView } from "@/components/layout/activity-bar";
 import { SidePanel } from "@/components/layout/side-panel";
+import { ToolSurface } from "@/components/layout/tool-surface";
 import { TabBar } from "@/components/tabs/tab-bar";
 import { UrlBar } from "@/components/request/url-bar";
 import { RequestPanel } from "@/components/request/request-panel";
@@ -22,8 +23,7 @@ import { useTheme } from "@/hooks/use-theme";
 import { useAutoSave } from "@/hooks/use-auto-save";
 import { useFileWatcher } from "@/hooks/use-file-watcher";
 import { useDocsStore } from "@/stores/docs-store";
-import { useMockStore } from "@/stores/mock-store";
-import { useMonitorStore } from "@/stores/monitor-store";
+import { useRightPanelStore } from "@/stores/right-panel-store";
 import { WelcomeScreen } from "@/components/onboarding/welcome-screen";
 import { GuidedTour } from "@/components/onboarding/guided-tour";
 import { BottomPanel } from "@/components/layout/bottom-panel";
@@ -44,8 +44,8 @@ const CurlImportDialog = lazy(() => import("@/components/request/curl-import-dia
 const CollectionRunnerDialog = lazy(() => import("@/components/runner/collection-runner-dialog").then(m => ({ default: m.CollectionRunnerDialog })));
 const ImportDialog = lazy(() => import("@/components/import/import-dialog").then(m => ({ default: m.ImportDialog })));
 const ResponseDiffDialog = lazy(() => import("@/components/response/response-diff-dialog").then(m => ({ default: m.ResponseDiffDialog })));
-const MockServerDialog = lazy(() => import("@/components/mock/mock-server-dialog").then(m => ({ default: m.MockServerDialog })));
-const MonitorDialog = lazy(() => import("@/components/scheduler/monitor-dialog").then(m => ({ default: m.MonitorDialog })));
+const MockServerPanel = lazy(() => import("@/components/mock/mock-server-panel").then(m => ({ default: m.MockServerPanel })));
+const MonitorPanel = lazy(() => import("@/components/scheduler/monitor-panel").then(m => ({ default: m.MonitorPanel })));
 const DocsPreviewDialog = lazy(() => import("@/components/docs/docs-preview-dialog").then(m => ({ default: m.DocsPreviewDialog })));
 const AiAssistantDialog = lazy(() => import("@/components/ai/ai-assistant-dialog").then(m => ({ default: m.AiAssistantDialog })));
 const SaveAsDialog = lazy(() => import("@/components/request/save-as-dialog").then(m => ({ default: m.SaveAsDialog })));
@@ -70,6 +70,7 @@ function App() {
   const [saveAsOpen, setSaveAsOpen] = useState(false);
   const [activeView, setActiveView] = useState<ActivityView>("collections");
   const [sidePanelVisible, setSidePanelVisible] = useState(true);
+  const rightPanel = useRightPanelStore((s) => s.kind);
   const [zenMode, setZenMode] = useState(false);
   const urlBarRef = useRef<HTMLInputElement>(null);
   const envSelectorRef = useRef<HTMLButtonElement>(null);
@@ -144,6 +145,14 @@ function App() {
 
   // Toggle side panel when clicking same activity view
   const handleViewChange = useCallback((view: ActivityView) => {
+    // Mock servers and monitors are full-surface tools: they take over the
+    // editor area instead of opening a tool page in the sidebar, so clicking
+    // their entry toggles the surface and leaves the sidebar untouched.
+    if (view === "mock" || view === "monitor") {
+      useRightPanelStore.getState().toggle(view);
+      return;
+    }
+    useRightPanelStore.getState().close();
     if (view === activeView && sidePanelVisible) {
       setSidePanelVisible(false);
     } else {
@@ -307,6 +316,7 @@ function App() {
         {!zenMode && (
           <ActivityBar
             activeView={activeView}
+            surface={rightPanel}
             onViewChange={handleViewChange}
             onOpenSettings={openSettings}
             onOpenAi={() => setAiOpen(true)}
@@ -314,13 +324,11 @@ function App() {
           />
         )}
 
-        {/* Side Panel */}
-        {!zenMode && sidePanelVisible && !isCompact && (
+        {/* Side Panel — hidden while a tool surface owns the work area */}
+        {!zenMode && sidePanelVisible && !isCompact && !rightPanel && (
           <SidePanel
             activeView={activeView}
             envSelectorRef={envSelectorRef}
-            onOpenMock={() => useMockStore.getState().openDialog()}
-            onOpenMonitor={() => useMonitorStore.getState().openDialog()}
             onOpenImport={() => setImportOpen(true)}
           />
         )}
@@ -328,10 +336,26 @@ function App() {
         {/* Main Panel */}
         <main id="main-content" className="flex flex-1 flex-col overflow-hidden bg-[var(--color-card)]" role="main">
           {/* Tab Bar — hidden for full-surface views that replace the request editor */}
-          {!zenMode && activeView !== "proxy" && <TabBar />}
+          {!zenMode && activeView !== "proxy" && !rightPanel && <TabBar />}
 
           {activeView === "proxy" ? (
             <ProxyCaptureViewer />
+          ) : rightPanel ? (
+            /* Mock / monitor surface — replaces the editor instead of sitting beside it */
+            <ToolSurface
+              title={rightPanel === "mock" ? t("mock.title") : t("monitor.title")}
+              description={rightPanel === "mock" ? t("mock.createDesc") : t("monitor.createDesc")}
+            >
+              <Suspense
+                fallback={
+                  <div className="p-3 text-xs text-[var(--color-text-dimmed)]">
+                    {t("common.loading")}
+                  </div>
+                }
+              >
+                {rightPanel === "mock" ? <MockServerPanel /> : <MonitorPanel />}
+              </Suspense>
+            </ToolSurface>
           ) : activeTab ? (
             <ProtocolView protocol={activeTab.protocol} urlBarRef={urlBarRef} />
           ) : (
@@ -393,8 +417,6 @@ function App() {
         <ImportDialog open={importOpen} onOpenChange={setImportOpen} />
         <AiAssistantDialog open={aiOpen} onOpenChange={setAiOpen} />
         <ResponseDiffDialog />
-        <MockServerDialog />
-        <MonitorDialog />
         <DocsDialogWrapper />
       </Suspense>
       <CommandPalette

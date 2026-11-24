@@ -4,7 +4,6 @@ import type { MonitorStatus, MonitorResult } from "@reqmate/types";
 interface MonitorStore {
   monitors: MonitorStatus[];
   results: Record<string, MonitorResult[]>; // keyed by monitor_id
-  dialogOpen: boolean;
   selectedMonitorId: string | null;
 
   setMonitors: (monitors: MonitorStatus[]) => void;
@@ -14,14 +13,11 @@ interface MonitorStore {
   setResults: (monitorId: string, results: MonitorResult[]) => void;
   addResult: (monitorId: string, result: MonitorResult) => void;
   selectMonitor: (monitorId: string | null) => void;
-  openDialog: () => void;
-  closeDialog: () => void;
 }
 
 export const useMonitorStore = create<MonitorStore>((set) => ({
   monitors: [],
   results: {},
-  dialogOpen: false,
   selectedMonitorId: null,
 
   setMonitors: (monitors) => set({ monitors }),
@@ -52,6 +48,4 @@ export const useMonitorStore = create<MonitorStore>((set) => ({
     }),
 
   selectMonitor: (monitorId) => set({ selectedMonitorId: monitorId }),
-  openDialog: () => set({ dialogOpen: true }),
-  closeDialog: () => set({ dialogOpen: false }),
 }));

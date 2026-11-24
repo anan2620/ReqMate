@@ -540,7 +540,8 @@
     "waitingForRequests": "في انتظار الطلبات على localhost:",
     "selectServer": "اختر خادماً لعرض التفاصيل",
     "createDesc": "أنشئ خوادم Mock محلية من مجموعاتك",
-    "newMockServer": "خادم Mock جديد"
+    "newMockServer": "خادم Mock جديد",
+    "runningServers": "الخوادم قيد التشغيل"
   },
   "monitor": {
     "selectCollection": "اختر مجموعة",
@@ -558,7 +559,18 @@
     "webhookOptional": "عنوان Webhook (اختياري)",
     "noneConfigured": "لا توجد مراقبات مُهيّأة",
     "notifyOnFailure": "إشعار عند الفشل",
-    "selectToView": "اختر مراقبة لعرض النتائج"
+    "selectToView": "اختر مراقبة لعرض النتائج",
+    "collection": "مجموعة",
+    "namePlaceholder": "اسم المراقب",
+    "results": "النتائج",
+    "noResults": "لا توجد نتائج بعد — في انتظار أول تشغيل",
+    "runs": "{{count}} تشغيل",
+    "time": "الوقت",
+    "status": "الحالة",
+    "requests": "الطلبات",
+    "passed": "ناجحة",
+    "failed": "فاشلة",
+    "duration": "المدة"
   },
   "docs": {
     "title": "وثائق API",
@@ -798,7 +810,19 @@
     "commitPlaceholder": "رسالة الالتزام...",
     "commit": "التزام ({{count}})",
     "history": "السجل ({{count}})",
-    "noCommits": "لا توجد التزامات بعد"
+    "noCommits": "لا توجد التزامات بعد",
+    "openFolder": "فتح مجلد آخر…",
+    "config": "إعدادات Git",
+    "repository": "المستودع",
+    "remote": "الخادم البعيد",
+    "noRemote": "غير مُعد",
+    "branchLabel": "الفرع",
+    "removeConfig": "حذف إعدادات Git",
+    "removeConfigConfirm": "يحذف مجلد .git الخاص بـ «{{name}}». تُحفظ ملفات المجموعة، لكن سجل الالتزامات يُفقد.",
+    "configRemoved": "تم حذف إعدادات Git",
+    "setRemote": "تعيين عنوان الخادم البعيد",
+    "remoteSaved": "تم حفظ عنوان الخادم البعيد",
+    "remoteDialogDesc": "أدخل عنوان HTTPS أو SSH. عند الحفظ سيشير origin إلى هذا العنوان."
   },
 
   "terminal": {

@@ -540,7 +540,8 @@
     "waitingForRequests": "Waiting for requests on localhost:",
     "selectServer": "Select a server to view details",
     "createDesc": "Create local mock servers from your collections",
-    "newMockServer": "New Mock Server"
+    "newMockServer": "New Mock Server",
+    "runningServers": "Running servers"
   },
   "monitor": {
     "selectCollection": "Select a collection",
@@ -558,7 +559,18 @@
     "webhookOptional": "Webhook URL (optional)",
     "noneConfigured": "No monitors configured",
     "notifyOnFailure": "Notify on failure",
-    "selectToView": "Select a monitor to view results"
+    "selectToView": "Select a monitor to view results",
+    "collection": "Collection",
+    "namePlaceholder": "Monitor name",
+    "results": "Results",
+    "noResults": "No results yet — waiting for the first run",
+    "runs": "{{count}} runs",
+    "time": "Time",
+    "status": "Status",
+    "requests": "Requests",
+    "passed": "Passed",
+    "failed": "Failed",
+    "duration": "Duration"
   },
   "docs": {
     "title": "API Documentation",
@@ -798,7 +810,19 @@
     "commitPlaceholder": "Commit message...",
     "commit": "Commit ({{count}})",
     "history": "History ({{count}})",
-    "noCommits": "No commits yet"
+    "noCommits": "No commits yet",
+    "openFolder": "Open another folder…",
+    "config": "Git config",
+    "repository": "Repository",
+    "remote": "Remote",
+    "noRemote": "Not configured",
+    "branchLabel": "Branch",
+    "removeConfig": "Delete Git config",
+    "removeConfigConfirm": "This deletes the .git directory of \"{{name}}\". Collection files are kept, but the commit history is removed.",
+    "configRemoved": "Git config deleted",
+    "setRemote": "Set remote URL",
+    "remoteSaved": "Remote URL saved",
+    "remoteDialogDesc": "Enter an HTTPS or SSH URL. Saving points the origin remote at it."
   },
 
   "terminal": {
